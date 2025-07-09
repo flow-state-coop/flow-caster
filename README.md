@@ -1,6 +1,4 @@
-# flow viz
-
-# Farcaster Mini App Template
+# Flow Caster
 
 This is a [Next.js](https://nextjs.org) starter kit to boostrap your Farcaster Mini App
 
