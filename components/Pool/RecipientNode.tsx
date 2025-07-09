@@ -44,7 +44,7 @@ export default function RecipientNode({
           cy={y}
           r={radius}
           strokeWidth="2"
-          className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer stroke-secondary-800 fill-primary-800"
+          className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer stroke-primary-800 fill-primary-800"
         />
       </g>
     </Tippy>

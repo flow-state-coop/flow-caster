@@ -33,7 +33,7 @@ export default function DonorNode({
           cy={y}
           r={radius}
           strokeWidth="2"
-          className="opacity-90 hover:opacity-100 transition-opacity cursor-pointer stroke-accent-800 fill-accent-200"
+          className="opacity-9100 cursor-pointer stroke-secondary-800 fill-secondary-800"
         />
       </g>
     </Tippy>

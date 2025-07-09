@@ -24,9 +24,9 @@ const sampleRecipients75 = Array.from({ length: 75 }, (_, i) => ({
 }));
 
 const sampleDonors = [
-  { accountId: "0xd1" },
-  { accountId: "0xd2" },
-  { accountId: "0xd3" },
+  { accountId: "0xd1", rate: "0.001" },
+  { accountId: "0xd2", rate: "0.002" },
+  { accountId: "0xd3", rate: ".003" },
 ];
 
 export default function PoolCircle() {
@@ -108,9 +108,9 @@ export default function PoolCircle() {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
-      boxShadow: "0 0 32px 8px #a78bfa",
-      filter: "drop-shadow(0 0 16px #a78bfa)",
-      stroke: "#a78bfa",
+      boxShadow: "0 0 32px 8px #e3653b",
+      filter: "drop-shadow(0 0 16px #e3653b)",
+      stroke: "#e3653b",
       strokeWidth: 8,
       opacity: 1,
       ease: "power1.inOut",
@@ -120,8 +120,8 @@ export default function PoolCircle() {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
-      filter: "drop-shadow(0 0 12px #a78bfa)",
-      stroke: "#a78bfa",
+      filter: "drop-shadow(0 0 12px #e3653b)",
+      stroke: "#e3653b",
       strokeWidth: 12,
       opacity: 1,
       ease: "power1.inOut",
@@ -132,11 +132,21 @@ export default function PoolCircle() {
   const poolParticles = Array.from({ length: 10 });
   const poolParticleRefs = useRef<(SVGCircleElement | null)[]>([]);
   const poolParticleColors = [
-    "#a78bfa", // purple
-    "#38bdf8", // blue
-    "#2dd4bf", // teal
-    "#4ade80", // green
-    "#f472b6", // pink
+    "#fdf4f1", // purple
+    "#f7d3c7", // blue
+    "#eb9173", // teal
+    "#e3653b", // green
+    "#c54a2a", // pink
+  ];
+
+  // Second set of particles (different speed)
+  const poolParticles2 = Array.from({ length: 8 });
+  const poolParticleRefs2 = useRef<(SVGCircleElement | null)[]>([]);
+  const poolParticleColors2 = [
+    "#fef3c7", // yellow
+    "#fbbf24", // amber
+    "#f59e0b", // orange
+    "#d97706", // deep orange
   ];
 
   useEffect(() => {
@@ -149,6 +159,30 @@ export default function PoolCircle() {
           angle: (2 * Math.PI * i) / poolParticles.length + 2 * Math.PI,
           repeat: -1,
           duration: 3,
+          ease: "linear",
+          onUpdate: function () {
+            const angle = this.targets()[0].angle;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            if (ref) {
+              ref.setAttribute("cx", x.toString());
+              ref.setAttribute("cy", y.toString());
+            }
+          },
+        }
+      );
+    });
+
+    // Second set of particles (slower)
+    poolParticles2.forEach((_, i) => {
+      const ref = poolParticleRefs2.current[i];
+      if (!ref) return;
+      gsap.to(
+        { angle: (2 * Math.PI * i) / poolParticles2.length },
+        {
+          angle: (2 * Math.PI * i) / poolParticles2.length + 2 * Math.PI,
+          repeat: -1,
+          duration: 6, // 2x slower
           ease: "linear",
           onUpdate: function () {
             const angle = this.targets()[0].angle;
@@ -204,6 +238,16 @@ export default function PoolCircle() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const poolEdgeX = centerX - (dx / dist) * radius;
           const poolEdgeY = centerY - (dy / dist) * radius;
+
+          // Determine rate string based on donor rate
+          const rateNum = parseFloat(donor.rate);
+          let rateString = "small";
+          if (rateNum >= 0.003) {
+            rateString = "large";
+          } else if (rateNum >= 0.002) {
+            rateString = "medium";
+          }
+
           return (
             <FlowLine
               key={donor.accountId}
@@ -211,6 +255,7 @@ export default function PoolCircle() {
               y1={y}
               x2={poolEdgeX}
               y2={poolEdgeY}
+              rate={rateString}
             />
           );
         })}
@@ -263,6 +308,27 @@ export default function PoolCircle() {
               fill={color}
               opacity={0.85}
               filter={`drop-shadow(0 0 8px ${color})`}
+            />
+          );
+        })}
+        {/* Second set of pool particles (slower) */}
+        {poolParticles2.map((_, i) => {
+          const angle = (2 * Math.PI * i) / poolParticles2.length;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          const color = poolParticleColors2[i % poolParticleColors2.length];
+          return (
+            <circle
+              key={`particle2-${i}`}
+              ref={(el) => {
+                poolParticleRefs2.current[i] = el || null;
+              }}
+              cx={x}
+              cy={y}
+              r={6} // Smaller size
+              fill={color}
+              opacity={0.7}
+              filter={`drop-shadow(0 0 6px ${color})`}
             />
           );
         })}

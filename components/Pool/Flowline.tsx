@@ -7,7 +7,7 @@ interface FlowLineProps {
   y1: number;
   x2: number;
   y2: number;
-  flowRate?: number; // Optional, for particle size/speed
+  rate?: string; // Flow rate from donor data
 }
 
 export default function FlowLine({
@@ -15,14 +15,27 @@ export default function FlowLine({
   y1,
   x2,
   y2,
-  flowRate = 1,
+  rate = "small",
 }: FlowLineProps) {
   const lineRef = useRef<SVGLineElement>(null);
   const particleRef = useRef<SVGCircleElement>(null);
 
+  // Determine size and speed based on rate
+  const getParticleConfig = (rate: string) => {
+    if (rate === "large") {
+      return { size: 12, speed: 0.8 }; // Large, fast
+    } else if (rate === "medium") {
+      return { size: 8, speed: 1.2 }; // Medium, medium
+    } else {
+      return { size: 4, speed: 1.8 }; // Small, slow
+    }
+  };
+
+  const config = getParticleConfig(rate);
+
   useEffect(() => {
     // Animate particle from donor to pool
-    const duration = 1.5 / flowRate; // Faster for higher flowRate
+    const duration = 1.5 / config.speed;
     gsap.fromTo(
       particleRef.current,
       { attr: { cx: x1, cy: y1 } },
@@ -37,10 +50,7 @@ export default function FlowLine({
         },
       }
     );
-  }, [x1, y1, x2, y2, flowRate]);
-
-  // Particle size based on flowRate
-  const particleRadius = 6 + Math.min(flowRate, 5) * 2;
+  }, [x1, y1, x2, y2, config.speed]);
 
   return (
     <g>
@@ -60,10 +70,10 @@ export default function FlowLine({
         ref={particleRef}
         cx={x1}
         cy={y1}
-        r={particleRadius}
-        fill="#a78bfa"
+        r={config.size}
+        fill="#D95D39"
         opacity={0.85}
-        filter="drop-shadow(0 0 8px #a78bfa)"
+        filter="drop-shadow(0 0 8px #D95D39)"
       />
     </g>
   );
