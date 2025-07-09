@@ -1,5 +1,6 @@
 "use client";
 import { useMiniApp } from "@/contexts/miniapp-context";
+import PoolCircle from "@/components/Pool/PoolCircle";
 
 export default function Home() {
   const { context } = useMiniApp();
@@ -11,9 +12,9 @@ export default function Home() {
       <h1 className="text-5xl mb-4 font-header text-secondary-800">
         Flow Splitter
       </h1>
-      <p>Cracked Farcaster Devs</p>
-      {/* <PoolCircle /> */}
+
       {context && <p className="text-xs">{context.user.displayName}</p>}
+      <PoolCircle />
     </main>
   );
 }
