@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { env } from "@/lib/env";
 import { loadGoogleFont, loadImage } from "@/lib/og-utils";
 import { ImageResponse } from "next/og";
@@ -66,6 +67,7 @@ export async function GET(
               marginBottom: "20px",
               borderRadius: "10px",
             }}
+            alt="logo"
           />
           {/* Display the example ID with custom styling */}
           <div

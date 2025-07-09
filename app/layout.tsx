@@ -1,13 +1,18 @@
 import Providers from "@/components/providers";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Archivo, Archivo_Black } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const bodyFont = Archivo({ subsets: ["latin"], variable: "--font-body" });
+const headerFont = Archivo_Black({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-header",
+});
 
 export const metadata: Metadata = {
-  title: "Farcaster Mini-app Starter",
-  description: "A starter for Farcaster mini-apps",
+  title: "Flow Splitter",
+  description: "Flow Splitter",
 };
 
 export default function RootLayout({
@@ -17,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${headerFont.variable} ${bodyFont.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>
