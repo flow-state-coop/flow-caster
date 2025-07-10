@@ -1,48 +1,62 @@
 "use client";
 import { useMemo, useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
+import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import FlowLine from "./Flowline";
 import gsap from "gsap";
+import { PoolData } from "@/hooks/use-pool-data";
+import { NeynarUser } from "@/lib/neynar";
+import { createDonorBuckets } from "@/lib/pool";
 
-const sampleRecipients8 = [
-  { accountId: "0x001", units: 1 },
-  { accountId: "0x002", units: 2 },
-  { accountId: "0x003", units: 1 },
-  { accountId: "0x004", units: 3 },
-  { accountId: "0x005", units: 1 },
-  { accountId: "0x006", units: 2 },
-  { accountId: "0x007", units: 1 },
-  { accountId: "0x008", units: 1 },
-];
+interface PoolCircleProps {
+  poolData?: PoolData;
+  connectedUser?: NeynarUser;
+  isLoading: boolean;
+  error: Error | null;
+}
 
-// Generate 75 recipients with random units (1-5)
-const sampleRecipients75 = Array.from({ length: 75 }, (_, i) => ({
-  accountId: `0x${(i + 1).toString().padStart(3, "0")}`,
-  units: Math.floor(Math.random() * 5) + 1,
-}));
-
-const sampleDonors = [
-  { accountId: "0xd1", rate: "0" },
-  { accountId: "0xd2", rate: "0.002" },
-  { accountId: "0xd3", rate: ".003" },
-];
-
-export default function PoolCircle() {
+export default function PoolCircle({
+  poolData,
+  connectedUser,
+  isLoading,
+  error,
+}: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
   const centerY = 150; // Move pool higher
 
-  const [donors, setDonors] = useState(sampleDonors);
-  const [useMany, setUseMany] = useState(false);
   const [streamOpened, setStreamOpened] = useState(false);
   const [streamOpenedCircle, setStreamOpenedCircle] = useState(false);
-  const recipients = useMany ? sampleRecipients75 : sampleRecipients8;
-  const totalUnits = recipients.reduce((sum, r) => sum + r.units, 0);
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
   const newParticleCircleRef = useRef<SVGCircleElement>(null);
+
+  // Transform pool data to component format
+  const recipients = useMemo(() => {
+    if (!poolData) return [];
+    return poolData.poolMembers.map((member) => ({
+      accountId: member.account.id,
+      units: parseInt(member.units),
+      farcasterUser: member.farcasterUser,
+    }));
+  }, [poolData]);
+
+  const donors = useMemo(() => {
+    if (!poolData) return [];
+    // return poolData.poolDistributors.map((distributor) => ({
+    //   accountId: distributor.account.id,
+    //   rate: distributor.flowRate,
+    //   farcasterUser: distributor.farcasterUser,
+    // }));
+
+    return createDonorBuckets(poolData.poolDistributors, connectedUser);
+  }, [poolData, connectedUser]);
+
+  const totalUnits = useMemo(() => {
+    return recipients.reduce((sum: number, r: any) => sum + r.units, 0);
+  }, [recipients]);
 
   useEffect(() => {
     // Calculate sizes first
@@ -154,6 +168,9 @@ export default function PoolCircle() {
   ];
 
   useEffect(() => {
+    // Only run particle animations when data is loaded
+    if (!poolData) return;
+
     poolParticles.forEach((_, i) => {
       const ref = poolParticleRefs.current[i];
       if (!ref) return;
@@ -201,20 +218,20 @@ export default function PoolCircle() {
       );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [centerX, centerY, radius]);
+  }, [poolData]);
 
   useEffect(() => {
     if (!streamOpenedCircle) return;
 
     // Calculate the starting angle based on where the particle is placed
     // We need to find which donor's flow line triggered this animation
-    const donor = donors.find((d) => d.accountId === "0xd1");
+    const donor = donors[0]; // First donor
     if (!donor) return;
 
     const donorY = centerY + radius + 150;
     const donorSpacing = 200;
     const donorStartX = centerX - donorSpacing;
-    const donorX = donorStartX + 0 * donorSpacing; // First donor (0xd1)
+    const donorX = donorStartX + 0 * donorSpacing; // First donor
     const donorY_pos = donorY;
 
     // Calculate intersection point on pool edge
@@ -231,9 +248,10 @@ export default function PoolCircle() {
       { angle: startAngle },
       {
         angle: startAngle + 2 * Math.PI,
-        repeat: -1,
+        repeat: 5,
         duration: 2,
         ease: "linear",
+        onComplete: handleOpenComplete,
         onUpdate: function () {
           const angle = this.targets()[0].angle;
           const x = centerX + radius * Math.cos(angle);
@@ -250,30 +268,53 @@ export default function PoolCircle() {
   }, [streamOpenedCircle]);
 
   const handleOpenStream = () => {
-    setDonors([
-      { accountId: "0xd1", rate: "0.001" },
-      { accountId: "0xd2", rate: "0.002" },
-      { accountId: "0xd3", rate: ".003" },
-    ]);
     setStreamOpened(true);
   };
+
+  const handleOpenComplete = () => {
+    gsap.to(newParticleCircleRef.current, {
+      opacity: 0,
+      duration: 1,
+      ease: "power2.out",
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        <p className="text-lg">Loading pool data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        <p className="text-lg text-red-500">
+          Failed to load pool data: {error.message}
+        </p>
+      </div>
+    );
+  }
+
+  if (!poolData) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        <p className="text-lg text-red-500">No pool data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="flex flex-row justify-between items-center w-full mb-4">
         <p className="text-sm font-bold">Cracked Farcaster Devs Pool</p>
-        <button
-          className="px-3 py-1 rounded bg-accent-800 text-white text-xs hover:bg-accent-700"
-          onClick={() => setUseMany((v) => !v)}
-        >
-          Toggle Flow
-        </button>
       </div>
       <svg
         width="400"
         height="500"
         viewBox="0 0 800 500"
-        className="bg-brand-light rounded-lg stroke-accent-800"
+        className="bg-black rounded-lg stroke-accent-800"
       >
         <circle
           ref={poolCircleRef}
@@ -304,40 +345,43 @@ export default function PoolCircle() {
           const poolEdgeX = centerX - (dx / dist) * radius;
           const poolEdgeY = centerY - (dy / dist) * radius;
 
-          // Determine rate string based on donor rate
+          // Determine rate string based on donor flow rate (normalize large numbers)
           let rateString = "small";
-          if (rateNum >= 0.003) {
+          const normalizedRate = rateNum / 1e15; // Normalize to reasonable range
+          if (normalizedRate >= 2) {
             rateString = "large";
-          } else if (rateNum >= 0.002) {
+          } else if (normalizedRate >= 1) {
             rateString = "medium";
           }
 
           return (
-            <>
+            <g key={donor.accountId}>
               <FlowLine
-                key={donor.accountId}
                 x1={x}
                 y1={y}
                 x2={poolEdgeX}
                 y2={poolEdgeY}
                 rate={rateString}
-                streamOpened={donor.accountId === "0xd1" && streamOpened}
+                streamOpened={
+                  donor.accountId === donors[0]?.accountId && streamOpened
+                }
                 setStreamOpenedCircle={setStreamOpenedCircle}
               />
-              {streamOpenedCircle && donor.accountId === "0xd1" && (
-                <circle
-                  ref={newParticleCircleRef}
-                  id="pool-outline-particle"
-                  cx={poolEdgeX}
-                  cy={poolEdgeY}
-                  r={45}
-                  strokeWidth={0}
-                  fill="#FFEA99"
-                  opacity={0.98}
-                  filter="blur(4px)"
-                />
-              )}
-            </>
+              {streamOpenedCircle &&
+                donor.accountId === donors[0]?.accountId && (
+                  <circle
+                    ref={newParticleCircleRef}
+                    id="pool-outline-particle"
+                    cx={poolEdgeX}
+                    cy={poolEdgeY}
+                    r={45}
+                    strokeWidth={0}
+                    fill="#FFEA99"
+                    opacity={0.98}
+                    filter="blur(4px)"
+                  />
+                )}
+            </g>
           );
         })}
         {/* Donor nodes in a row below the pool */}
@@ -355,6 +399,7 @@ export default function PoolCircle() {
               y={y}
               accountId={donor.accountId}
               radius={60}
+              farcasterUser={donor.farcasterUser}
             />
           );
         })}
@@ -369,6 +414,7 @@ export default function PoolCircle() {
             units={recipient.units}
             totalUnits={totalUnits}
             recipientCount={recipients.length}
+            farcasterUser={recipient.farcasterUser}
           />
         ))}
         {/* Pool circle particles */}

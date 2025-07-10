@@ -85,7 +85,7 @@ export const UserProvider = ({
 
   const handleSignIn = useCallback(async () => {
     try {
-      console.log("handleSignIn");
+      console.log("*** handleSignIn");
       setIsLoading(true);
       setError(null);
 
@@ -118,6 +118,7 @@ export const UserProvider = ({
   }, [context, signIn]);
 
   useEffect(() => {
+    console.log("*** can i?");
     if (context && !isSignedIn && !isLoading && autoSignIn && userError) {
       handleSignIn();
     }

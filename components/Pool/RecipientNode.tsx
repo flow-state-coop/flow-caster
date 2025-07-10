@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRef, useEffect } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import gsap from "gsap";
+import { NeynarUser } from "@/hooks/use-pool-data";
 
 interface RecipientNodeProps {
   x: number;
@@ -12,6 +14,7 @@ interface RecipientNodeProps {
   units: number;
   totalUnits: number;
   recipientCount: number;
+  farcasterUser?: NeynarUser | null;
 }
 
 export default function RecipientNode({
@@ -22,14 +25,16 @@ export default function RecipientNode({
   units,
   totalUnits,
   recipientCount,
+  farcasterUser,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
+  const circleImgRef = useRef<SVGImageElement>(null);
 
   useEffect(() => {
     if (!circleRef.current) return;
 
     // Gentle wiggle animation
-    gsap.to(circleRef.current, {
+    gsap.to([circleRef.current, circleImgRef.current], {
       x: "random(-2, 1.5)",
       y: "random(-2, 1.5)",
       duration: "random(1.5, 2.5)",
@@ -40,7 +45,7 @@ export default function RecipientNode({
 
     // Subtle scale pulse for both glow and main circle
     // gsap.to([glowRef.current, circleRef.current], {
-    gsap.to([circleRef.current], {
+    gsap.to([circleRef.current, circleImgRef.current], {
       scale: 1.1,
       duration: "random(2, 4)",
       repeat: -1,
@@ -62,9 +67,25 @@ export default function RecipientNode({
     <Tippy
       content={
         <div className="text-xs p-2">
-          <div>
-            <b>Account:</b> {accountId}
-          </div>
+          {farcasterUser ? (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <img
+                  src={farcasterUser.pfp_url}
+                  alt={farcasterUser.display_name}
+                  className="w-6 h-6 rounded-full"
+                />
+                <div>
+                  <div className="font-bold">{farcasterUser.display_name}</div>
+                  <div className="text-gray-400">@{farcasterUser.username}</div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>
+              <b>Account:</b> {accountId}
+            </div>
+          )}
           <div>
             <b>Units:</b> {units}
           </div>
@@ -76,6 +97,16 @@ export default function RecipientNode({
       appendTo={document.body}
     >
       <g>
+        {/* Profile image as a clip path */}
+        {farcasterUser?.pfp_url && (
+          <defs>
+            <clipPath id={`recipient-clip-${accountId}`}>
+              <circle cx={x} cy={y} r={radius} />
+            </clipPath>
+          </defs>
+        )}
+
+        {/* Background circle */}
         <circle
           ref={circleRef}
           cx={x}
@@ -85,6 +116,20 @@ export default function RecipientNode({
           className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer stroke-primary-400 fill-primary-400"
           filter="drop-shadow(0 0 6px #1a5d6b)"
         />
+
+        {/* Profile image */}
+        {farcasterUser?.pfp_url && (
+          <image
+            ref={circleImgRef}
+            href={farcasterUser.pfp_url}
+            x={x - radius}
+            y={y - radius}
+            width={radius * 2}
+            height={radius * 2}
+            clipPath={`url(#recipient-clip-${accountId})`}
+            className="cursor-pointer"
+          />
+        )}
       </g>
     </Tippy>
   );
