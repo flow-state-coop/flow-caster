@@ -8,10 +8,10 @@ const frame = {
   version: "next",
   imageUrl: `${appUrl}/images/feed.png`,
   button: {
-    title: "Launch Flow Splitter",
+    title: "Launch Flow Caster",
     action: {
       type: "launch_frame",
-      name: "Flow Splitter",
+      name: "Flow Caster",
       url: appUrl,
       splashImageUrl: `${appUrl}/images/splash.png`,
       splashBackgroundColor: "#ffffff",
@@ -21,10 +21,10 @@ const frame = {
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Flow Splitter",
+    title: "Flow Caster",
     openGraph: {
-      title: "Flow Splitter",
-      description: "Flow Splitter",
+      title: "Flow Caster",
+      description: "Flow Caster",
     },
     other: {
       "fc:frame": JSON.stringify(frame),
