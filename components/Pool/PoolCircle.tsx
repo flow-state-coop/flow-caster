@@ -24,7 +24,7 @@ const sampleRecipients75 = Array.from({ length: 75 }, (_, i) => ({
 }));
 
 const sampleDonors = [
-  { accountId: "0xd1", rate: "0.001" },
+  { accountId: "0xd1", rate: "0" },
   { accountId: "0xd2", rate: "0.002" },
   { accountId: "0xd3", rate: ".003" },
 ];
@@ -32,25 +32,29 @@ const sampleDonors = [
 export default function PoolCircle() {
   const radius = 370;
   const centerX = 400;
-  const centerY = 140; // Move pool higher
+  const centerY = 150; // Move pool higher
 
+  const [donors, setDonors] = useState(sampleDonors);
   const [useMany, setUseMany] = useState(false);
+  const [streamOpened, setStreamOpened] = useState(false);
+  const [streamOpenedCircle, setStreamOpenedCircle] = useState(false);
   const recipients = useMany ? sampleRecipients75 : sampleRecipients8;
   const totalUnits = recipients.reduce((sum, r) => sum + r.units, 0);
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
+  const newParticleCircleRef = useRef<SVGCircleElement>(null);
 
   useEffect(() => {
     // Calculate sizes first
     const poolArea = Math.PI * radius * radius;
-    const availableArea = poolArea * 0.8; // Use 80% of pool area for recipients
+    const availableArea = poolArea * 0.95; // Use 80% of pool area for recipients
     const avgAreaPerRecipient = availableArea / Math.max(recipients.length, 3);
     const baseRadius = Math.sqrt(avgAreaPerRecipient / Math.PI);
 
     const nodes = recipients.map((recipient) => {
       const unitRatio = recipient.units / totalUnits;
       const nodeRadius = Math.max(
-        baseRadius * 0.5, // Min 50% of base size
+        baseRadius * 0.7, // Min 50% of base size
         Math.min(
           baseRadius * 3, // Max 300% of base size
           baseRadius * unitRatio * 4 // Scale by units with multiplier
@@ -196,24 +200,80 @@ export default function PoolCircle() {
         }
       );
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centerX, centerY, radius]);
+
+  useEffect(() => {
+    if (!streamOpenedCircle) return;
+
+    // Calculate the starting angle based on where the particle is placed
+    // We need to find which donor's flow line triggered this animation
+    const donor = donors.find((d) => d.accountId === "0xd1");
+    if (!donor) return;
+
+    const donorY = centerY + radius + 150;
+    const donorSpacing = 200;
+    const donorStartX = centerX - donorSpacing;
+    const donorX = donorStartX + 0 * donorSpacing; // First donor (0xd1)
+    const donorY_pos = donorY;
+
+    // Calculate intersection point on pool edge
+    const dx = centerX - donorX;
+    const dy = centerY - donorY_pos;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const poolEdgeX = centerX - (dx / dist) * radius;
+    const poolEdgeY = centerY - (dy / dist) * radius;
+
+    // Calculate the starting angle from the pool center to the particle position
+    const startAngle = Math.atan2(poolEdgeY - centerY, poolEdgeX - centerX);
+
+    gsap.to(
+      { angle: startAngle },
+      {
+        angle: startAngle + 2 * Math.PI,
+        repeat: -1,
+        duration: 2,
+        ease: "linear",
+        onUpdate: function () {
+          const angle = this.targets()[0].angle;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          if (newParticleCircleRef.current) {
+            newParticleCircleRef.current.setAttribute("cx", x.toString());
+            newParticleCircleRef.current.setAttribute("cy", y.toString());
+          }
+        },
+      }
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamOpenedCircle]);
+
+  const handleOpenStream = () => {
+    setDonors([
+      { accountId: "0xd1", rate: "0.001" },
+      { accountId: "0xd2", rate: "0.002" },
+      { accountId: "0xd3", rate: ".003" },
+    ]);
+    setStreamOpened(true);
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <div className="flex flex-row justify-around items-center w-full mb-4">
-        <p>Cracked Farcaster Devs</p>
+      <div className="flex flex-row justify-between items-center w-full mb-4">
+        <p className="text-sm font-bold">Cracked Farcaster Devs Pool</p>
         <button
           className="px-3 py-1 rounded bg-accent-800 text-white text-xs hover:bg-accent-700"
           onClick={() => setUseMany((v) => !v)}
         >
-          Toggle {useMany ? "8" : "75"} Recipients
+          Toggle Flow
         </button>
       </div>
       <svg
         width="400"
-        height="600"
-        viewBox="0 0 800 600"
-        className="border border-gray-200 rounded-lg stroke-accent-800"
+        height="500"
+        viewBox="0 0 800 500"
+        className="bg-brand-light rounded-lg stroke-accent-800"
       >
         <circle
           ref={poolCircleRef}
@@ -226,12 +286,17 @@ export default function PoolCircle() {
           className="opacity-50"
         />
         {/* Flow lines from donors to pool */}
-        {sampleDonors.map((donor, i) => {
+        {donors.map((donor, i) => {
           const donorY = centerY + radius + 150;
           const donorSpacing = 200;
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
+
+          // Skip flow line if rate is "0"
+          const rateNum = parseFloat(donor.rate);
+          if (rateNum === 0) return null;
+
           // Calculate intersection point on pool edge (from donor to pool center)
           const dx = centerX - x;
           const dy = centerY - y;
@@ -240,7 +305,6 @@ export default function PoolCircle() {
           const poolEdgeY = centerY - (dy / dist) * radius;
 
           // Determine rate string based on donor rate
-          const rateNum = parseFloat(donor.rate);
           let rateString = "small";
           if (rateNum >= 0.003) {
             rateString = "large";
@@ -249,18 +313,35 @@ export default function PoolCircle() {
           }
 
           return (
-            <FlowLine
-              key={donor.accountId}
-              x1={x}
-              y1={y}
-              x2={poolEdgeX}
-              y2={poolEdgeY}
-              rate={rateString}
-            />
+            <>
+              <FlowLine
+                key={donor.accountId}
+                x1={x}
+                y1={y}
+                x2={poolEdgeX}
+                y2={poolEdgeY}
+                rate={rateString}
+                streamOpened={donor.accountId === "0xd1" && streamOpened}
+                setStreamOpenedCircle={setStreamOpenedCircle}
+              />
+              {streamOpenedCircle && donor.accountId === "0xd1" && (
+                <circle
+                  ref={newParticleCircleRef}
+                  id="pool-outline-particle"
+                  cx={poolEdgeX}
+                  cy={poolEdgeY}
+                  r={45}
+                  strokeWidth={0}
+                  fill="#FFEA99"
+                  opacity={0.98}
+                  filter="blur(4px)"
+                />
+              )}
+            </>
           );
         })}
         {/* Donor nodes in a row below the pool */}
-        {sampleDonors.map((donor, i) => {
+        {donors.map((donor, i) => {
           // Place donors in a horizontal row below the pool
           const donorY = centerY + radius + 150; // 80px below pool edge
           const donorSpacing = 200; // horizontal spacing between donors
@@ -333,6 +414,12 @@ export default function PoolCircle() {
           );
         })}
       </svg>
+      <button
+        className="mt-5 px-3 py-1 rounded bg-accent-800 text-white text-lg hover:bg-accent-700"
+        onClick={handleOpenStream}
+      >
+        Open Stream
+      </button>
     </div>
   );
 }
