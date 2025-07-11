@@ -85,7 +85,7 @@ export const UserProvider = ({
 
   const handleSignIn = useCallback(async () => {
     try {
-      console.log("handleSignIn");
+      console.log("*** handleSignIn");
       setIsLoading(true);
       setError(null);
 

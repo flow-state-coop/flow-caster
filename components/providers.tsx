@@ -6,7 +6,7 @@ import { UserProvider } from "@/contexts/user-context";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <MiniAppProvider addMiniAppOnLoad={true}>
-      <UserProvider autoSignIn={false}>{children}</UserProvider>
+      <UserProvider autoSignIn={true}>{children}</UserProvider>
     </MiniAppProvider>
   );
 }

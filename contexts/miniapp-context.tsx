@@ -20,7 +20,9 @@ interface MiniAppContextType {
   addMiniApp: () => Promise<AddMiniAppResult | null>;
 }
 
-const FarcasterMiniAppContext = createContext<MiniAppContextType | undefined>(undefined);
+const FarcasterMiniAppContext = createContext<MiniAppContextType | undefined>(
+  undefined
+);
 
 export function MiniAppProvider({
   addMiniAppOnLoad,
@@ -74,7 +76,7 @@ export function MiniAppProvider({
   useEffect(() => {
     // on load, set the frame as ready
     if (isMiniAppReady && !context?.client?.added && addMiniAppOnLoad) {
-      handleAddMiniApp();
+      // handleAddMiniApp();
     }
   }, [
     isMiniAppReady,

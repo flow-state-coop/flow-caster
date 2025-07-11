@@ -28,7 +28,7 @@ export default function FlowLine({
   // Determine size and speed based on rate
   const getParticleConfig = (rate: string) => {
     if (rate === "large") {
-      return { size: 12, speed: 0.8 }; // Large, fast
+      return { size: 14, speed: 0.8 }; // Large, fast
     } else if (rate === "medium") {
       return { size: 8, speed: 1.2 }; // Medium, medium
     } else {
@@ -39,6 +39,7 @@ export default function FlowLine({
   const config = getParticleConfig(rate);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
     // Animate particle from donor to pool
     const duration = 1.5 / config.speed;
     gsap.fromTo(
@@ -109,16 +110,18 @@ export default function FlowLine({
         opacity={0.85}
         filter="drop-shadow(0 0 8px #D95D39)"
       />
-      <circle
-        ref={newParticleRef}
-        cx={x1}
-        cy={y1}
-        r={45}
-        strokeWidth={0}
-        fill="#FFEA99"
-        opacity={0.98}
-        filter="blur(4px)"
-      />
+      {streamOpened && (
+        <circle
+          ref={newParticleRef}
+          cx={x1}
+          cy={y1}
+          r={45}
+          strokeWidth={0}
+          fill="#FFEA99"
+          opacity={0.98}
+          filter="blur(4px)"
+        />
+      )}
     </g>
   );
 }
