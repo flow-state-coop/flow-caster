@@ -45,14 +45,16 @@ export default function PoolCircle({
 
   const donors = useMemo(() => {
     if (!poolData) return [];
-    // return poolData.poolDistributors.map((distributor) => ({
-    //   accountId: distributor.account.id,
-    //   rate: distributor.flowRate,
-    //   farcasterUser: distributor.farcasterUser,
-    // }));
 
-    return createDonorBuckets(poolData.poolDistributors, connectedUser);
-  }, [poolData, connectedUser]);
+    // return createDonorBuckets(poolData.poolDistributors, connectedUser);
+
+    return poolData.poolDistributors.map((member) => ({
+      accountId: member.account.id,
+      rate: member.flowRate,
+      farcasterUser: member.farcasterUser,
+    }));
+    // }, [poolData, connectedUser]);
+  }, [poolData]);
 
   const totalUnits = useMemo(() => {
     return recipients.reduce((sum: number, r: any) => sum + r.units, 0);
@@ -168,6 +170,7 @@ export default function PoolCircle({
   ];
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
     // Only run particle animations when data is loaded
     if (!poolData) return;
 
@@ -335,7 +338,9 @@ export default function PoolCircle({
           const y = donorY;
 
           // Skip flow line if rate is "0"
+          // const rateNum = parseFloat(donor.rate);
           const rateNum = parseFloat(donor.rate);
+
           if (rateNum === 0) return null;
 
           // Calculate intersection point on pool edge (from donor to pool center)
@@ -392,14 +397,16 @@ export default function PoolCircle({
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
+
           return (
             <DonorNode
               key={donor.accountId}
               x={x}
               y={y}
-              accountId={donor.accountId}
+              accountId={donor?.accountId}
+              rate={donor.rate}
               radius={60}
-              farcasterUser={donor.farcasterUser}
+              farcasterUser={donor?.farcasterUser}
             />
           );
         })}
@@ -460,6 +467,14 @@ export default function PoolCircle({
           );
         })}
       </svg>
+      <div className="flex flex-row justify-start w-full gap-20">
+        {donors.map((donor, i) => {
+          return (
+            // <div key={i} className="text-xs">{`${donor.rate} USDCx / mo`}</div>
+            <div key={i} className="text-xs">{`200 USDCx / mo`}</div>
+          );
+        })}
+      </div>
       <button
         className="mt-5 px-3 py-1 rounded bg-accent-800 text-white text-lg hover:bg-accent-700"
         onClick={handleOpenStream}

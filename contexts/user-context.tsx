@@ -118,7 +118,6 @@ export const UserProvider = ({
   }, [context, signIn]);
 
   useEffect(() => {
-    console.log("*** can i?");
     if (context && !isSignedIn && !isLoading && autoSignIn && userError) {
       handleSignIn();
     }

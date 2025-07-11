@@ -1,16 +1,12 @@
 import { PoolData } from "@/hooks/use-pool-data";
 import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import { NeynarUser } from "./neynar";
+import { formatUnits } from "viem";
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
   connectedUser?: NeynarUser
 ) => {
-  //get higest
-  //get connected
-  // total the rest
-  let donors = [];
-
   const topDonor = poolDistributors.reduce((highest, current) => {
     const currentRate = parseFloat(current.flowRate);
     const highestRate = parseFloat(highest.flowRate);
@@ -28,8 +24,6 @@ export const createDonorBuckets = (
       d.account.id === connectedUser?.verified_addresses.eth_addresses[0]
   );
 
-  console.log("connectedDonor", connectedDonor);
-
   const totalFlow = poolDistributors.reduce((total, current) => {
     try {
       const currentRate = BigInt(current.flowRate);
@@ -43,14 +37,21 @@ export const createDonorBuckets = (
 
   const totalDonor = {
     accountId: `${poolDistributors.length} Total`,
-    rate: totalFlow,
+    // rate: formatUnits(totalFlow, 18),
+    rate: totalFlow.toString(),
+    farcasterUser: null,
   };
 
   const connectAndTop = [connectedDonor, topDonor].map((distributor) => ({
     accountId: distributor?.account.id,
-    rate: distributor?.flowRate,
+    // rate: formatUnits(BigInt(distributor?.flowRate || "0"), 18),
+    rate: distributor?.flowRate || "0",
+
     farcasterUser: distributor?.farcasterUser,
   }));
 
   return [...connectAndTop, totalDonor];
 };
+
+export const truncateAddress = (addr: string) =>
+  `${addr.slice(0, 6)}...${addr.slice(-4)}`;

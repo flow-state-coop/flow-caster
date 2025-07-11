@@ -1,13 +1,5 @@
+import { NeynarUser } from "@/lib/neynar";
 import { useQuery } from "@tanstack/react-query";
-
-export interface NeynarUser {
-  fid: string;
-  username: string;
-  display_name: string;
-  pfp_url: string;
-  custody_address: string;
-  verifications: string[];
-}
 
 export interface PoolData {
   __typename: string;

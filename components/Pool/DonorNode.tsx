@@ -1,15 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import { NeynarUser } from "@/lib/neynar";
+import { truncateAddress } from "@/lib/pool";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import { NeynarUser } from "@/hooks/use-pool-data";
 
 interface DonorNodeProps {
   x: number;
   y: number;
   radius?: number;
-  accountId: string;
-  farcasterUser?: NeynarUser | null;
+  accountId?: string;
+  rate: string;
+  farcasterUser?: NeynarUser | null | undefined;
 }
 
 export default function DonorNode({
@@ -17,8 +19,11 @@ export default function DonorNode({
   y,
   radius = 18,
   accountId,
+  rate,
   farcasterUser,
 }: DonorNodeProps) {
+  const isTotalBucket = !accountId || accountId.includes("Total");
+
   return (
     <Tippy
       content={
@@ -32,15 +37,12 @@ export default function DonorNode({
                   className="w-6 h-6 rounded-full"
                 />
                 <div>
-                  <div className="font-bold">{farcasterUser.display_name}</div>
                   <div className="text-gray-400">@{farcasterUser.username}</div>
                 </div>
               </div>
             </>
           ) : (
-            <div>
-              <b>Account:</b> {accountId}
-            </div>
+            <div>{accountId && truncateAddress(accountId)}</div>
           )}
         </div>
       }
@@ -48,6 +50,7 @@ export default function DonorNode({
       interactive={true}
       placement="top"
       appendTo={document.body}
+      disabled={isTotalBucket}
     >
       <g>
         {/* Profile image as a clip path */}
@@ -65,7 +68,10 @@ export default function DonorNode({
           cy={y}
           r={radius}
           strokeWidth="2"
-          className="opacity-90 hover:opacity-100 transition-opacity cursor-pointer stroke-secondary-800 fill-secondary-800"
+          className={`opacity-90 stroke-secondary-800 fill-secondary-800 ${
+            !isTotalBucket &&
+            `hover:opacity-100 transition-opacity cursor-pointer`
+          }`}
         />
 
         {/* Profile image */}
@@ -77,7 +83,7 @@ export default function DonorNode({
             width={radius * 2}
             height={radius * 2}
             clipPath={`url(#donor-clip-${accountId})`}
-            className="cursor-pointer"
+            className={`${isTotalBucket && `cursor-pointer`}`}
             preserveAspectRatio="xMidYMid slice"
           />
         )}

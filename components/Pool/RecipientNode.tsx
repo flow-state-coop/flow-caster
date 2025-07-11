@@ -31,6 +31,7 @@ export default function RecipientNode({
   const circleImgRef = useRef<SVGImageElement>(null);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
     if (!circleRef.current) return;
 
     // Gentle wiggle animation
