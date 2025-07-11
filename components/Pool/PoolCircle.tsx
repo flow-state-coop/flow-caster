@@ -13,19 +13,17 @@ import { createDonorBuckets } from "@/lib/pool";
 interface PoolCircleProps {
   poolData?: PoolData;
   connectedUser?: NeynarUser;
-  isLoading: boolean;
-  error: Error | null;
 }
 
 export default function PoolCircle({
   poolData,
   connectedUser,
-  isLoading,
-  error,
 }: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
   const centerY = 150; // Move pool higher
+
+  // console.log("page render at PoolCircle.tsx");
 
   const [streamOpened, setStreamOpened] = useState(false);
   const [streamOpenedCircle, setStreamOpenedCircle] = useState(false);
@@ -46,14 +44,23 @@ export default function PoolCircle({
   const donors = useMemo(() => {
     if (!poolData) return [];
 
-    // return createDonorBuckets(poolData.poolDistributors, connectedUser);
+    const formattedDonors = createDonorBuckets(
+      poolData.poolDistributors,
+      connectedUser
+    );
 
-    return poolData.poolDistributors.map((member) => ({
-      accountId: member.account.id,
-      rate: member.flowRate,
-      farcasterUser: member.farcasterUser,
-    }));
-    // }, [poolData, connectedUser]);
+    console.log("connectedUser", connectedUser);
+
+    console.log("poolData.poolDistributors", poolData.poolDistributors);
+    console.log("formattedDonors", formattedDonors);
+
+    // return poolData.poolDistributors.map((member) => ({
+    //   accountId: member.account.id,
+    //   rate: member.flowRate,
+    //   farcasterUser: member.farcasterUser,
+    // }));
+
+    return formattedDonors;
   }, [poolData]);
 
   const totalUnits = useMemo(() => {
@@ -70,7 +77,7 @@ export default function PoolCircle({
     const nodes = recipients.map((recipient) => {
       const unitRatio = recipient.units / totalUnits;
       const nodeRadius = Math.max(
-        baseRadius * 0.7, // Min 50% of base size
+        baseRadius * 0.8, // Min 80% of base size
         Math.min(
           baseRadius * 3, // Max 300% of base size
           baseRadius * unitRatio * 4 // Scale by units with multiplier
@@ -88,6 +95,10 @@ export default function PoolCircle({
       };
     });
 
+    // Throttle position updates to reduce rerenders
+    let lastUpdateTime = 0;
+    const updateThrottle = 40; // ~60fps
+
     // Create force simulation
     const simulation = d3
       .forceSimulation(nodes)
@@ -99,6 +110,10 @@ export default function PoolCircle({
       .force("x", d3.forceX(centerX).strength(0.1))
       .force("y", d3.forceY(centerY).strength(0.1))
       .on("tick", () => {
+        const now = Date.now();
+        if (now - lastUpdateTime < updateThrottle) return;
+        lastUpdateTime = now;
+
         // Keep nodes within pool bounds
         nodes.forEach((node: any) => {
           const distanceFromCenter = Math.sqrt(
@@ -124,7 +139,7 @@ export default function PoolCircle({
   // Animate pool outline and flow lines
   useEffect(() => {
     // Pool outline glow/pulse
-    gsap.to("#pool-outline", {
+    const poolOutlineAnimation = gsap.to("#pool-outline", {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
@@ -136,7 +151,7 @@ export default function PoolCircle({
       ease: "power1.inOut",
     });
     // Flow lines glow/pulse
-    gsap.to("#flow-line", {
+    const flowLineAnimation = gsap.to("#flow-line", {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
@@ -146,6 +161,11 @@ export default function PoolCircle({
       opacity: 1,
       ease: "power1.inOut",
     });
+
+    return () => {
+      poolOutlineAnimation.kill();
+      flowLineAnimation.kill();
+    };
   }, []);
 
   // Pool particles animation
@@ -252,7 +272,7 @@ export default function PoolCircle({
       {
         angle: startAngle + 2 * Math.PI,
         repeat: 5,
-        duration: 2,
+        duration: 0.5,
         ease: "linear",
         onComplete: handleOpenComplete,
         onUpdate: function () {
@@ -281,24 +301,6 @@ export default function PoolCircle({
       ease: "power2.out",
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg">Loading pool data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg text-red-500">
-          Failed to load pool data: {error.message}
-        </p>
-      </div>
-    );
-  }
 
   if (!poolData) {
     return (
@@ -468,7 +470,7 @@ export default function PoolCircle({
         })}
       </svg>
       <div className="flex flex-row justify-start w-full gap-20">
-        {donors.map((donor, i) => {
+        {donors.map((_, i) => {
           return (
             // <div key={i} className="text-xs">{`${donor.rate} USDCx / mo`}</div>
             <div key={i} className="text-xs">{`200 USDCx / mo`}</div>
