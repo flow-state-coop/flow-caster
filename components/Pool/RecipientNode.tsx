@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRef, useEffect } from "react";
+import { NeynarUser } from "@/lib/neynar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import gsap from "gsap";
+import { ArrowRight, CircleArrowRight } from "lucide-react";
 
 interface RecipientNodeProps {
   x: number;
@@ -29,40 +31,6 @@ export default function RecipientNode({
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
-    if (!circleRef.current) return;
-
-    // Gentle wiggle animation
-    gsap.to([circleRef.current, circleImgRef.current], {
-      x: "random(-2, 1.5)",
-      y: "random(-2, 1.5)",
-      duration: "random(1.5, 2.5)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-
-    // Subtle scale pulse for both glow and main circle
-    // gsap.to([glowRef.current, circleRef.current], {
-    gsap.to([circleRef.current, circleImgRef.current], {
-      scale: 1.1,
-      duration: "random(2, 4)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-
-    // Opacity pulse for the glow
-    gsap.to(circleRef.current, {
-      opacity: 0.6,
-      duration: "random(2, 4)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-  }, [circleRef]);
-
   return (
     <Tippy
       content={
@@ -87,8 +55,8 @@ export default function RecipientNode({
             </div>
           )}
           <div className="font-bold text-lg">{units} % Split</div>
-          <button className="px-2 py-1 text-xs rounded-sm bg-primary-800 text-white font-medium hover:bg-primary-700 transition-colors">
-            Profile
+          <button className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs rounded-sm bg-brand-light text-black border border-black rounded-sm">
+            Profile <CircleArrowRight />
           </button>
         </div>
       }

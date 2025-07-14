@@ -39,7 +39,7 @@ export default function FlowLine({
   const config = getParticleConfig(rate);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
+    // if (process.env.NEXT_PUBLIC_VIS === "paused") return;
     // Animate particle from donor to pool
     const duration = 1.5 / config.speed;
     gsap.fromTo(

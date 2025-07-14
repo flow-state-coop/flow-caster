@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { PoolData } from "@/hooks/use-pool-data";
+import { PoolData } from "@/lib/types";
 import { CircleUserRound, Crown } from "lucide-react";
 import { useMemo } from "react";
 import { formatEther } from "viem";

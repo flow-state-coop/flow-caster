@@ -1,7 +1,7 @@
-import { PoolData } from "@/hooks/use-pool-data";
 import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import { NeynarUser } from "./neynar";
 import { formatUnits } from "viem";
+import { PoolData } from "./types";
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],

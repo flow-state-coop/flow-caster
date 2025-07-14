@@ -5,13 +5,13 @@ import LeaderboardList from "./LeaderboardList";
 import LeaderActions from "./LeaderActions";
 
 export default function Leaderboard() {
-  const { chainid, poolId } = useParams<{ chainid: string; poolId: string }>();
+  const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();
   const {
     data: poolData,
     isLoading,
     error,
   } = usePoolData({
-    chainId: chainid,
+    chainId: chainId,
     poolId: poolId,
   });
 
@@ -36,7 +36,7 @@ export default function Leaderboard() {
   return (
     <main className="relative">
       <LeaderboardList poolData={poolData} />
-      <LeaderActions chainId={chainid} poolId={poolId} />
+      <LeaderActions chainId={chainId} poolId={poolId} />
     </main>
   );
 }

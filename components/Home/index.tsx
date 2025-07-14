@@ -5,7 +5,7 @@ import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 
 const DEFAULT_CHAIN_ID = "11155420";
-const DEFAULT_POOL_ID = "0xa7a13049bdf22c499e33e743c2031b66eb03772a";
+const DEFAULT_POOL_ID = "71";
 
 export default function Home() {
   const {
@@ -17,6 +17,8 @@ export default function Home() {
     poolId: DEFAULT_POOL_ID,
   });
   const { user, signIn } = useUser();
+
+  console.log("poolData", poolData);
 
   const handleOpenStream = () => {
     // This will be called from PoolActions component

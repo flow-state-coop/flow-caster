@@ -5,7 +5,7 @@ import { Metadata } from "next";
 const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
-  params: Promise<{ chainid: string; poolId: string }>;
+  params: Promise<{ chainId: string; poolId: string }>;
 };
 
 const frame = {

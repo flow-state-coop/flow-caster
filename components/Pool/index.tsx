@@ -6,13 +6,13 @@ import { usePoolData } from "@/hooks/use-pool-data";
 import { useParams } from "next/navigation";
 
 export default function Pool() {
-  const { chainid, poolId } = useParams<{ chainid: string; poolId: string }>();
+  const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();
   const {
     data: poolData,
     isLoading,
     error,
   } = usePoolData({
-    chainId: chainid,
+    chainId: chainId,
     poolId: poolId,
   });
   const { user, signIn } = useUser();
@@ -60,7 +60,7 @@ export default function Pool() {
       <PoolActions
         onOpenStream={handleOpenStream}
         onClaimSup={handleClaimSup}
-        chainId={chainid}
+        chainId={chainId}
         poolId={poolId}
       />
     </main>

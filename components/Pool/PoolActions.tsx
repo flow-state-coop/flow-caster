@@ -72,14 +72,14 @@ export default function PoolActions({
               rel="noopener noreferrer"
               className="p-2 text-black text-xs"
             >
-              <button className="flex flex-row items-center gap-1  px-2 py-1 rounded-lg border border-brand-sfGreen bg-brand-light">
+              <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
                 Claim
                 <img
                   src="/images/sup.svg"
                   alt="Farcaster"
                   className="w-6 h-6"
                 />
-              </button>
+              </div>
             </a>
             <Link
               href={`/pool/${chainId}/${poolId}/leaderboard`}
@@ -93,18 +93,6 @@ export default function PoolActions({
             >
               <Info size={20} />
             </button>
-            <a
-              href="https://flowstate.network/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-black"
-            >
-              <img
-                src="/images/fs-logo-circle-black.svg"
-                alt="Farcaster"
-                className="w-6 h-6"
-              />
-            </a>
           </div>
         </div>
       </div>
