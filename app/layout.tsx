@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${headerFont.variable} ${bodyFont.variable} bg-black color-white p-4`}
+        className={`${headerFont.variable} ${bodyFont.variable} bg-white color-white p-4`}
       >
         <Providers>
           <Header />

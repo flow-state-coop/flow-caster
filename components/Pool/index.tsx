@@ -3,18 +3,17 @@ import PoolCircle from "@/components/Pool/PoolCircle";
 import PoolActions from "@/components/Pool/PoolActions";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
+import { useParams } from "next/navigation";
 
-const DEFAULT_CHAIN_ID = "11155420";
-const DEFAULT_POOL_ID = "0xa7a13049bdf22c499e33e743c2031b66eb03772a";
-
-export default function Home() {
+export default function Pool() {
+  const { chainid, poolId } = useParams<{ chainid: string; poolId: string }>();
   const {
     data: poolData,
     isLoading,
     error,
   } = usePoolData({
-    chainId: DEFAULT_CHAIN_ID,
-    poolId: DEFAULT_POOL_ID,
+    chainId: chainid,
+    poolId: poolId,
   });
   const { user, signIn } = useUser();
 
@@ -61,8 +60,8 @@ export default function Home() {
       <PoolActions
         onOpenStream={handleOpenStream}
         onClaimSup={handleClaimSup}
-        chainId={DEFAULT_CHAIN_ID}
-        poolId={DEFAULT_POOL_ID}
+        chainId={chainid}
+        poolId={poolId}
       />
     </main>
   );

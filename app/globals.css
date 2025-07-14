@@ -25,3 +25,9 @@ body {
     text-wrap: balance;
   }
 }
+
+.tippy-box[data-theme~="flow"] {
+  background-color: #d95d39;
+  color: black;
+  opacity: 0.95;
+}
