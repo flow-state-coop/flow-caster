@@ -1,0 +1,120 @@
+{
+  "__typename": "Pool",
+  "id": "0xb44253387d42c45cbb9d92eb9d7d84a3f733f41d",
+  "flowRate": "19025875100",
+  "totalUnits": "100",
+  "totalAmountFlowedDistributedUntilUpdatedAt": "3576864518800",
+  "totalAmountInstantlyDistributedUntilUpdatedAt": "0",
+  "updatedAtTimestamp": "1751581522",
+  "poolMembers": [
+    {
+      "__typename": "PoolMember",
+      "account": {
+        "__typename": "Account",
+        "id": "0x83ab8e31df35aa3281d630529c6f4bf5ac7f7abf"
+      },
+      "units": "40",
+      "isConnected": true
+    },
+    {
+      "__typename": "PoolMember",
+      "account": {
+        "__typename": "Account",
+        "id": "0xbc5b552641e5d203f0a6c230aa9dc14da7450053"
+      },
+      "units": "25",
+      "isConnected": false
+    },
+    {
+      "__typename": "PoolMember",
+      "account": {
+        "__typename": "Account",
+        "id": "0xf100041473280b594d78ab5fa4c44ba81edd367b"
+      },
+      "units": "35",
+      "isConnected": false
+    }
+  ],
+  "poolDistributors": [
+    {
+      "__typename": "PoolDistributor",
+      "account": {
+        "__typename": "Account",
+        "id": "0x83ab8e31df35aa3281d630529c6f4bf5ac7f7abf"
+      },
+      "flowRate": "19025875100"
+    }
+  ],
+  "token": {
+    "__typename": "Token",
+    "id": "0x0043d7c85c8b96a49a72a92c0b48cdc4720437d7",
+    "symbol": "ETHx"
+  },
+  "poolCreatedEvent": {
+    "__typename": "PoolCreatedEvent",
+    "timestamp": "1751581142",
+    "transactionHash": "0x646b17ae8b6c009882517f82aaf0fdbda5e62a751a5ca3444a02fb37efa51478",
+    "name": "PoolCreated"
+  },
+  "memberUnitsUpdatedEvents": [
+    {
+      "__typename": "MemberUnitsUpdatedEvent",
+      "units": "25",
+      "oldUnits": "0",
+      "poolMember": {
+        "__typename": "PoolMember",
+        "account": {
+          "__typename": "Account",
+          "id": "0xbc5b552641e5d203f0a6c230aa9dc14da7450053"
+        }
+      },
+      "timestamp": "1751581142",
+      "transactionHash": "0x646b17ae8b6c009882517f82aaf0fdbda5e62a751a5ca3444a02fb37efa51478"
+    },
+    {
+      "__typename": "MemberUnitsUpdatedEvent",
+      "units": "35",
+      "oldUnits": "0",
+      "poolMember": {
+        "__typename": "PoolMember",
+        "account": {
+          "__typename": "Account",
+          "id": "0xf100041473280b594d78ab5fa4c44ba81edd367b"
+        }
+      },
+      "timestamp": "1751581142",
+      "transactionHash": "0x646b17ae8b6c009882517f82aaf0fdbda5e62a751a5ca3444a02fb37efa51478"
+    },
+    {
+      "__typename": "MemberUnitsUpdatedEvent",
+      "units": "40",
+      "oldUnits": "0",
+      "poolMember": {
+        "__typename": "PoolMember",
+        "account": {
+          "__typename": "Account",
+          "id": "0x83ab8e31df35aa3281d630529c6f4bf5ac7f7abf"
+        }
+      },
+      "timestamp": "1751581142",
+      "transactionHash": "0x646b17ae8b6c009882517f82aaf0fdbda5e62a751a5ca3444a02fb37efa51478"
+    }
+  ],
+  "flowDistributionUpdatedEvents": [
+    {
+      "__typename": "FlowDistributionUpdatedEvent",
+      "newDistributorToPoolFlowRate": "19025875100",
+      "oldFlowRate": "0",
+      "poolDistributor": {
+        "__typename": "PoolDistributor",
+        "account": {
+          "__typename": "Account",
+          "id": "0x83ab8e31df35aa3281d630529c6f4bf5ac7f7abf"
+        }
+      },
+      "timestamp": "1751581334",
+      "transactionHash": "0xc18704e7f47b0c35db1b4c2dbcec1a15b34bc019c13c57204e4413b9db24066e"
+    }
+  ],
+  "instantDistributionUpdatedEvents": []
+}

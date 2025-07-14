@@ -55,3 +55,6 @@ export const createDonorBuckets = (
 
 export const truncateAddress = (addr: string) =>
   `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+
+export const truncateString = (addr: string, numChars: number) =>
+  `${addr.slice(0, numChars)}...${addr.slice(-numChars)}`;

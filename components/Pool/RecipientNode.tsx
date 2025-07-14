@@ -4,7 +4,6 @@ import { useRef, useEffect } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import gsap from "gsap";
-import { NeynarUser } from "@/hooks/use-pool-data";
 
 interface RecipientNodeProps {
   x: number;
@@ -67,10 +66,10 @@ export default function RecipientNode({
   return (
     <Tippy
       content={
-        <div className="text-xs p-2">
+        <div className="text-xs p-4">
           {farcasterUser ? (
             <>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 ">
                 <img
                   src={farcasterUser.pfp_url}
                   alt={farcasterUser.display_name}
@@ -78,7 +77,7 @@ export default function RecipientNode({
                 />
                 <div>
                   <div className="font-bold">{farcasterUser.display_name}</div>
-                  <div className="text-gray-400">@{farcasterUser.username}</div>
+                  <div>@{farcasterUser.username}</div>
                 </div>
               </div>
             </>
@@ -87,15 +86,18 @@ export default function RecipientNode({
               <b>Account:</b> {accountId}
             </div>
           )}
-          <div>
-            <b>Units:</b> {units}
-          </div>
+          <div className="font-bold text-lg">{units} % Split</div>
+          <button className="px-2 py-1 text-xs rounded-sm bg-primary-800 text-white font-medium hover:bg-primary-700 transition-colors">
+            Profile
+          </button>
         </div>
       }
       trigger="click"
       interactive={true}
       placement="top"
       appendTo={document.body}
+      theme="flow"
+      className="bg-primary-400"
     >
       <g>
         {/* Profile image as a clip path */}

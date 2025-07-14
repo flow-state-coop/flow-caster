@@ -8,24 +8,26 @@ import FlowLine from "./Flowline";
 import gsap from "gsap";
 import { PoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
-import { createDonorBuckets } from "@/lib/pool";
+import { createDonorBuckets, truncateString } from "@/lib/pool";
+import { formatEther } from "viem";
+import { Crown } from "lucide-react";
 
 interface PoolCircleProps {
   poolData?: PoolData;
   connectedUser?: NeynarUser;
-  isLoading: boolean;
-  error: Error | null;
+  onOpenStream?: () => void;
 }
 
 export default function PoolCircle({
   poolData,
   connectedUser,
-  isLoading,
-  error,
+  onOpenStream,
 }: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
   const centerY = 150; // Move pool higher
+
+  // console.log("page render at PoolCircle.tsx");
 
   const [streamOpened, setStreamOpened] = useState(false);
   const [streamOpenedCircle, setStreamOpenedCircle] = useState(false);
@@ -46,15 +48,13 @@ export default function PoolCircle({
   const donors = useMemo(() => {
     if (!poolData) return [];
 
-    // return createDonorBuckets(poolData.poolDistributors, connectedUser);
+    const formattedDonors = createDonorBuckets(
+      poolData.poolDistributors,
+      connectedUser
+    );
 
-    return poolData.poolDistributors.map((member) => ({
-      accountId: member.account.id,
-      rate: member.flowRate,
-      farcasterUser: member.farcasterUser,
-    }));
-    // }, [poolData, connectedUser]);
-  }, [poolData]);
+    return formattedDonors;
+  }, [poolData, connectedUser]);
 
   const totalUnits = useMemo(() => {
     return recipients.reduce((sum: number, r: any) => sum + r.units, 0);
@@ -70,7 +70,7 @@ export default function PoolCircle({
     const nodes = recipients.map((recipient) => {
       const unitRatio = recipient.units / totalUnits;
       const nodeRadius = Math.max(
-        baseRadius * 0.7, // Min 50% of base size
+        baseRadius * 0.8, // Min 80% of base size
         Math.min(
           baseRadius * 3, // Max 300% of base size
           baseRadius * unitRatio * 4 // Scale by units with multiplier
@@ -88,6 +88,10 @@ export default function PoolCircle({
       };
     });
 
+    // Throttle position updates to reduce rerenders
+    let lastUpdateTime = 0;
+    const updateThrottle = 40; // ~60fps
+
     // Create force simulation
     const simulation = d3
       .forceSimulation(nodes)
@@ -99,6 +103,10 @@ export default function PoolCircle({
       .force("x", d3.forceX(centerX).strength(0.1))
       .force("y", d3.forceY(centerY).strength(0.1))
       .on("tick", () => {
+        const now = Date.now();
+        if (now - lastUpdateTime < updateThrottle) return;
+        lastUpdateTime = now;
+
         // Keep nodes within pool bounds
         nodes.forEach((node: any) => {
           const distanceFromCenter = Math.sqrt(
@@ -124,7 +132,7 @@ export default function PoolCircle({
   // Animate pool outline and flow lines
   useEffect(() => {
     // Pool outline glow/pulse
-    gsap.to("#pool-outline", {
+    const poolOutlineAnimation = gsap.to("#pool-outline", {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
@@ -136,7 +144,7 @@ export default function PoolCircle({
       ease: "power1.inOut",
     });
     // Flow lines glow/pulse
-    gsap.to("#flow-line", {
+    const flowLineAnimation = gsap.to("#flow-line", {
       repeat: -1,
       yoyo: true,
       duration: 1.2,
@@ -146,6 +154,11 @@ export default function PoolCircle({
       opacity: 1,
       ease: "power1.inOut",
     });
+
+    return () => {
+      poolOutlineAnimation.kill();
+      flowLineAnimation.kill();
+    };
   }, []);
 
   // Pool particles animation
@@ -232,7 +245,7 @@ export default function PoolCircle({
     if (!donor) return;
 
     const donorY = centerY + radius + 150;
-    const donorSpacing = 200;
+    const donorSpacing = 250;
     const donorStartX = centerX - donorSpacing;
     const donorX = donorStartX + 0 * donorSpacing; // First donor
     const donorY_pos = donorY;
@@ -252,7 +265,7 @@ export default function PoolCircle({
       {
         angle: startAngle + 2 * Math.PI,
         repeat: 5,
-        duration: 2,
+        duration: 0.5,
         ease: "linear",
         onComplete: handleOpenComplete,
         onUpdate: function () {
@@ -272,6 +285,7 @@ export default function PoolCircle({
 
   const handleOpenStream = () => {
     setStreamOpened(true);
+    onOpenStream?.();
   };
 
   const handleOpenComplete = () => {
@@ -282,28 +296,10 @@ export default function PoolCircle({
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg">Loading pool data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg text-red-500">
-          Failed to load pool data: {error.message}
-        </p>
-      </div>
-    );
-  }
-
   if (!poolData) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg text-red-500">No pool data available</p>
+        <p className="text-lg text-black">No pool data available</p>
       </div>
     );
   }
@@ -311,13 +307,13 @@ export default function PoolCircle({
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="flex flex-row justify-between items-center w-full mb-4">
-        <p className="text-sm font-bold">Cracked Farcaster Devs Pool</p>
+        <p className="text-sm text-black">Cracked Farcaster Devs Pool</p>
       </div>
       <svg
         width="400"
         height="500"
         viewBox="0 0 800 500"
-        className="bg-black rounded-lg stroke-accent-800"
+        className="bg-white rounded-lg stroke-accent-800"
       >
         <circle
           ref={poolCircleRef}
@@ -332,7 +328,7 @@ export default function PoolCircle({
         {/* Flow lines from donors to pool */}
         {donors.map((donor, i) => {
           const donorY = centerY + radius + 150;
-          const donorSpacing = 200;
+          const donorSpacing = 250;
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
@@ -393,21 +389,30 @@ export default function PoolCircle({
         {donors.map((donor, i) => {
           // Place donors in a horizontal row below the pool
           const donorY = centerY + radius + 150; // 80px below pool edge
-          const donorSpacing = 200; // horizontal spacing between donors
+          const donorSpacing = 250; // horizontal spacing between donors
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
+          const isMiddleDonor = i === 1; // 2nd donor (index 1) is the middle one
 
           return (
-            <DonorNode
-              key={donor.accountId}
-              x={x}
-              y={y}
-              accountId={donor?.accountId}
-              rate={donor.rate}
-              radius={60}
-              farcasterUser={donor?.farcasterUser}
-            />
+            <g key={i}>
+              {/* Crown for middle donor */}
+              {isMiddleDonor && (
+                <g transform={`translate(${x + 54}, ${y - 140}) rotate(45)`}>
+                  <Crown width={120} height={120} fill="gold" />
+                </g>
+              )}
+              <DonorNode
+                index={i}
+                x={x}
+                y={y}
+                accountId={donor?.accountId}
+                rate={donor.rate}
+                radius={60}
+                farcasterUser={donor?.farcasterUser}
+              />
+            </g>
           );
         })}
         {/* Recipients inside the pool */}
@@ -467,20 +472,41 @@ export default function PoolCircle({
           );
         })}
       </svg>
-      <div className="flex flex-row justify-start w-full gap-20">
+      <div className="flex flex-row justify-center w-full">
         {donors.map((donor, i) => {
+          const donorY = 370 + 85;
+          const donorSpacing = 125;
+          const donorStartX = 75;
+
+          const x = donorStartX + i * donorSpacing;
+
           return (
-            // <div key={i} className="text-xs">{`${donor.rate} USDCx / mo`}</div>
-            <div key={i} className="text-xs">{`200 USDCx / mo`}</div>
+            <div
+              key={donor.accountId}
+              className="text-[10px] text-center absolute"
+              style={{
+                left: `${x - 50}px`, // Center the text under the donor circle
+                top: `${donorY + 80}px`, // Position below the donor circle
+                width: "100px", // Fixed width for consistent spacing
+              }}
+            >
+              <div className="flex flex-col items-center text-black font-bold">
+                <div>
+                  {`${Number(formatEther(BigInt(donor.rate))).toFixed(
+                    2
+                  )} USDCx / mo`}
+                </div>
+                <div className="text-brand-sfGreen">
+                  +
+                  {`${Number(formatEther(BigInt(donor.rate))).toFixed(
+                    2
+                  )} SUP / mo`}
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>
-      <button
-        className="mt-5 px-3 py-1 rounded bg-accent-800 text-white text-lg hover:bg-accent-700"
-        onClick={handleOpenStream}
-      >
-        Open Stream
-      </button>
     </div>
   );
 }
