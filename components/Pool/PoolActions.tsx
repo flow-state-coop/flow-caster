@@ -1,23 +1,31 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useState, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { Award, Info, X } from "lucide-react";
 import InfoDrawer from "./InfoDrawer";
 import OpenStream from "./OpenStream";
-import ClaimSup from "./ClaimSup";
 import Link from "next/link";
+import ConnectPool from "./ConnectPool";
+import { PoolData } from "@/lib/types";
 
 interface PoolActionsProps {
   onOpenStream: () => void;
   onClaimSup?: () => void;
   chainId: string;
   poolId: string;
+  shouldConnect?: boolean;
+  poolAddress: string;
+  connectedAddressNotPoolAddress: boolean;
+  connectedMember: PoolData["poolMembers"][0];
 }
+
+type DrawerTypes = "stream" | "claim" | "info" | "connect";
 
 const drawerTitles = {
   stream: "Open Stream",
   claim: "Claim SUP",
   info: "About This Pool",
+  connect: "Connect To Pool",
 };
 
 export default function PoolActions({
@@ -25,13 +33,22 @@ export default function PoolActions({
   onClaimSup,
   chainId,
   poolId,
+  shouldConnect,
+  poolAddress,
+  connectedAddressNotPoolAddress,
+  connectedMember,
 }: PoolActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerType, setDrawerType] = useState<"stream" | "claim" | "info">(
-    "stream"
-  );
+  const [drawerType, setDrawerType] = useState<DrawerTypes>("stream");
 
-  const handleOpenDrawer = (type: "stream" | "claim" | "info") => {
+  useEffect(() => {
+    if (shouldConnect) {
+      setDrawerType("connect");
+      setIsDrawerOpen(true);
+    }
+  }, [shouldConnect]);
+
+  const handleOpenDrawer = (type: DrawerTypes) => {
     setDrawerType(type);
     setIsDrawerOpen(true);
     if (type === "stream") {
@@ -56,12 +73,6 @@ export default function PoolActions({
             >
               Open Stream
             </button>
-            {/* <button
-              className="px-4 py-2 rounded-lg bg-brand-light text-sm font-bold border-2 border-black"
-              onClick={() => handleOpenDrawer("claim")}
-            >
-              Claim SUP
-            </button> */}
           </div>
 
           {/* Links */}
@@ -73,7 +84,6 @@ export default function PoolActions({
               className="p-2 text-black text-xs"
             >
               <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
-                Claim
                 <img
                   src="/images/sup.svg"
                   alt="Farcaster"
@@ -114,7 +124,7 @@ export default function PoolActions({
         <div className="p-6">
           {/* Drawer Header */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-black">
               {drawerTitles[drawerType]}
             </h2>
             <button
@@ -131,6 +141,15 @@ export default function PoolActions({
           )}
           {/* {drawerType === "claim" && <ClaimSup onClaimSup={onClaimSup} />} */}
           {drawerType === "info" && <InfoDrawer />}
+          {drawerType === "connect" && (
+            <ConnectPool
+              poolAddress={poolAddress}
+              poolId={poolId}
+              chainId={chainId}
+              connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+              connectedMember={connectedMember}
+            />
+          )}
         </div>
       </div>
     </>

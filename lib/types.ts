@@ -5,6 +5,7 @@ export interface PoolData {
   id: string;
   flowRate: string;
   totalUnits: string;
+  totalAmountDistributedUntilUpdatedAt: string;
   totalAmountFlowedDistributedUntilUpdatedAt: string;
   totalAmountInstantlyDistributedUntilUpdatedAt: string;
   updatedAtTimestamp: string;
@@ -16,6 +17,8 @@ export interface PoolData {
     };
     units: string;
     isConnected: boolean;
+    poolTotalAmountDistributedUntilUpdatedAt: string;
+    updatedAtTimestamp: string;
     farcasterUser: NeynarUser | null;
   }>;
   poolDistributors: Array<{
@@ -25,6 +28,8 @@ export interface PoolData {
       id: string;
     };
     flowRate: string;
+    totalAmountDistributedUntilUpdatedAt: string;
+    updatedAtTimestamp: string;
     farcasterUser: NeynarUser | null;
   }>;
   token: {

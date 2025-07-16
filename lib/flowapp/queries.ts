@@ -31,8 +31,10 @@ export const SUPERFLUID_QUERY = gql`
       id
       flowRate
       totalUnits
+      totalAmountDistributedUntilUpdatedAt
       totalAmountFlowedDistributedUntilUpdatedAt
       totalAmountInstantlyDistributedUntilUpdatedAt
+      totalFlowAdjustmentAmountDistributedUntilUpdatedAt
       updatedAtTimestamp
       poolMembers(first: 1000, where: { units_not: "0" }) {
         account {
@@ -40,12 +42,16 @@ export const SUPERFLUID_QUERY = gql`
         }
         units
         isConnected
+        poolTotalAmountDistributedUntilUpdatedAt
+        updatedAtTimestamp
       }
       poolDistributors(first: 1000, where: { flowRate_not: "0" }) {
         account {
           id
         }
         flowRate
+        totalAmountDistributedUntilUpdatedAt
+        updatedAtTimestamp
       }
       token {
         id

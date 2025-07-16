@@ -1,11 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import gsap from "gsap";
 import { ArrowRight, CircleArrowRight } from "lucide-react";
+import {
+  displayIndividualFlowPercentage,
+  displayIndividualFlowRate,
+  getMemberFlowRate,
+} from "@/lib/pool";
+import useFlowingAmount from "@/hooks/use-flowing-amount";
+import FlowAmount from "./FlowAmount";
 
 interface RecipientNodeProps {
   x: number;
@@ -14,8 +21,11 @@ interface RecipientNodeProps {
   accountId: string;
   units: number;
   totalUnits: number;
-  recipientCount: number;
+  totalFlowRate: number;
+  totalFlowed: string;
+  updatedAt: string;
   farcasterUser?: NeynarUser | null;
+  startingAmount: string;
 }
 
 export default function RecipientNode({
@@ -25,11 +35,14 @@ export default function RecipientNode({
   accountId,
   units,
   totalUnits,
-  recipientCount,
+  totalFlowRate,
   farcasterUser,
+  updatedAt,
+  startingAmount,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
+  const [showing, setShowing] = useState(false);
 
   return (
     <Tippy
@@ -54,7 +67,18 @@ export default function RecipientNode({
               <b>Account:</b> {accountId}
             </div>
           )}
-          <div className="font-bold text-lg">{units} % Split</div>
+
+          <div className="font-bold text-xl text-accent-800 leading-tight">
+            {displayIndividualFlowPercentage(totalUnits, units)} %{" "}
+            <span className="text-sm text-black font-semibold">of pool</span>
+          </div>
+
+          <div className="font-bold text-xl text-accent-800 leading-tight">
+            {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
+            <span className="text-xs text-black font-semibold">USDCx / mo</span>
+          </div>
+          <div className="font-bold text-xs text-accent-800"></div>
+
           <button className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs rounded-sm bg-brand-light text-black border border-black rounded-sm">
             Profile <CircleArrowRight />
           </button>
@@ -66,6 +90,8 @@ export default function RecipientNode({
       appendTo={document.body}
       theme="flow"
       className="bg-primary-400"
+      onShow={() => setShowing(true)}
+      onHide={() => setShowing(false)}
     >
       <g>
         {/* Profile image as a clip path */}

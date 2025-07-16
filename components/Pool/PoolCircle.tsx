@@ -11,9 +11,10 @@ import { createDonorBuckets, truncateString } from "@/lib/pool";
 import { formatEther } from "viem";
 import { Crown } from "lucide-react";
 import { PoolData } from "@/lib/types";
+import DonorStats from "./DonorStats";
 
 interface PoolCircleProps {
-  poolData?: PoolData;
+  poolData: PoolData;
   connectedUser?: NeynarUser;
   onOpenStream?: () => void;
 }
@@ -41,6 +42,8 @@ export default function PoolCircle({
     return poolData.poolMembers.map((member) => ({
       accountId: member.account.id,
       units: parseInt(member.units),
+      startingAmount: member.poolTotalAmountDistributedUntilUpdatedAt,
+      udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
     }));
   }, [poolData]);
@@ -56,10 +59,6 @@ export default function PoolCircle({
     return formattedDonors;
   }, [poolData, connectedUser]);
 
-  const totalUnits = useMemo(() => {
-    return recipients.reduce((sum: number, r: any) => sum + r.units, 0);
-  }, [recipients]);
-
   useEffect(() => {
     // Calculate sizes first
     const poolArea = Math.PI * radius * radius;
@@ -68,7 +67,7 @@ export default function PoolCircle({
     const baseRadius = Math.sqrt(avgAreaPerRecipient / Math.PI);
 
     const nodes = recipients.map((recipient) => {
-      const unitRatio = recipient.units / totalUnits;
+      const unitRatio = recipient.units / Number(poolData.totalUnits);
       const nodeRadius = Math.max(
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
@@ -127,7 +126,7 @@ export default function PoolCircle({
     return () => {
       simulation.stop();
     };
-  }, [recipients, totalUnits]);
+  }, [recipients, poolData]);
 
   // Animate pool outline and flow lines
   useEffect(() => {
@@ -380,9 +379,11 @@ export default function PoolCircle({
             radius={recipient.radius}
             accountId={recipient.accountId}
             units={recipient.units}
-            totalUnits={totalUnits}
-            recipientCount={recipients.length}
+            totalUnits={Number(poolData.totalUnits)}
             farcasterUser={recipient.farcasterUser}
+            totalFlowRate={Number(poolData.flowRate)}
+            startingAmount={recipient.startingAmount}
+            updatedAt={recipient.updatedAt}
           />
         ))}
         {/* Pool circle particles */}
@@ -429,58 +430,16 @@ export default function PoolCircle({
         })}
       </svg>
       <div className="flex flex-row justify-between w-full mt-2">
-        {/* {donors.map((donor, i) => {
-          const donorY = 370 + 85;
-          const donorSpacing = 125;
-          const donorStartX = 75;
-
-          const x = donorStartX + i * donorSpacing;
-
-          return (
-            <div
-              key={`${donor.accountId}-${donor.rate}`}
-              className="text-[10px] text-center absolute"
-              style={{
-                left: `${x - 50}px`, // Center the text under the donor circle
-                top: `${donorY + 80}px`, // Position below the donor circle
-                width: "100px", // Fixed width for consistent spacing
-              }}
-            >
-              <div className="flex flex-col items-center text-black font-bold">
-                <div>
-                  {`${Number(formatEther(BigInt(donor.rate))).toFixed(
-                    3
-                  )} USDCx / mo`}
-                </div>
-                <div className="text-brand-sfGreen">
-                  +
-                  {`${Number(formatEther(BigInt(donor.rate))).toFixed(
-                    2
-                  )} SUP / mo`}
-                </div>
-              </div>
-            </div>
-          );
-        })} */}
-
         {donors.map((donor, i) => {
           return (
-            <div
+            <DonorStats
               key={`${donor.accountId}-${donor.rate}`}
-              className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full"
-            >
-              <div>
-                {`${Number(formatEther(BigInt(donor.rate))).toFixed(
-                  3
-                )} USDCx / mo`}
-              </div>
-              <div className="text-brand-sfGreen">
-                +
-                {`${Number(formatEther(BigInt(donor.rate))).toFixed(
-                  2
-                )} SUP / mo`}
-              </div>
-            </div>
+              rate={donor.rate}
+              showSup={i < 2}
+              showTotalFlow={i > 1}
+              startingTimestamp={poolData.updatedAtTimestamp}
+              startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}
+            />
           );
         })}
       </div>
