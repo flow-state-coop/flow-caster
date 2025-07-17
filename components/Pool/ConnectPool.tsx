@@ -6,12 +6,12 @@ import {
   useSwitchChain,
   useAccount,
   useConnect,
-  useDisconnect,
 } from "wagmi";
 import { useCallback, useEffect, useState } from "react";
 import sdk from "@farcaster/miniapp-sdk";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { PoolData } from "@/lib/types";
+import { ArrowRight } from "lucide-react";
 
 export default function ConnectPool({
   poolAddress,
@@ -37,7 +37,6 @@ export default function ConnectPool({
     poolId,
   });
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
 
   const { writeContract, data: hash } = useWriteContract();
 
@@ -107,7 +106,7 @@ export default function ConnectPool({
     setIsSuccess(true);
   }
 
-  const openExporerUrl = useCallback(() => {
+  const openExplorerUrl = useCallback(() => {
     sdk.actions.openUrl(`https://basescan.org/tx/${hash}`);
   }, [hash]);
 
@@ -115,7 +114,7 @@ export default function ConnectPool({
     if (isLoading) return "Preparing...";
     if (isConfirming) return "Confirming...";
     if (isSuccess) return "Success!";
-    return "Start Recieiving";
+    return "Start Receiving";
   };
 
   const getButtonClass = () => {
@@ -135,7 +134,7 @@ export default function ConnectPool({
         {!isSuccess && (
           <p className="text-black">
             You&apos;re a recipient in this pool but haven&apos;t connected your
-            shares. Run the connection transacation to start receiving tokens.
+            shares. Run the connection transaction to start receiving tokens.
           </p>
         )}
       </div>
@@ -154,17 +153,17 @@ export default function ConnectPool({
 
       {hash && (
         <div
-          onClick={openExporerUrl}
-          className="mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
+          onClick={openExplorerUrl}
+          className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
         >
-          Open TX in Explorer →
+          Open TX in Explorer <ArrowRight className="w-4 h-4" />
         </div>
       )}
 
       {connectedAddressNotPoolAddress && (
         <div className="flex flex-col gap-2 mb-4 p-3 bg-accent-200 border border-accent-900 text-xs text-accent-900 rounded break-words">
           <div>
-            Your connected wallet is not the recieving wallet for this pool.
+            Your connected wallet is not the receiving wallet for this pool.
           </div>
           <div>Connected Wallet: {address}</div>
           <div>Recipient Wallet: {connectedMember.account.id}</div>

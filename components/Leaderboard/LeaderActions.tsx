@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useState, ReactNode } from "react";
-import { Award, Badge, Info, X } from "lucide-react";
+import { useState } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
+import { Badge, Info, Share, X } from "lucide-react";
 import Link from "next/link";
 import InfoDrawer from "../Pool/InfoDrawer";
 
@@ -30,6 +31,15 @@ export default function LeaderActions({ chainId, poolId }: LeaderActionsProps) {
     setIsDrawerOpen(false);
   };
 
+  const handleCast = async () => {
+    // pool home
+    // /pool/chainid/poolid
+    await sdk.actions.composeCast({
+      text: "replace me",
+      embeds: ["i am a url to the app"],
+    });
+  };
+
   return (
     <>
       {/* Sticky Footer */}
@@ -39,28 +49,22 @@ export default function LeaderActions({ chainId, poolId }: LeaderActionsProps) {
           <div className="flex items-center">
             <Link
               href={`/pool/${chainId}/${poolId}`}
-              className="p-2 text-black"
+              className="flex flex-row items-center gap-1 p-2 text-black text-xs font-bold"
             >
-              <Badge size={20} />
+              Back to Pool <Badge size={20} />
             </Link>
+            <div
+              className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"
+              onClick={handleCast}
+            >
+              <Share size={20} />
+            </div>
             <button
               className="p-2 text-black"
               onClick={() => handleOpenDrawer("info")}
             >
               <Info size={20} />
             </button>
-            <a
-              href="https://flowstate.network/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-black"
-            >
-              <img
-                src="/images/fs-logo-circle-black.svg"
-                alt="Farcaster"
-                className="w-6 h-6"
-              />
-            </a>
           </div>
         </div>
       </div>

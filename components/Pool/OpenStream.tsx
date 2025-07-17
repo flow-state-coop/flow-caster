@@ -1,41 +1,231 @@
-import { useState } from "react";
+import { usePoolData } from "@/hooks/use-pool-data";
+import { TOKEN_DATA } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import {
+  useAccount,
+  useConnect,
+  useSwitchChain,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
+import { useReadSuperToken } from "@sfpro/sdk/hook";
+
+import erc20Abi from "@/lib/abi/erc20.json";
+import { truncateString } from "@/lib/pool";
 
 interface OpenStreamProps {
-  onOpenStream: () => void;
+  chainId: string;
+  poolId: string;
 }
 
-export default function OpenStream({ onOpenStream }: OpenStreamProps) {
+export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
+  const [underlyingTokenAllowance, setUnderlyingTokenAllowance] = useState("");
+  const [underlyingTokenBalance, setUnderlyingTokenBalance] = useState("");
+  const [tokenBalance, setTokenBalance] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { address, isConnected, chainId: connectedChainId } = useAccount();
+  const { switchChain } = useSwitchChain();
+  const { refetch } = usePoolData({
+    chainId,
+    poolId,
+  });
+  const { connect, connectors } = useConnect();
+  const { writeContract: approve, data: approvalHash } = useWriteContract();
+
+  const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
+    useWaitForTransactionReceipt({
+      hash: approvalHash,
+    });
+
   const [monthlyDonation, setMonthlyDonation] = useState<string>("");
   const [wrapAmount, setWrapAmount] = useState<string>("");
   const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
   const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
 
-  // Dummy data for balances
-  const userBalance = 1250.5;
-  const usdcBalance = 850.25;
+  const tokenData = TOKEN_DATA[chainId];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch SuperToken balance
+  const { data: superTokenBalance } = useReadSuperToken({
+    address: tokenData.address,
+    functionName: "balanceOf",
+    args: [address || "0x0000000000000000000000000000000000000000"],
+  });
+
+  // Fetch underlying token balance
+  const { data: underlyingBalance } = useReadContract({
+    address: tokenData.underlyingAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address || "0x0000000000000000000000000000000000000000"],
+  });
+
+  // Fetch underlying token allowance for SuperToken contract
+  const { data: underlyingAllowance } = useReadContract({
+    address: tokenData.underlyingAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [
+      address || "0x0000000000000000000000000000000000000000",
+      tokenData.address,
+    ],
+  });
+
+  // Update underlying token balance when data changes
+  useEffect(() => {
+    if (underlyingBalance) {
+      setUnderlyingTokenBalance(underlyingBalance.toString());
+    } else {
+      setUnderlyingTokenBalance("");
+    }
+  }, [underlyingBalance]);
+
+  // Update underlying token allowance when data changes
+  useEffect(() => {
+    if (underlyingAllowance) {
+      setUnderlyingTokenAllowance(underlyingAllowance.toString());
+    } else {
+      setUnderlyingTokenAllowance("");
+    }
+  }, [underlyingAllowance]);
+
+  // Update token balance when superTokenBalance changes
+  useEffect(() => {
+    if (superTokenBalance) {
+      setTokenBalance(superTokenBalance.toString());
+    } else {
+      setTokenBalance("");
+    }
+  }, [superTokenBalance]);
+
+  const userBalance = tokenBalance ? parseFloat(tokenBalance) / 1e18 : 0;
+  const usdcBalance = underlyingTokenBalance
+    ? parseFloat(underlyingTokenBalance) / 1e6
+    : 0;
+
+  // Validation logic
+  const monthlyDonationAmount = parseFloat(monthlyDonation) || 0;
+  const wrapAmountValue = parseFloat(wrapAmount) || 0;
+  const totalSuperTokenBalance = userBalance + wrapAmountValue;
+
+  const isMonthlyDonationEmpty = monthlyDonationAmount === 0;
+  const isInsufficientBalance =
+    monthlyDonationAmount > 0 && totalSuperTokenBalance < monthlyDonationAmount;
+  const isWrapAmountExceedsBalance = wrapAmountValue > usdcBalance;
+  const isButtonDisabled =
+    isMonthlyDonationEmpty ||
+    isInsufficientBalance ||
+    isWrapAmountExceedsBalance;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    onOpenStream();
+
+    if (!address) {
+      setError("Please connect your wallet");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const wrapAmountValue = parseFloat(wrapAmount) || 0;
+    const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
+
+    // Step 1: Handle approval if needed
+    if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
+      approve(
+        {
+          address: tokenData.underlyingAddress as `0x${string}`,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [
+            tokenData.address,
+            BigInt(Math.ceil(wrapAmountValue * 1e6)), // Convert to wei with 6 decimals for USDC
+          ],
+        },
+        {
+          onSuccess: () => {
+            console.log("Approval transaction sent successfully");
+            // The approval will be handled by the useWaitForTransactionReceipt hook
+          },
+          onError: (error) => {
+            console.error("Approval failed:", error);
+            setError(`Approval failed: ${error.message}`);
+            setIsLoading(false);
+          },
+        }
+      );
+    } else {
+      // No approval needed, proceed with main transaction
+      proceedWithMainTransaction();
+    }
+  };
+
+  // Function to handle the main transaction after approval
+  const proceedWithMainTransaction = () => {
+    // TODO: Implement the main transaction logic here
+    console.log("Proceeding with main transaction");
+    setIsSuccess(true);
+    setIsLoading(false);
+  };
+
+  // Monitor approval transaction completion
+  useEffect(() => {
+    if (isApprovalSuccess && isApprovalConfirming === false) {
+      console.log(
+        "Approval transaction confirmed, proceeding with main transaction"
+      );
+      proceedWithMainTransaction();
+    }
+  }, [isApprovalSuccess, isApprovalConfirming]);
+
+  const getButtonText = () => {
+    if (isLoading) return "Preparing...";
+    if (isConfirming || isApprovalConfirming) return "Confirming...";
+    if (isSuccess) return "Success!";
+    if (isMonthlyDonationEmpty) return "Add streaming amount";
+    if (isWrapAmountExceedsBalance)
+      return `${tokenData.underlyingSymbol} balance too low`;
+    if (isInsufficientBalance)
+      return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}`;
+    return "Open Stream";
+  };
+
+  const getButtonClass = () => {
+    const baseClass =
+      "w-full px-4 py-3 rounded-lg text-black border-2 border-black font-medium text-xl transition-colors";
+
+    if (
+      isLoading ||
+      isConfirming ||
+      isApprovalConfirming ||
+      isSuccess ||
+      isButtonDisabled
+    ) {
+      return `${baseClass} bg-gray-400 text-gray-700 cursor-not-allowed`;
+    }
+
+    return `${baseClass} bg-accent-800 hover:bg-accent-600`;
   };
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="mb-6">
-        <p className="text-black">
-          Configure your stream settings and start streaming to the pool.
-        </p>
-      </div>
+      <div className="mb-6"></div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Error Display */}
+
         {/* Monthly Donation Stream */}
         <div>
           <label
             htmlFor="monthlyDonation"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-primary-800 mb-2"
           >
-            Monthly Donation Stream
+            How much do you want to stream per month?
           </label>
           <div className="relative">
             <input
@@ -43,17 +233,18 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
               id="monthlyDonation"
               value={monthlyDonation}
               onChange={(e) => setMonthlyDonation(e.target.value)}
-              step="0.01"
-              min="0"
               placeholder="0.00"
-              className="w-full px-4 py-3 pr-20 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+              className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500 text-sm font-medium">USDCx</span>
+              <span className="text-gray-500 text-sm font-medium">
+                {tokenData.symbol}
+              </span>
             </div>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
-            Connected wallet balance: {userBalance.toFixed(2)} USDCx
+          <p className="mt-2 text-xs text-primary-700">
+            Streaming token ({tokenData.symbol}) balance:{" "}
+            {userBalance.toFixed(2)}
           </p>
         </div>
 
@@ -61,9 +252,10 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
         <div>
           <label
             htmlFor="wrapAmount"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-primary-800 mb-2"
           >
-            Wrap for USDCx
+            How much {tokenData.underlyingSymbol} should we wrap to support your
+            stream?
           </label>
           <div className="relative">
             <input
@@ -72,18 +264,66 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
               value={wrapAmount}
               onChange={(e) => setWrapAmount(e.target.value)}
               step="0.01"
-              min="0"
-              max={usdcBalance}
               placeholder="0.00"
-              className="w-full px-4 py-3 pr-20 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+              className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500 text-sm font-medium">USDC</span>
+              <span className="text-gray-500 text-sm font-medium">
+                {tokenData.underlyingSymbol}{" "}
+              </span>
             </div>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
-            USDC balance: {usdcBalance.toFixed(2)} USDC
+          <p className="mt-2 text-xs text-primary-700">
+            {tokenData.underlyingSymbol} balance: {usdcBalance.toFixed(2)}
           </p>
+          <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
+            <p className="text-primary-800 font-bold">
+              Your stream will last until your {tokenData.symbol} balance is
+              depleted. You can wrap/unwrap more at any time to extend/shorten.{" "}
+            </p>
+            <p className="mt-1 text-primary-800 font-normal">
+              {(() => {
+                const currentBalance = userBalance;
+                const wrapAmountValue = parseFloat(wrapAmount) || 0;
+                const monthlyAmount = parseFloat(monthlyDonation) || 0;
+                const totalBalance = currentBalance + wrapAmountValue;
+
+                if (monthlyAmount > 0 && totalBalance > 0) {
+                  const monthsSupported = totalBalance / monthlyAmount;
+                  if (monthsSupported >= 1) {
+                    return `${totalBalance} ${
+                      tokenData.symbol
+                    } will support your stream for ~ ${monthsSupported.toFixed(
+                      1
+                    )} months.`;
+                  } else {
+                    const daysSupported = Math.floor(monthsSupported * 30);
+                    return `This much ${tokenData.symbol} will support your stream for ${daysSupported} days.`;
+                  }
+                } else if (monthlyAmount === 0) {
+                  return "Enter a monthly amount to see how long your balance will last.";
+                } else {
+                  return "Wrap some tokens to support your stream.";
+                }
+              })()}
+            </p>
+          </div>
+          {(() => {
+            const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
+            const wrapAmountValue = parseFloat(wrapAmount) || 0;
+
+            if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
+              return (
+                <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
+                  <p className="text-xs text-accent-800">
+                    There will be an approval request allowing wrapping of{" "}
+                    {tokenData.underlyingSymbol}
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         {/* Donate to Flow Caster devs */}
@@ -94,11 +334,11 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
               id="donateToDevs"
               checked={donateToDevs}
               onChange={(e) => setDonateToDevs(e.target.checked)}
-              className="h-4 w-4 text-secondary-600 focus:ring-secondary-500 border-gray-300 rounded"
+              className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 rounded accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
             />
             <label
               htmlFor="donateToDevs"
-              className="ml-2 block text-sm font-medium text-gray-700"
+              className="ml-2 block text-sm font-medium text-primary-800"
             >
               Donate to Flow Caster devs
             </label>
@@ -106,9 +346,6 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
 
           {donateToDevs && (
             <div className="ml-6 space-y-3">
-              <p className="text-sm text-gray-600">
-                Select donation percentage:
-              </p>
               <div className="flex space-x-3">
                 {[5, 10, 15].map((percent) => (
                   <label key={percent} className="flex items-center">
@@ -120,9 +357,9 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
                       onChange={(e) =>
                         setDevDonationPercent(Number(e.target.value))
                       }
-                      className="h-4 w-4 text-secondary-600 focus:ring-secondary-500 border-gray-300"
+                      className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
                     />
-                    <span className="ml-2 text-sm text-gray-700">
+                    <span className="ml-2 text-sm text-primary-800">
                       {percent}%
                     </span>
                   </label>
@@ -132,13 +369,36 @@ export default function OpenStream({ onOpenStream }: OpenStreamProps) {
           )}
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full px-4 py-3 rounded-lg bg-secondary-800 text-white font-medium hover:bg-secondary-700 transition-colors"
-        >
-          Open Stream
-        </button>
+        {error && (
+          <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
+            {truncateString(error, 100)}
+          </div>
+        )}
+
+        {!isConnected && (
+          <button
+            onClick={() => connect({ connector: connectors[0] })}
+            className="w-full px-4 py-3 text-black rounded-lg border-2 border-black font-medium text-xl transition-colors"
+          >
+            Connect Wallet
+          </button>
+        )}
+
+        {isConnected && (
+          <button
+            type="submit"
+            className={getButtonClass()}
+            disabled={
+              isLoading ||
+              isConfirming ||
+              isApprovalConfirming ||
+              isSuccess ||
+              isButtonDisabled
+            }
+          >
+            {getButtonText()}
+          </button>
+        )}
       </form>
     </div>
   );

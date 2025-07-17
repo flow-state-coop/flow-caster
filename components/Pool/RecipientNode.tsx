@@ -1,18 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import gsap from "gsap";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { ArrowRight, CircleArrowRight } from "lucide-react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
-  getMemberFlowRate,
 } from "@/lib/pool";
-import useFlowingAmount from "@/hooks/use-flowing-amount";
-import FlowAmount from "./FlowAmount";
 
 interface RecipientNodeProps {
   x: number;
@@ -23,9 +20,7 @@ interface RecipientNodeProps {
   totalUnits: number;
   totalFlowRate: number;
   totalFlowed: string;
-  updatedAt: string;
   farcasterUser?: NeynarUser | null;
-  startingAmount: string;
 }
 
 export default function RecipientNode({
@@ -37,12 +32,16 @@ export default function RecipientNode({
   totalUnits,
   totalFlowRate,
   farcasterUser,
-  updatedAt,
-  startingAmount,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
   const [showing, setShowing] = useState(false);
+
+  const handleViewProfile = async (fid: number) => {
+    await sdk.actions.viewProfile({
+      fid,
+    });
+  };
 
   return (
     <Tippy
@@ -79,9 +78,14 @@ export default function RecipientNode({
           </div>
           <div className="font-bold text-xs text-accent-800"></div>
 
-          <button className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs rounded-sm bg-brand-light text-black border border-black rounded-sm">
-            Profile <CircleArrowRight />
-          </button>
+          {farcasterUser && (
+            <button
+              onClick={() => handleViewProfile(Number(farcasterUser.fid))}
+              className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs text-primary-500 hover:text-primary-300"
+            >
+              View Profile <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       }
       trigger="click"

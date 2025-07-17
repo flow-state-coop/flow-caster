@@ -321,20 +321,6 @@ export default function PoolCircle({
                 }
                 setStreamOpenedCircle={setStreamOpenedCircle}
               />
-              {streamOpenedCircle &&
-                donor.accountId === donors[0]?.accountId && (
-                  <circle
-                    ref={newParticleCircleRef}
-                    id="pool-outline-particle"
-                    cx={poolEdgeX}
-                    cy={poolEdgeY}
-                    r={45}
-                    strokeWidth={0}
-                    fill="#FFEA99"
-                    opacity={0.98}
-                    filter="blur(4px)"
-                  />
-                )}
             </g>
           );
         })}
