@@ -148,7 +148,11 @@ export default function PoolActions({
 
           {/* Drawer Content */}
           {drawerType === "stream" && (
-            <OpenStream chainId={chainId} poolId={poolId} />
+            <OpenStream
+              chainId={chainId}
+              poolId={poolId}
+              poolAddress={poolAddress}
+            />
           )}
           {/* {drawerType === "claim" && <ClaimSup onClaimSup={onClaimSup} />} */}
           {drawerType === "info" && <InfoDrawer />}

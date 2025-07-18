@@ -1,6 +1,7 @@
 import { usePoolData } from "@/hooks/use-pool-data";
 import { TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
+import sdk from "@farcaster/miniapp-sdk";
 import {
   useAccount,
   useConnect,
@@ -11,15 +12,35 @@ import {
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
 
+import {
+  Operation,
+  OPERATION_TYPE,
+  prepareOperation,
+} from "@sfpro/sdk/constant";
+
+import { superTokenAbi, cfaForwarderAbi } from "@sfpro/sdk/abi";
+import { useWriteHost } from "@sfpro/sdk/hook/core";
 import erc20Abi from "@/lib/abi/erc20.json";
-import { truncateString } from "@/lib/pool";
+import {
+  calculateFlowratePerSecond,
+  TIME_UNIT,
+  truncateString,
+} from "@/lib/pool";
+import { encodeFunctionData, parseEther } from "viem";
+import { networks } from "@/lib/flowapp/networks";
+import { ArrowRight } from "lucide-react";
 
 interface OpenStreamProps {
   chainId: string;
   poolId: string;
+  poolAddress: string;
 }
 
-export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
+export default function OpenStream({
+  chainId,
+  poolId,
+  poolAddress,
+}: OpenStreamProps) {
   const [underlyingTokenAllowance, setUnderlyingTokenAllowance] = useState("");
   const [underlyingTokenBalance, setUnderlyingTokenBalance] = useState("");
   const [tokenBalance, setTokenBalance] = useState("");
@@ -40,6 +61,12 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
   const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
     useWaitForTransactionReceipt({
       hash: approvalHash,
+    });
+
+  const { writeContract: batchCall, data: batchHash } = useWriteHost();
+  const { isLoading: isBatchConfirming, isSuccess: isBatchSuccess } =
+    useWaitForTransactionReceipt({
+      hash: batchHash,
     });
 
   const [monthlyDonation, setMonthlyDonation] = useState<string>("");
@@ -86,6 +113,7 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
 
   // Update underlying token allowance when data changes
   useEffect(() => {
+    console.log("underlyingAllowance", underlyingAllowance);
     if (underlyingAllowance) {
       setUnderlyingTokenAllowance(underlyingAllowance.toString());
     } else {
@@ -132,6 +160,12 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
     setIsLoading(true);
     setError(null);
 
+    if (Number(chainId) !== connectedChainId) {
+      console.log("switching to chainId", chainId);
+      await switchChain({ chainId: Number(chainId) });
+      return;
+    }
+
     const wrapAmountValue = parseFloat(wrapAmount) || 0;
     const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
 
@@ -166,11 +200,78 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
   };
 
   // Function to handle the main transaction after approval
-  const proceedWithMainTransaction = () => {
+  const proceedWithMainTransaction = async () => {
     // TODO: Implement the main transaction logic here
     console.log("Proceeding with main transaction");
     setIsSuccess(true);
     setIsLoading(false);
+
+    const network = networks.find((network) => network.id === Number(chainId));
+
+    if (!network?.cfaForwarder) {
+      setError("Network or GDA forwarder not found");
+      return;
+    }
+
+    let txBatch: Operation[] = [];
+
+    const wrapAmountValue = parseFloat(wrapAmount) || 0;
+    console.log("wrapAmountValue", wrapAmountValue);
+    console.log("monthlyDonation", monthlyDonation);
+
+    if (wrapAmountValue > 0) {
+      txBatch = [
+        prepareOperation({
+          operationType: OPERATION_TYPE.SUPERTOKEN_UPGRADE,
+          target: tokenData.address,
+          data: encodeFunctionData({
+            abi: superTokenAbi,
+            functionName: "upgrade",
+            args: [parseEther(wrapAmountValue.toString())],
+          }),
+        }),
+      ];
+    }
+
+    txBatch = [
+      ...txBatch,
+      prepareOperation({
+        operationType: OPERATION_TYPE.SUPERFLUID_CALL_AGREEMENT,
+        target: network.cfaForwarder,
+        data: encodeFunctionData({
+          abi: cfaForwarderAbi,
+          functionName: "setFlowrate",
+          args: [
+            tokenData.address,
+            poolAddress as `0x${string}`,
+            calculateFlowratePerSecond({
+              amountWei: parseEther(monthlyDonation),
+              timeUnit: TIME_UNIT["month"],
+            }),
+          ],
+        }),
+      }),
+    ];
+
+    console.log("txBatch", txBatch);
+
+    batchCall(
+      {
+        functionName: "batchCall",
+        args: [txBatch],
+      },
+      {
+        onSuccess: () => {
+          console.log("batch transaction sent successfully");
+          // The approval will be handled by the useWaitForTransactionReceipt hook
+        },
+        onError: (error) => {
+          console.error("bacth failed:", error);
+          setError(`batch failed: ${error.message}`);
+          setIsLoading(false);
+        },
+      }
+    );
   };
 
   // Monitor approval transaction completion
@@ -181,7 +282,23 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
       );
       proceedWithMainTransaction();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isApprovalSuccess, isApprovalConfirming]);
+
+  // Monitor batch transaction completion
+  useEffect(() => {
+    if (isBatchSuccess && isBatchConfirming === false) {
+      console.log(
+        "Batch transaction confirmed, proceeding with main transaction"
+      );
+      refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBatchSuccess, isBatchConfirming]);
+
+  const openExplorerUrl = (hash: string) => {
+    sdk.actions.openUrl(`https://basescan.org/tx/${hash}`);
+  };
 
   const getButtonText = () => {
     if (isLoading) return "Preparing...";
@@ -372,6 +489,24 @@ export default function OpenStream({ chainId, poolId }: OpenStreamProps) {
         {error && (
           <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
             {truncateString(error, 100)}
+          </div>
+        )}
+
+        {approvalHash && (
+          <div
+            onClick={() => openExplorerUrl(approvalHash)}
+            className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
+          >
+            Approval TX in Explorer <ArrowRight className="w-4 h-4" />
+          </div>
+        )}
+
+        {batchHash && (
+          <div
+            onClick={() => openExplorerUrl(batchHash)}
+            className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
+          >
+            Stream TX in Explorer <ArrowRight className="w-4 h-4" />
           </div>
         )}
 

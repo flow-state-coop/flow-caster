@@ -4,9 +4,10 @@ import { createConfig, http, WagmiProvider } from "wagmi";
 import { base, optimismSepolia } from "wagmi/chains";
 
 export const config = createConfig({
-  chains: [base, optimismSepolia],
+  // chains: [base, optimismSepolia],
+  chains: [optimismSepolia],
   transports: {
-    [base.id]: http(),
+    // [base.id]: http(),
     [optimismSepolia.id]: http(),
   },
   connectors: [miniAppConnector()],
