@@ -238,7 +238,7 @@ export default function PoolCircle({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <svg width="400" height="500" viewBox="0 0 800 500" className="bg-white">
+      <svg width="390" height="500" viewBox="0 0 800 500" className="bg-white">
         <circle
           ref={poolCircleRef}
           id="pool-outline"
@@ -407,6 +407,7 @@ export default function PoolCircle({
               showTotalFlow={i > 1}
               startingTimestamp={poolData.updatedAtTimestamp}
               startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}
+              donorAddress={donor.accountId}
             />
           );
         })}

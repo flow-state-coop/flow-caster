@@ -21,3 +21,6 @@ export const TOKEN_DATA: Record<
     underlyingSymbol: "fDAI",
   },
 };
+
+export const FLUID_LOCKER_CONTRACT =
+  "0xA6694cAB43713287F7735dADc940b555db9d39D9";

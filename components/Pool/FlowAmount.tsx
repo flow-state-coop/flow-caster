@@ -1,6 +1,4 @@
 import useFlowingAmount from "@/hooks/use-flowing-amount";
-import { useSupPoints } from "@/hooks/use-sup-points";
-import { useEffect } from "react";
 import { formatEther } from "viem";
 
 interface FlowAmountProps {

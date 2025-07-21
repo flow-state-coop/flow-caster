@@ -78,6 +78,8 @@ export async function GET(request: NextRequest) {
     const fid = searchParams.get("fid") ?? "868887";
     const flowRate = searchParams.get("flowRate");
 
+    console.log("*******flowRate", flowRate);
+
     let user;
 
     const options = {
@@ -94,7 +96,6 @@ export async function GET(request: NextRequest) {
       const users = await res.json();
 
       user = users.users[0];
-      console.log("user", user);
     }
 
     return new ImageResponse(

@@ -13,14 +13,12 @@ export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
   const search = await searchParams;
-  let imageUrl = `${appUrl}/api/share`;
+  let imageUrl = `${appUrl}/api/share-donation?`;
 
-  if (search.fid) {
-    imageUrl += `?fid=${search.fid}`;
+  if (search.fid && search.flowRate) {
+    imageUrl += `fid=${search.fid}&flowRate=${search.flowRate}`;
   }
-  if (search.flowRate) {
-    imageUrl += `?flowRate=${search.flowRate}`;
-  }
+
   const frame = {
     version: "next",
     imageUrl: imageUrl,

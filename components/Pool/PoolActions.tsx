@@ -10,6 +10,7 @@ import ConnectPool from "./ConnectPool";
 import { PoolData } from "@/lib/types";
 import { formatEther } from "viem";
 import { ratePerMonthFormatted } from "@/lib/pool";
+import ClaimSup from "./ClaimSup";
 
 interface PoolActionsProps {
   onOpenStream: () => void;
@@ -27,7 +28,7 @@ type DrawerTypes = "stream" | "claim" | "info" | "connect";
 
 const drawerTitles = {
   stream: "Open Stream",
-  claim: "Claim SUP",
+  claim: "SUP Rewards",
   info: "What is this?",
   connect: "Connect To Pool",
 };
@@ -90,11 +91,9 @@ export default function PoolActions({
 
           {/* Links */}
           <div className="flex items-center">
-            <a
-              href="https://claim.superfluid.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-black text-xs hover:opacity-90"
+            <button
+              className="p-2 text-black hover:text-gray-800"
+              onClick={() => handleOpenDrawer("claim")}
             >
               <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
                 <img
@@ -103,7 +102,7 @@ export default function PoolActions({
                   className="w-6 h-6"
                 />
               </div>
-            </a>
+            </button>
             <Link
               href={`/pool/${chainId}/${poolId}/leaderboard`}
               className="p-2 text-black hover:text-gray-800"
@@ -162,7 +161,7 @@ export default function PoolActions({
               poolAddress={poolAddress}
             />
           )}
-          {/* {drawerType === "claim" && <ClaimSup onClaimSup={onClaimSup} />} */}
+          {drawerType === "claim" && <ClaimSup />}
           {drawerType === "info" && <InfoDrawer />}
           {drawerType === "connect" && connectedMember && (
             <ConnectPool

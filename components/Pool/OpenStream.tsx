@@ -29,6 +29,8 @@ import {
 import { encodeFunctionData, parseEther } from "viem";
 import { networks } from "@/lib/flowapp/networks";
 import { ArrowRight } from "lucide-react";
+import { useMiniApp } from "@/contexts/miniapp-context";
+import { useUser } from "@/contexts/user-context";
 
 interface OpenStreamProps {
   chainId: string;
@@ -48,7 +50,9 @@ export default function OpenStream({
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [isSuccess, setIsSuccess] = useState(false);
+
   const { address, isConnected, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const { refetch } = usePoolData({
@@ -57,6 +61,8 @@ export default function OpenStream({
   });
   const { connect, connectors } = useConnect();
   const { writeContract: approve, data: approvalHash } = useWriteContract();
+
+  const { user } = useUser();
 
   const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
     useWaitForTransactionReceipt({
@@ -300,6 +306,15 @@ export default function OpenStream({
     sdk.actions.openUrl(`https://basescan.org/tx/${hash}`);
   };
 
+  const handleCast = async () => {
+    await sdk.actions.composeCast({
+      text: "I'm supporting Cracked Farcaster Devs",
+      embeds: [
+        `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
+      ],
+    });
+  };
+
   const getButtonText = () => {
     if (isLoading) return "Preparing...";
     if (isConfirming || isApprovalConfirming) return "Confirming...";
@@ -331,208 +346,230 @@ export default function OpenStream({
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="mb-6"></div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Error Display */}
-
-        {/* Monthly Donation Stream */}
-        <div>
-          <label
-            htmlFor="monthlyDonation"
-            className="block text-sm font-medium text-primary-800 mb-2"
-          >
-            How much do you want to stream per month?
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              id="monthlyDonation"
-              value={monthlyDonation}
-              onChange={(e) => setMonthlyDonation(e.target.value)}
-              placeholder="0.00"
-              className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500 text-sm font-medium">
-                {tokenData.symbol}
-              </span>
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-primary-700">
-            Streaming token ({tokenData.symbol}) balance:{" "}
-            {userBalance.toFixed(2)}
-          </p>
-        </div>
-
-        {/* Wrap for USDCx */}
-        <div>
-          <label
-            htmlFor="wrapAmount"
-            className="block text-sm font-medium text-primary-800 mb-2"
-          >
-            How much {tokenData.underlyingSymbol} should we wrap to support your
-            stream?
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              id="wrapAmount"
-              value={wrapAmount}
-              onChange={(e) => setWrapAmount(e.target.value)}
-              step="0.01"
-              placeholder="0.00"
-              className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500 text-sm font-medium">
-                {tokenData.underlyingSymbol}{" "}
-              </span>
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-primary-700">
-            {tokenData.underlyingSymbol} balance: {usdcBalance.toFixed(2)}
-          </p>
-          <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
-            <p className="text-primary-800 font-bold">
-              Your stream will last until your {tokenData.symbol} balance is
-              depleted. You can wrap/unwrap more at any time to extend/shorten.{" "}
-            </p>
-            <p className="mt-1 text-primary-800 font-normal">
-              {(() => {
-                const currentBalance = userBalance;
-                const wrapAmountValue = parseFloat(wrapAmount) || 0;
-                const monthlyAmount = parseFloat(monthlyDonation) || 0;
-                const totalBalance = currentBalance + wrapAmountValue;
-
-                if (monthlyAmount > 0 && totalBalance > 0) {
-                  const monthsSupported = totalBalance / monthlyAmount;
-                  if (monthsSupported >= 1) {
-                    return `${totalBalance} ${
-                      tokenData.symbol
-                    } will support your stream for ~ ${monthsSupported.toFixed(
-                      1
-                    )} months.`;
-                  } else {
-                    const daysSupported = Math.floor(monthsSupported * 30);
-                    return `This much ${tokenData.symbol} will support your stream for ${daysSupported} days.`;
-                  }
-                } else if (monthlyAmount === 0) {
-                  return "Enter a monthly amount to see how long your balance will last.";
-                } else {
-                  return "Wrap some tokens to support your stream.";
-                }
-              })()}
-            </p>
-          </div>
-          {(() => {
-            const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
-            const wrapAmountValue = parseFloat(wrapAmount) || 0;
-
-            if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
-              return (
-                <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
-                  <p className="text-xs text-accent-800">
-                    There will be an approval request allowing wrapping of{" "}
-                    {tokenData.underlyingSymbol}
-                  </p>
+        {!isSuccess && (
+          <>
+            <div>
+              <label
+                htmlFor="monthlyDonation"
+                className="block text-sm font-medium text-primary-800 mb-2"
+              >
+                How much do you want to stream per month?
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="monthlyDonation"
+                  value={monthlyDonation}
+                  onChange={(e) => setMonthlyDonation(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span className="text-gray-500 text-sm font-medium">
+                    {tokenData.symbol}
+                  </span>
                 </div>
-              );
-            }
-            return null;
-          })()}
-        </div>
-
-        {/* Donate to Flow Caster devs */}
-        <div>
-          <div className="flex items-center mb-3">
-            <input
-              type="checkbox"
-              id="donateToDevs"
-              checked={donateToDevs}
-              onChange={(e) => setDonateToDevs(e.target.checked)}
-              className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 rounded accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
-            />
-            <label
-              htmlFor="donateToDevs"
-              className="ml-2 block text-sm font-medium text-primary-800"
-            >
-              Donate to Flow Caster devs
-            </label>
-          </div>
-
-          {donateToDevs && (
-            <div className="ml-6 space-y-3">
-              <div className="flex space-x-3">
-                {[5, 10, 15].map((percent) => (
-                  <label key={percent} className="flex items-center">
-                    <input
-                      type="radio"
-                      name="devDonationPercent"
-                      value={percent}
-                      checked={devDonationPercent === percent}
-                      onChange={(e) =>
-                        setDevDonationPercent(Number(e.target.value))
-                      }
-                      className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
-                    />
-                    <span className="ml-2 text-sm text-primary-800">
-                      {percent}%
-                    </span>
-                  </label>
-                ))}
               </div>
+              <p className="mt-2 text-xs text-primary-700">
+                Streaming token ({tokenData.symbol}) balance:{" "}
+                {userBalance.toFixed(2)}
+              </p>
             </div>
-          )}
-        </div>
 
-        {error && (
-          <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-            {truncateString(error, 100)}
-          </div>
+            {/* Wrap for USDCx */}
+            <div>
+              <label
+                htmlFor="wrapAmount"
+                className="block text-sm font-medium text-primary-800 mb-2"
+              >
+                How much {tokenData.underlyingSymbol} should we wrap to support
+                your stream?
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="wrapAmount"
+                  value={wrapAmount}
+                  onChange={(e) => setWrapAmount(e.target.value)}
+                  step="0.01"
+                  placeholder="0.00"
+                  className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span className="text-gray-500 text-sm font-medium">
+                    {tokenData.underlyingSymbol}{" "}
+                  </span>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-primary-700">
+                {tokenData.underlyingSymbol} balance: {usdcBalance.toFixed(2)}
+              </p>
+              <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
+                <p className="text-primary-800 font-bold">
+                  Your stream will last until your {tokenData.symbol} balance is
+                  depleted. You can wrap/unwrap more at any time to
+                  extend/shorten.{" "}
+                </p>
+                <p className="mt-1 text-primary-800 font-normal">
+                  {(() => {
+                    const currentBalance = userBalance;
+                    const wrapAmountValue = parseFloat(wrapAmount) || 0;
+                    const monthlyAmount = parseFloat(monthlyDonation) || 0;
+                    const totalBalance = currentBalance + wrapAmountValue;
+
+                    if (monthlyAmount > 0 && totalBalance > 0) {
+                      const monthsSupported = totalBalance / monthlyAmount;
+                      if (monthsSupported >= 1) {
+                        return `${totalBalance} ${
+                          tokenData.symbol
+                        } will support your stream for ~ ${monthsSupported.toFixed(
+                          1
+                        )} months.`;
+                      } else {
+                        const daysSupported = Math.floor(monthsSupported * 30);
+                        return `This much ${tokenData.symbol} will support your stream for ${daysSupported} days.`;
+                      }
+                    } else if (monthlyAmount === 0) {
+                      return "Enter a monthly amount to see how long your balance will last.";
+                    } else {
+                      return "Wrap some tokens to support your stream.";
+                    }
+                  })()}
+                </p>
+              </div>
+              {(() => {
+                const currentAllowance =
+                  parseFloat(underlyingTokenAllowance) || 0;
+                const wrapAmountValue = parseFloat(wrapAmount) || 0;
+
+                if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
+                  return (
+                    <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
+                      <p className="text-xs text-accent-800">
+                        There will be an approval request allowing wrapping of{" "}
+                        {tokenData.underlyingSymbol}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+
+            {/* Donate to Flow Caster devs */}
+            <div>
+              <div className="flex items-center mb-3">
+                <input
+                  type="checkbox"
+                  id="donateToDevs"
+                  checked={donateToDevs}
+                  onChange={(e) => setDonateToDevs(e.target.checked)}
+                  className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 rounded accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
+                />
+                <label
+                  htmlFor="donateToDevs"
+                  className="ml-2 block text-sm font-medium text-primary-800"
+                >
+                  Donate to Flow Caster devs
+                </label>
+              </div>
+
+              {donateToDevs && (
+                <div className="ml-6 space-y-3">
+                  <div className="flex space-x-3">
+                    {[5, 10, 15].map((percent) => (
+                      <label key={percent} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="devDonationPercent"
+                          value={percent}
+                          checked={devDonationPercent === percent}
+                          onChange={(e) =>
+                            setDevDonationPercent(Number(e.target.value))
+                          }
+                          className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
+                        />
+                        <span className="ml-2 text-sm text-primary-800">
+                          {percent}%
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
+                {truncateString(error, 100)}
+              </div>
+            )}
+
+            {approvalHash && (
+              <div
+                onClick={() => openExplorerUrl(approvalHash)}
+                className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
+              >
+                Approval TX in Explorer <ArrowRight className="w-4 h-4" />
+              </div>
+            )}
+
+            {batchHash && (
+              <div
+                onClick={() => openExplorerUrl(batchHash)}
+                className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
+              >
+                Stream TX in Explorer <ArrowRight className="w-4 h-4" />
+              </div>
+            )}
+
+            {!isConnected && (
+              <button
+                onClick={() => connect({ connector: connectors[0] })}
+                className="w-full px-4 py-3 text-black rounded-lg border-2 border-black font-medium text-xl transition-colors"
+              >
+                Connect Wallet
+              </button>
+            )}
+
+            {isConnected && (
+              <button
+                type="submit"
+                className={getButtonClass()}
+                disabled={
+                  isLoading ||
+                  isConfirming ||
+                  isApprovalConfirming ||
+                  isSuccess ||
+                  isButtonDisabled
+                }
+              >
+                {getButtonText()}
+              </button>
+            )}
+          </>
         )}
+        {isSuccess && (
+          <>
+            <p className="text-accent-800 text-3xl font-bold">Success! 🫡</p>
+            <p className="text-primary-500 text-sm">
+              You&apos;ve joined the galaxy of cracked dev supporters and have
+              started earning SUP rewards.
+            </p>
 
-        {approvalHash && (
-          <div
-            onClick={() => openExplorerUrl(approvalHash)}
-            className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
-          >
-            Approval TX in Explorer <ArrowRight className="w-4 h-4" />
-          </div>
-        )}
+            <p className="text-primary-500 text-sm font-bold">
+              Cast about it to help grow the flow.
+            </p>
 
-        {batchHash && (
-          <div
-            onClick={() => openExplorerUrl(batchHash)}
-            className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
-          >
-            Stream TX in Explorer <ArrowRight className="w-4 h-4" />
-          </div>
-        )}
-
-        {!isConnected && (
-          <button
-            onClick={() => connect({ connector: connectors[0] })}
-            className="w-full px-4 py-3 text-black rounded-lg border-2 border-black font-medium text-xl transition-colors"
-          >
-            Connect Wallet
-          </button>
-        )}
-
-        {isConnected && (
-          <button
-            type="submit"
-            className={getButtonClass()}
-            disabled={
-              isLoading ||
-              isConfirming ||
-              isApprovalConfirming ||
-              isSuccess ||
-              isButtonDisabled
-            }
-          >
-            {getButtonText()}
-          </button>
+            <button
+              onClick={handleCast}
+              type="button"
+              className="w-full px-4 py-3 rounded-lg text-black border-2 border-black font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
+            >
+              Cast
+            </button>
+          </>
         )}
       </form>
     </div>

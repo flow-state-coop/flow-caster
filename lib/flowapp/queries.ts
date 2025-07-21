@@ -109,3 +109,22 @@ export const SUPERFLUID_QUERY = gql`
     }
   }
 `;
+
+export const SF_SUP_TOKEN_SNAPSHOT = gql`
+  query SuperfluidSupTokenQuery($address: String!) {
+    accountTokenSnapshots(
+      where: {
+        token: "0xa69f80524381275a7ffdb3ae01c54150644c8792"
+        account: $address
+      }
+    ) {
+      balanceUntilUpdatedAt
+      totalNetFlowRate
+      updatedAtTimestamp
+      totalInflowRate
+      account {
+        id
+      }
+    }
+  }
+`;

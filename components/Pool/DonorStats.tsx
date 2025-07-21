@@ -1,6 +1,7 @@
 import { formatEther } from "viem";
 import FlowAmount from "./FlowAmount";
 import { ratePerMonthFormatted } from "@/lib/pool";
+import { useSupPoints } from "@/hooks/use-sup-points";
 
 interface DonorStatsProps {
   rate: string;
@@ -8,6 +9,7 @@ interface DonorStatsProps {
   showTotalFlow: boolean;
   startingAmount?: string;
   startingTimestamp?: string;
+  donorAddress?: string;
 }
 
 export default function DonorStats({
@@ -16,10 +18,15 @@ export default function DonorStats({
   showTotalFlow,
   startingAmount,
   startingTimestamp,
+  donorAddress,
 }: DonorStatsProps) {
+  const { data } = useSupPoints({
+    userAddress:
+      donorAddress && donorAddress.startsWith("0x0") ? donorAddress : undefined,
+  });
+
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">
-      {/* <div>{`${Number(formatEther(BigInt(rate))).toFixed(3)} USDCx / mo`}</div> */}
       <div>{`~ ${ratePerMonthFormatted(rate)} USDCx / mo`}</div>
 
       {showTotalFlow && (
@@ -27,12 +34,19 @@ export default function DonorStats({
           startingAmount={BigInt(startingAmount || "0")}
           startingTimestamp={Number(startingTimestamp)}
           flowRate={BigInt(rate)}
+          textAfter="Total"
         />
       )}
 
-      {showSup && (
+      {showSup && data && (
         <div className="text-brand-sfGreen">
-          +{`${Number(formatEther(BigInt(rate))).toFixed(2)} SUP / mo`}
+          <FlowAmount
+            textBefore="+"
+            textAfter="SUP / mo"
+            startingAmount={BigInt(data.balanceUntilUpdatedAt || "0")}
+            startingTimestamp={Number(data.updatedAtTimestamp)}
+            flowRate={BigInt(data.totalNetFlowRate)}
+          />
         </div>
       )}
     </div>
