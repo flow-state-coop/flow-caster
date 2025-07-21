@@ -21,6 +21,8 @@ import {
 import { superTokenAbi, cfaForwarderAbi } from "@sfpro/sdk/abi";
 import { useWriteHost } from "@sfpro/sdk/hook/core";
 import erc20Abi from "@/lib/abi/erc20.json";
+import hostAbi from "@/lib/abi/sfHost.json";
+
 import {
   calculateFlowratePerSecond,
   TIME_UNIT,
@@ -29,7 +31,6 @@ import {
 import { encodeFunctionData, parseEther } from "viem";
 import { networks } from "@/lib/flowapp/networks";
 import { ArrowRight } from "lucide-react";
-import { useMiniApp } from "@/contexts/miniapp-context";
 import { useUser } from "@/contexts/user-context";
 
 interface OpenStreamProps {
@@ -69,7 +70,9 @@ export default function OpenStream({
       hash: approvalHash,
     });
 
-  const { writeContract: batchCall, data: batchHash } = useWriteHost();
+  // const { writeContract: batchCall, data: batchHash } = useWriteHost();
+  const { writeContract: batchCall, data: batchHash } = useWriteContract();
+
   const { isLoading: isBatchConfirming, isSuccess: isBatchSuccess } =
     useWaitForTransactionReceipt({
       hash: batchHash,
@@ -167,7 +170,6 @@ export default function OpenStream({
     setError(null);
 
     if (Number(chainId) !== connectedChainId) {
-      console.log("switching to chainId", chainId);
       await switchChain({ chainId: Number(chainId) });
       return;
     }
@@ -175,8 +177,12 @@ export default function OpenStream({
     const wrapAmountValue = parseFloat(wrapAmount) || 0;
     const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
 
+    console.log("[currentAllowance", currentAllowance);
+    console.log("wrapAmountValue", wrapAmountValue);
+
     // Step 1: Handle approval if needed
     if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
+      setIsConfirming(true);
       approve(
         {
           address: tokenData.underlyingAddress as `0x${string}`,
@@ -191,11 +197,13 @@ export default function OpenStream({
           onSuccess: () => {
             console.log("Approval transaction sent successfully");
             // The approval will be handled by the useWaitForTransactionReceipt hook
+            setIsConfirming(false);
           },
           onError: (error) => {
             console.error("Approval failed:", error);
             setError(`Approval failed: ${error.message}`);
             setIsLoading(false);
+            setIsConfirming(false);
           },
         }
       );
@@ -209,24 +217,40 @@ export default function OpenStream({
   const proceedWithMainTransaction = async () => {
     // TODO: Implement the main transaction logic here
     console.log("Proceeding with main transaction");
-    setIsSuccess(true);
+    setIsSuccess(false);
     setIsLoading(false);
+    setIsConfirming(true);
 
     const network = networks.find((network) => network.id === Number(chainId));
 
+    console.log("network", network);
+
     if (!network?.cfaForwarder) {
-      setError("Network or GDA forwarder not found");
+      setError("Network or CFA forwarder not found");
       return;
     }
 
-    let txBatch: Operation[] = [];
+    let operations: Operation[] = [];
 
     const wrapAmountValue = parseFloat(wrapAmount) || 0;
     console.log("wrapAmountValue", wrapAmountValue);
     console.log("monthlyDonation", monthlyDonation);
+    console.log(
+      "parseEther(wrapAmountValue.toString()",
+      parseEther(wrapAmountValue.toString())
+    );
+    console.log("parseEther(monthlyDonation)", parseEther(monthlyDonation));
+
+    console.log(
+      "calculateFlowratePerSecond",
+      calculateFlowratePerSecond({
+        amountWei: parseEther(monthlyDonation),
+        timeUnit: TIME_UNIT["month"],
+      })
+    );
 
     if (wrapAmountValue > 0) {
-      txBatch = [
+      operations = [
         prepareOperation({
           operationType: OPERATION_TYPE.SUPERTOKEN_UPGRADE,
           target: tokenData.address,
@@ -239,8 +263,8 @@ export default function OpenStream({
       ];
     }
 
-    txBatch = [
-      ...txBatch,
+    operations = [
+      ...operations,
       prepareOperation({
         operationType: OPERATION_TYPE.SUPERFLUID_CALL_AGREEMENT,
         target: network.cfaForwarder,
@@ -259,12 +283,14 @@ export default function OpenStream({
       }),
     ];
 
-    console.log("txBatch", txBatch);
+    console.log("operations", operations);
 
     batchCall(
       {
+        address: network.superfluidHost,
+        abi: hostAbi,
         functionName: "batchCall",
-        args: [txBatch],
+        args: [operations],
       },
       {
         onSuccess: () => {
@@ -298,6 +324,19 @@ export default function OpenStream({
         "Batch transaction confirmed, proceeding with main transaction"
       );
       refetch();
+      setIsSuccess(true);
+
+      const options = {
+        method: "POST",
+        body: JSON.stringify({
+          poolid: poolId,
+          chainid: chainId,
+          poolname: "Farcaster Cracked Devs",
+          username: user?.data?.username || "A myster donor",
+          flowrate: monthlyDonation,
+        }),
+      };
+      fetch(`/api/notify-donation`, options);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBatchSuccess, isBatchConfirming]);
