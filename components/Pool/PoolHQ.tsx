@@ -6,6 +6,7 @@ import { usePoolData } from "@/hooks/use-pool-data";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { PoolData } from "@/lib/types";
+import { getTotalFlow } from "@/lib/pool";
 
 export default function PoolHQ({
   chainId,
@@ -85,11 +86,7 @@ export default function PoolHQ({
 
   return (
     <>
-      <PoolCircle
-        poolData={poolData}
-        connectedUser={user.data}
-        onOpenStream={handleOpenStream}
-      />
+      <PoolCircle poolData={poolData} connectedUser={user.data} />
       <PoolActions
         onOpenStream={handleOpenStream}
         onClaimSup={handleClaimSup}
@@ -99,6 +96,7 @@ export default function PoolHQ({
         poolAddress={poolData.id}
         connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
         connectedMember={connectedMember}
+        totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
       />
     </>
   );

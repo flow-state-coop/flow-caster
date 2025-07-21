@@ -5,26 +5,33 @@ import { Metadata } from "next";
 const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
-  params: Promise<{ chainid: string; poolId: string }>;
+  // params: Promise<{ chainid: string; poolId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-const frame = {
-  version: "next",
-  imageUrl: `${appUrl}/images/feed.png`,
-  button: {
-    title: "Launch Flow Caster",
-    action: {
-      type: "launch_frame",
-      name: "Flow Caster",
-      url: appUrl,
-      splashImageUrl: `${appUrl}/images/splash.png`,
-      splashBackgroundColor: "#ffffff",
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const search = await searchParams;
+  let imageUrl = `${appUrl}/api/share`;
+
+  if (search.totalFlow || search.totalFlow === "0") {
+    imageUrl += `?totalFlow=${search.totalFlow}`;
+  }
+  const frame = {
+    version: "next",
+    imageUrl: imageUrl,
+    button: {
+      title: "Launch Flow Caster",
+      action: {
+        type: "launch_frame",
+        name: "Flow Caster",
+        url: appUrl,
+        splashImageUrl: `${appUrl}/images/splash.png`,
+        splashBackgroundColor: "#ffffff",
+      },
     },
-  },
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  console.log("params", params);
+  };
   return {
     title: "Flow Caster",
     openGraph: {

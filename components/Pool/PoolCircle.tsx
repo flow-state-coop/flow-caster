@@ -16,25 +16,18 @@ import DonorStats from "./DonorStats";
 interface PoolCircleProps {
   poolData: PoolData;
   connectedUser?: NeynarUser;
-  onOpenStream?: () => void;
 }
 
 export default function PoolCircle({
   poolData,
   connectedUser,
-  onOpenStream,
 }: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
   const centerY = 170; // Move pool higher
 
-  // console.log("page render at PoolCircle.tsx");
-
-  const [streamOpened, setStreamOpened] = useState(false);
-  const [streamOpenedCircle, setStreamOpenedCircle] = useState(false);
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
-  const newParticleCircleRef = useRef<SVGCircleElement>(null);
 
   // Transform pool data to component format
   const recipients = useMemo(() => {
@@ -235,11 +228,6 @@ export default function PoolCircle({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolData]);
 
-  const handleOpenStream = () => {
-    setStreamOpened(true);
-    onOpenStream?.();
-  };
-
   if (!poolData) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
@@ -316,10 +304,6 @@ export default function PoolCircle({
                 x2={poolEdgeX}
                 y2={poolEdgeY}
                 rate={rateString}
-                streamOpened={
-                  donor.accountId === donors[0]?.accountId && streamOpened
-                }
-                setStreamOpenedCircle={setStreamOpenedCircle}
               />
             </g>
           );
@@ -368,8 +352,6 @@ export default function PoolCircle({
             totalUnits={Number(poolData.totalUnits)}
             farcasterUser={recipient.farcasterUser}
             totalFlowRate={Number(poolData.flowRate)}
-            startingAmount={recipient.startingAmount}
-            updatedAt={recipient.updatedAt}
           />
         ))}
         {/* Pool circle particles */}

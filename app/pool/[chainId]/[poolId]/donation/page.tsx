@@ -5,6 +5,7 @@ import { Metadata } from "next";
 const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
+  // params: Promise<{ chainid: string; poolId: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -14,10 +15,12 @@ export async function generateMetadata({
   const search = await searchParams;
   let imageUrl = `${appUrl}/api/share`;
 
-  if (search.totalFlow || search.totalFlow === "0") {
-    imageUrl += `?totalFlow=${search.totalFlow}`;
+  if (search.fid) {
+    imageUrl += `?fid=${search.fid}`;
   }
-
+  if (search.flowRate) {
+    imageUrl += `?flowRate=${search.flowRate}`;
+  }
   const frame = {
     version: "next",
     imageUrl: imageUrl,
@@ -44,11 +47,11 @@ export async function generateMetadata({
   };
 }
 
-const HomePage = dynamic(() => import("@/components/Home"), {
+const LeaderboardPage = dynamic(() => import("@/components/Leaderboard"), {
   ssr: false,
   loading: () => <div>Loading...</div>,
 });
 
 export default function Home() {
-  return <HomePage />;
+  return <LeaderboardPage />;
 }

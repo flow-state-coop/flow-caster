@@ -5,10 +5,12 @@ import { sdk } from "@farcaster/miniapp-sdk";
 import { Badge, Info, Share, X } from "lucide-react";
 import Link from "next/link";
 import InfoDrawer from "../Pool/InfoDrawer";
+import { ratePerMonthFormatted } from "@/lib/pool";
 
 interface LeaderActionsProps {
   chainId: string;
   poolId: string;
+  totalFlow: string | number;
 }
 
 const drawerTitles = {
@@ -17,7 +19,11 @@ const drawerTitles = {
   info: "About This Pool",
 };
 
-export default function LeaderActions({ chainId, poolId }: LeaderActionsProps) {
+export default function LeaderActions({
+  chainId,
+  poolId,
+  totalFlow,
+}: LeaderActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<"stream" | "claim" | "info">(
     "stream"
@@ -32,11 +38,15 @@ export default function LeaderActions({ chainId, poolId }: LeaderActionsProps) {
   };
 
   const handleCast = async () => {
-    // pool home
-    // /pool/chainid/poolid
     await sdk.actions.composeCast({
-      text: "replace me",
-      embeds: ["i am a url to the app"],
+      text: "Support Cracked Farcaster Devs",
+      embeds: [
+        `${
+          process.env.NEXT_PUBLIC_URL
+        }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+          totalFlow
+        )}`,
+      ],
     });
   };
 

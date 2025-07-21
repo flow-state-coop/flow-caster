@@ -3,6 +3,21 @@ import { NeynarUser } from "./neynar";
 import { formatEther, formatUnits } from "viem";
 import { PoolData } from "./types";
 
+export const getTotalFlow = (
+  poolDistributors: PoolData["poolDistributors"]
+) => {
+  return poolDistributors.reduce((total, current) => {
+    try {
+      const currentRate = BigInt(current.flowRate);
+      return total + currentRate;
+    } catch (error) {
+      // Skip invalid BigInt values
+      console.warn(`Invalid flowRate value: ${current.flowRate}`);
+      return total;
+    }
+  }, BigInt(0));
+};
+
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
   connectedUser?: NeynarUser
@@ -24,16 +39,7 @@ export const createDonorBuckets = (
       d.account.id === connectedUser?.verified_addresses.eth_addresses[0]
   );
 
-  const totalFlow = poolDistributors.reduce((total, current) => {
-    try {
-      const currentRate = BigInt(current.flowRate);
-      return total + currentRate;
-    } catch (error) {
-      // Skip invalid BigInt values
-      console.warn(`Invalid flowRate value: ${current.flowRate}`);
-      return total;
-    }
-  }, BigInt(0));
+  const totalFlow = getTotalFlow(poolDistributors);
 
   const totalDonor = {
     accountId: `${poolDistributors.length} Total`,

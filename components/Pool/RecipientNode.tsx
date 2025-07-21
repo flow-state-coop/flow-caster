@@ -19,7 +19,6 @@ interface RecipientNodeProps {
   units: number;
   totalUnits: number;
   totalFlowRate: number;
-  totalFlowed: string;
   farcasterUser?: NeynarUser | null;
 }
 

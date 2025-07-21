@@ -8,8 +8,6 @@ interface FlowLineProps {
   x2: number;
   y2: number;
   rate?: string; // Flow rate from donor data
-  streamOpened?: boolean;
-  setStreamOpenedCircle: (circle: boolean) => void;
 }
 
 export default function FlowLine({
@@ -18,12 +16,9 @@ export default function FlowLine({
   x2,
   y2,
   rate = "small",
-  streamOpened,
-  setStreamOpenedCircle,
 }: FlowLineProps) {
   const lineRef = useRef<SVGLineElement>(null);
   const particleRef = useRef<SVGCircleElement>(null);
-  const newParticleRef = useRef<SVGCircleElement>(null);
 
   // Determine size and speed based on rate
   const getParticleConfig = (rate: string) => {
@@ -58,35 +53,6 @@ export default function FlowLine({
     );
   }, [x1, y1, x2, y2, config.speed]);
 
-  useEffect(() => {
-    // Animate particle from donor to pool
-
-    if (!streamOpened) return;
-    const duration = 2;
-    gsap.fromTo(
-      newParticleRef.current,
-      { attr: { cx: x1, cy: y1 }, opacity: 0.25 },
-      {
-        attr: { cx: x2, cy: y2 },
-        opacity: 1,
-        repeat: 0,
-        duration,
-        ease: "power4.out",
-        onComplete: handleOpenComplete,
-      }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [x1, y1, x2, y2, streamOpened]);
-
-  const handleOpenComplete = () => {
-    // Hide the new particle by animating opacity to 0
-    gsap.to(newParticleRef.current, {
-      opacity: 0,
-      duration: 0.1,
-      ease: "power2.out",
-    });
-    setStreamOpenedCircle(true);
-  };
   return (
     <g>
       <line
@@ -110,18 +76,6 @@ export default function FlowLine({
         opacity={0.85}
         filter="drop-shadow(0 0 8px #D95D39)"
       />
-      {streamOpened && (
-        <circle
-          ref={newParticleRef}
-          cx={x1}
-          cy={y1}
-          r={45}
-          strokeWidth={0}
-          fill="#FFEA99"
-          opacity={0.98}
-          filter="blur(4px)"
-        />
-      )}
     </g>
   );
 }

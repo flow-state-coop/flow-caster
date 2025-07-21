@@ -29,6 +29,7 @@ export async function GET(
   }
 ) {
   try {
+    console.log("YOOOOOOOOOOOo");
     // Extract the ID from the route parameters
     const { id } = await params;
 

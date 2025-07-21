@@ -3,6 +3,7 @@ import { usePoolData } from "@/hooks/use-pool-data";
 import { useParams } from "next/navigation";
 import LeaderboardList from "./LeaderboardList";
 import LeaderActions from "./LeaderActions";
+import { getTotalFlow } from "@/lib/pool";
 
 export default function Leaderboard() {
   const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();
@@ -15,7 +16,7 @@ export default function Leaderboard() {
     poolId: poolId,
   });
 
-  if (isLoading) {
+  if (isLoading || !poolData) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <p className="text-lg">Loading pool data...</p>
@@ -36,7 +37,11 @@ export default function Leaderboard() {
   return (
     <main className="relative">
       <LeaderboardList poolData={poolData} />
-      <LeaderActions chainId={chainId} poolId={poolId} />
+      <LeaderActions
+        chainId={chainId}
+        poolId={poolId}
+        totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+      />
     </main>
   );
 }

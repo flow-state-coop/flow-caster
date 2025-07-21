@@ -8,6 +8,8 @@ import OpenStream from "./OpenStream";
 import Link from "next/link";
 import ConnectPool from "./ConnectPool";
 import { PoolData } from "@/lib/types";
+import { formatEther } from "viem";
+import { ratePerMonthFormatted } from "@/lib/pool";
 
 interface PoolActionsProps {
   onOpenStream: () => void;
@@ -18,6 +20,7 @@ interface PoolActionsProps {
   poolAddress: string;
   connectedAddressNotPoolAddress: boolean;
   connectedMember?: PoolData["poolMembers"][0];
+  totalFlow: string | number;
 }
 
 type DrawerTypes = "stream" | "claim" | "info" | "connect";
@@ -25,7 +28,7 @@ type DrawerTypes = "stream" | "claim" | "info" | "connect";
 const drawerTitles = {
   stream: "Open Stream",
   claim: "Claim SUP",
-  info: "About This Pool",
+  info: "What is this?",
   connect: "Connect To Pool",
 };
 
@@ -36,6 +39,7 @@ export default function PoolActions({
   poolAddress,
   connectedAddressNotPoolAddress,
   connectedMember,
+  totalFlow,
 }: PoolActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes>("stream");
@@ -57,11 +61,15 @@ export default function PoolActions({
   };
 
   const handleCast = async () => {
-    // pool home
-    // /pool/chainid/poolid
     await sdk.actions.composeCast({
-      text: "replace me",
-      embeds: ["i am a url to the app"],
+      text: "Support Cracked Farcaster Devs",
+      embeds: [
+        `${
+          process.env.NEXT_PUBLIC_URL
+        }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+          totalFlow
+        )}`,
+      ],
     });
   };
 

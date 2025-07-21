@@ -5,6 +5,7 @@ import { CircleUserRound, Crown } from "lucide-react";
 import { useMemo } from "react";
 import { formatEther } from "viem";
 import FlowAmount from "../Pool/FlowAmount";
+import { triggerDonationWorkflow } from "@/lib/qstash";
 
 interface LeaderboardListProps {
   poolData?: PoolData;
@@ -23,6 +24,30 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
     );
   }, [poolData]);
 
+  const handleTest = async () => {
+    // triggerDonationWorkflow({
+    //   poolid: "71",
+    //   chainid: "11155420",
+    //   poolname: "Farcaster Cracked Devs",
+    //   username: "skuhl.eth",
+    //   flowrate: "2000",
+    // });
+
+    const options = {
+      method: "POST",
+      body: JSON.stringify({
+        poolid: "71",
+        chainid: "11155420",
+        poolname: "Farcaster Cracked Devs",
+        username: "skuhl.eth",
+        flowrate: "2000",
+      }),
+    };
+    const response = await fetch(`/api/notify-donation`, options);
+
+    console.log("response", response);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto bg-white">
       <p className="text-sm font-bold text-black mt-3">
@@ -31,6 +56,9 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
       <h2 className="text-3xl text-primary-500 font-bold mb-3">
         Donor Leaderboard
       </h2>
+      <button className="text-black" onClick={handleTest}>
+        test
+      </button>
       <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
         <div className="col-span-2">&nbsp;</div>
         <div className="text-right">USDCx/mo</div>
