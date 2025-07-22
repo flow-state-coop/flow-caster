@@ -18,17 +18,17 @@ import {
   prepareOperation,
 } from "@sfpro/sdk/constant";
 
-import { superTokenAbi, cfaForwarderAbi } from "@sfpro/sdk/abi";
-import { useWriteHost } from "@sfpro/sdk/hook/core";
+import { superTokenAbi } from "@sfpro/sdk/abi";
 import erc20Abi from "@/lib/abi/erc20.json";
 import hostAbi from "@/lib/abi/sfHost.json";
+import gdaAbi from "@/lib/abi/gdaV1.json";
 
 import {
   calculateFlowratePerSecond,
   TIME_UNIT,
   truncateString,
 } from "@/lib/pool";
-import { encodeFunctionData, parseEther } from "viem";
+import { encodeFunctionData, formatUnits, parseEther, parseUnits } from "viem";
 import { networks } from "@/lib/flowapp/networks";
 import { ArrowRight } from "lucide-react";
 import { useUser } from "@/contexts/user-context";
@@ -44,15 +44,14 @@ export default function OpenStream({
   poolId,
   poolAddress,
 }: OpenStreamProps) {
-  const [underlyingTokenAllowance, setUnderlyingTokenAllowance] = useState("");
-  const [underlyingTokenBalance, setUnderlyingTokenBalance] = useState("");
-  const [tokenBalance, setTokenBalance] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [isSuccess, setIsSuccess] = useState(false);
+  const [monthlyDonation, setMonthlyDonation] = useState<string>("");
+  const [wrapAmount, setWrapAmount] = useState<string>("");
+  const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
+  const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
 
   const { address, isConnected, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
@@ -61,10 +60,9 @@ export default function OpenStream({
     poolId,
   });
   const { connect, connectors } = useConnect();
-  const { writeContract: approve, data: approvalHash } = useWriteContract();
-
   const { user } = useUser();
 
+  const { writeContract: approve, data: approvalHash } = useWriteContract();
   const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
     useWaitForTransactionReceipt({
       hash: approvalHash,
@@ -72,16 +70,10 @@ export default function OpenStream({
 
   // const { writeContract: batchCall, data: batchHash } = useWriteHost();
   const { writeContract: batchCall, data: batchHash } = useWriteContract();
-
   const { isLoading: isBatchConfirming, isSuccess: isBatchSuccess } =
     useWaitForTransactionReceipt({
       hash: batchHash,
     });
-
-  const [monthlyDonation, setMonthlyDonation] = useState<string>("");
-  const [wrapAmount, setWrapAmount] = useState<string>("");
-  const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
-  const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
 
   const tokenData = TOKEN_DATA[chainId];
 
@@ -98,7 +90,7 @@ export default function OpenStream({
     abi: erc20Abi,
     functionName: "balanceOf",
     args: [address || "0x0000000000000000000000000000000000000000"],
-  });
+  }) as { data: bigint | undefined };
 
   // Fetch underlying token allowance for SuperToken contract
   const { data: underlyingAllowance } = useReadContract({
@@ -109,39 +101,14 @@ export default function OpenStream({
       address || "0x0000000000000000000000000000000000000000",
       tokenData.address,
     ],
-  });
+  }) as { data: bigint | undefined };
 
-  // Update underlying token balance when data changes
-  useEffect(() => {
-    if (underlyingBalance) {
-      setUnderlyingTokenBalance(underlyingBalance.toString());
-    } else {
-      setUnderlyingTokenBalance("");
-    }
-  }, [underlyingBalance]);
+  const userBalance = superTokenBalance
+    ? Number(formatUnits(superTokenBalance, 18))
+    : 0;
 
-  // Update underlying token allowance when data changes
-  useEffect(() => {
-    console.log("underlyingAllowance", underlyingAllowance);
-    if (underlyingAllowance) {
-      setUnderlyingTokenAllowance(underlyingAllowance.toString());
-    } else {
-      setUnderlyingTokenAllowance("");
-    }
-  }, [underlyingAllowance]);
-
-  // Update token balance when superTokenBalance changes
-  useEffect(() => {
-    if (superTokenBalance) {
-      setTokenBalance(superTokenBalance.toString());
-    } else {
-      setTokenBalance("");
-    }
-  }, [superTokenBalance]);
-
-  const userBalance = tokenBalance ? parseFloat(tokenBalance) / 1e18 : 0;
-  const usdcBalance = underlyingTokenBalance
-    ? parseFloat(underlyingTokenBalance) / 1e6
+  const usdcBalance = underlyingBalance
+    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals))
     : 0;
 
   // Validation logic
@@ -174,11 +141,16 @@ export default function OpenStream({
       return;
     }
 
-    const wrapAmountValue = parseFloat(wrapAmount) || 0;
-    const currentAllowance = parseFloat(underlyingTokenAllowance) || 0;
+    // const wrapAmountValue = parseFloat(wrapAmount) || 0;
+    const wrapAmountValue = parseUnits(
+      wrapAmount,
+      tokenData.underlyingDecimals
+    );
 
-    console.log("[currentAllowance", currentAllowance);
+    const currentAllowance = Number(underlyingAllowance) || 0;
+
     console.log("wrapAmountValue", wrapAmountValue);
+    console.log("[currentAllowance", currentAllowance);
 
     // Step 1: Handle approval if needed
     if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
@@ -188,10 +160,7 @@ export default function OpenStream({
           address: tokenData.underlyingAddress as `0x${string}`,
           abi: erc20Abi,
           functionName: "approve",
-          args: [
-            tokenData.address,
-            BigInt(Math.ceil(wrapAmountValue * 1e6)), // Convert to wei with 6 decimals for USDC
-          ],
+          args: [tokenData.address, BigInt(wrapAmountValue)],
         },
         {
           onSuccess: () => {
@@ -215,38 +184,22 @@ export default function OpenStream({
 
   // Function to handle the main transaction after approval
   const proceedWithMainTransaction = async () => {
-    // TODO: Implement the main transaction logic here
-    console.log("Proceeding with main transaction");
     setIsSuccess(false);
     setIsLoading(false);
     setIsConfirming(true);
 
     const network = networks.find((network) => network.id === Number(chainId));
 
-    console.log("network", network);
-
-    if (!network?.cfaForwarder) {
-      setError("Network or CFA forwarder not found");
+    if (!network || !address) {
+      setError("Network or sender address not found");
       return;
     }
 
     let operations: Operation[] = [];
 
-    const wrapAmountValue = parseFloat(wrapAmount) || 0;
-    console.log("wrapAmountValue", wrapAmountValue);
-    console.log("monthlyDonation", monthlyDonation);
-    console.log(
-      "parseEther(wrapAmountValue.toString()",
-      parseEther(wrapAmountValue.toString())
-    );
-    console.log("parseEther(monthlyDonation)", parseEther(monthlyDonation));
-
-    console.log(
-      "calculateFlowratePerSecond",
-      calculateFlowratePerSecond({
-        amountWei: parseEther(monthlyDonation),
-        timeUnit: TIME_UNIT["month"],
-      })
+    const wrapAmountValue = parseUnits(
+      wrapAmount,
+      tokenData.underlyingDecimals
     );
 
     if (wrapAmountValue > 0) {
@@ -257,27 +210,31 @@ export default function OpenStream({
           data: encodeFunctionData({
             abi: superTokenAbi,
             functionName: "upgrade",
-            args: [parseEther(wrapAmountValue.toString())],
+            args: [wrapAmountValue],
           }),
         }),
       ];
     }
 
+    const flowRate = calculateFlowratePerSecond({
+      amountWei: parseEther(monthlyDonation),
+      timeUnit: TIME_UNIT["month"],
+    });
+
     operations = [
       ...operations,
       prepareOperation({
         operationType: OPERATION_TYPE.SUPERFLUID_CALL_AGREEMENT,
-        target: network.cfaForwarder,
+        target: network.gdaV1,
         data: encodeFunctionData({
-          abi: cfaForwarderAbi,
-          functionName: "setFlowrate",
+          abi: gdaAbi,
+          functionName: "distributeFlow",
           args: [
             tokenData.address,
+            address,
             poolAddress as `0x${string}`,
-            calculateFlowratePerSecond({
-              amountWei: parseEther(monthlyDonation),
-              timeUnit: TIME_UNIT["month"],
-            }),
+            flowRate,
+            "0x",
           ],
         }),
       }),
@@ -298,7 +255,7 @@ export default function OpenStream({
           // The approval will be handled by the useWaitForTransactionReceipt hook
         },
         onError: (error) => {
-          console.error("bacth failed:", error);
+          console.error("batch failed:", error);
           setError(`batch failed: ${error.message}`);
           setIsLoading(false);
         },
@@ -478,9 +435,16 @@ export default function OpenStream({
                 </p>
               </div>
               {(() => {
-                const currentAllowance =
-                  parseFloat(underlyingTokenAllowance) || 0;
-                const wrapAmountValue = parseFloat(wrapAmount) || 0;
+                const currentAllowance = Number(underlyingAllowance) || 0;
+                // const wrapAmountValue = parseFloat(wrapAmount) || 0;
+                const wrapAmountValue = parseUnits(
+                  wrapAmount,
+                  tokenData.underlyingDecimals
+                );
+
+                console.log("underlyingAllowance", underlyingAllowance);
+                console.log("currentAllowance", currentAllowance);
+                console.log("wrapAmountValue", wrapAmountValue);
 
                 if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
                   return (

@@ -31,6 +31,8 @@ export type Network = {
   alloRegistry: Address;
   gdaForwarder: Address;
   cfaForwarder: Address;
+  cfaV1: Address;
+  gdaV1: Address;
 };
 
 const networks: Network[] = [
@@ -59,7 +61,9 @@ const networks: Network[] = [
     recipientSuperappFactory: "0x7C959499F285E8Ca70EfDC46afD15C36A58c087a",
     allo: "0x1133eA7Af70876e64665ecD07C0A0476d09465a1",
     alloRegistry: "0x4AAcca72145e1dF2aeC137E1f3C5E3D75DB8b5f3",
+    gdaV1: "0x1e299701792a2aF01408B122419d65Fd2dF0Ba02",
     gdaForwarder: "0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08",
+    cfaV1: "0x731FdBB12944973B500518aea61942381d7e240D",
     cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
     tokens: [
       {
@@ -110,7 +114,9 @@ const networks: Network[] = [
     allo: "0x1133eA7Af70876e64665ecD07C0A0476d09465a1",
     alloRegistry: "0x4AAcca72145e1dF2aeC137E1f3C5E3D75DB8b5f3",
     gdaForwarder: "0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08",
+    gdaV1: "0xfE6c87BE05feDB2059d2EC41bA0A09826C9FD7aa",
     cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
+    cfaV1: "0x19ba78B9cDB05A877718841c574325fdB53601bb",
     tokens: [
       {
         symbol: "DAIx",
@@ -165,7 +171,9 @@ const networks: Network[] = [
     allo: "0x1133eA7Af70876e64665ecD07C0A0476d09465a1",
     alloRegistry: "0x4AAcca72145e1dF2aeC137E1f3C5E3D75DB8b5f3",
     gdaForwarder: "0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08",
+    gdaV1: "0x308b7405272d11494716e30C6E972DbF6fb89555",
     cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
+    cfaV1: "0x9d369e78e1a682cE0F8d9aD849BeA4FE1c3bD3Ad",
     tokens: [
       {
         symbol: "CELOx",
@@ -205,7 +213,9 @@ const networks: Network[] = [
     allo: "0x1133eA7Af70876e64665ecD07C0A0476d09465a1",
     alloRegistry: "0x4AAcca72145e1dF2aeC137E1f3C5E3D75DB8b5f3",
     gdaForwarder: "0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08",
+    gdaV1: "0x68Ae17fa7a31b86F306c383277552fd4813b0d35",
     cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
+    cfaV1: "0x204C6f131bb7F258b2Ea1593f5309911d8E458eD",
     tokens: [
       {
         symbol: "DAIx",
@@ -259,8 +269,10 @@ const networks: Network[] = [
     recipientSuperappFactory: "0x77F9A5D05e37B0c1DAEbB425bf2C69Fa8d9BEF90",
     allo: "0x1133eA7Af70876e64665ecD07C0A0476d09465a1",
     alloRegistry: "0x4AAcca72145e1dF2aeC137E1f3C5E3D75DB8b5f3",
-    cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
     gdaForwarder: "0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08",
+    gdaV1: "0xd453d38A001B47271488886532f1CCeAbf0c7eF3",
+    cfaForwarder: "0xcfA132E353cB4E398080B9700609bb008eceB125",
+    cfaV1: "0x8a3170AdbC67233196371226141736E4151e7C26",
     tokens: [
       {
         symbol: "ETHx",

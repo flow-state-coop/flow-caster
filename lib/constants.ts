@@ -4,7 +4,11 @@ export const MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 day
 
 export const TOKEN_DATA: Record<
   string,
-  Token & { underlyingAddress: string; underlyingSymbol: string }
+  Token & {
+    underlyingAddress: string;
+    underlyingSymbol: string;
+    underlyingDecimals: number;
+  }
 > = {
   "8453": {
     symbol: "USDCx",
@@ -12,6 +16,7 @@ export const TOKEN_DATA: Record<
     icon: "/usdc.png",
     underlyingAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     underlyingSymbol: "USDC",
+    underlyingDecimals: 6,
   },
   "11155420": {
     symbol: "fDAIx",
@@ -19,6 +24,7 @@ export const TOKEN_DATA: Record<
     icon: "/dai.png",
     underlyingAddress: "0x4247bA6C3658Fa5C0F523BAcea8D0b97aF1a175e",
     underlyingSymbol: "fDAI",
+    underlyingDecimals: 18,
   },
 };
 
