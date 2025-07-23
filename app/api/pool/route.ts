@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import farcasterDevsData from "@/lib/data/farcasterDevs.json";
 import { fetchUsersByEthAddress, NeynarUser } from "@/lib/neynar";
 import { networks } from "@/lib/flowapp/networks";
 import { GraphQLClient } from "graphql-request";
