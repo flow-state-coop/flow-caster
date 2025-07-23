@@ -53,7 +53,6 @@ export default function PoolHQ({
   }, [poolData, address, user]);
 
   useEffect(() => {
-    console.log("address", address);
     if (!address || !poolData) return;
 
     const donor = poolData.poolDistributors.find((d) => {

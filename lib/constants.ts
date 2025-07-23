@@ -31,3 +31,4 @@ export const TOKEN_DATA: Record<
 export const FLUID_LOCKER_CONTRACT =
   "0xA6694cAB43713287F7735dADc940b555db9d39D9";
 export const DEV_POOL_ADDRESS = "0x592834dfaa81dc050dc5ac46f4fc87d594faeb75";
+export const DEV_POOL_ID = "73";

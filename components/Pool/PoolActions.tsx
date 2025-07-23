@@ -25,14 +25,7 @@ interface PoolActionsProps {
   connectedDonor?: PoolData["poolDistributors"][0];
 }
 
-type DrawerTypes = "stream" | "claim" | "info" | "connect";
-
-const drawerTitles = {
-  stream: "Open Stream",
-  claim: "SUP Rewards",
-  info: "What is this?",
-  connect: "Connect To Pool",
-};
+type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
 export default function PoolActions({
   chainId,
@@ -76,6 +69,18 @@ export default function PoolActions({
     });
   };
 
+  const getDrawerTitle = () => {
+    const drawerTitles = {
+      stream: "Open Stream",
+      claim: "SUP Rewards",
+      info: "What is this?",
+      connect: "Connect To Pool",
+      edit: "Edit Stream",
+    };
+
+    return drawerTitles[drawerType];
+  };
+
   return (
     <>
       {/* Sticky Footer */}
@@ -85,7 +90,13 @@ export default function PoolActions({
           <div className="flex gap-3 text-black">
             <button
               className="px-4 py-2 rounded-lg bg-brand-light text-base font-bold border-2 border-black"
-              onClick={() => handleOpenDrawer("stream")}
+              onClick={() =>
+                handleOpenDrawer(
+                  connectedDonor && Number(connectedDonor.flowRate) > 0
+                    ? "edit"
+                    : "stream"
+                )
+              }
             >
               {connectedDonor && Number(connectedDonor.flowRate) > 0
                 ? "Edit"
@@ -148,7 +159,7 @@ export default function PoolActions({
           {/* Drawer Header */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-accent-800">
-              {drawerTitles[drawerType]}
+              {getDrawerTitle()}
             </h2>
             <button
               onClick={handleCloseDrawer}
@@ -159,13 +170,14 @@ export default function PoolActions({
           </div>
 
           {/* Drawer Content */}
-          {drawerType === "stream" && (
+          {drawerType === "stream" || drawerType === "edit" ? (
             <OpenStream
               chainId={chainId}
               poolId={poolId}
               poolAddress={poolAddress}
+              connectedDonor={connectedDonor}
             />
-          )}
+          ) : null}
           {drawerType === "claim" && <ClaimSup />}
           {drawerType === "info" && <InfoDrawer />}
           {drawerType === "connect" && connectedMember && (
