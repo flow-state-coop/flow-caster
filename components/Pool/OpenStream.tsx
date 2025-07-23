@@ -378,7 +378,7 @@ export default function OpenStream({
     await sdk.actions.composeCast({
       text: "I'm supporting Cracked Farcaster Devs",
       embeds: [
-        `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
+        `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
       ],
     });
   };

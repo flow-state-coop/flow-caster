@@ -16,7 +16,7 @@ interface LeaderActionsProps {
 const drawerTitles = {
   stream: "Open Stream",
   claim: "Claim SUP",
-  info: "About This Pool",
+  info: "What is this?",
 };
 
 export default function LeaderActions({
@@ -26,7 +26,7 @@ export default function LeaderActions({
 }: LeaderActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<"stream" | "claim" | "info">(
-    "stream"
+    "info"
   );
   const handleOpenDrawer = (type: "stream" | "claim" | "info") => {
     setDrawerType(type);
@@ -61,7 +61,7 @@ export default function LeaderActions({
               href={`/pool/${chainId}/${poolId}`}
               className="flex flex-row items-center gap-1 p-2 text-black text-xs font-bold"
             >
-              Back to Pool <Badge size={20} />
+              Back to <Badge size={20} />
             </Link>
             <div
               className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"
@@ -96,7 +96,7 @@ export default function LeaderActions({
         <div className="p-6">
           {/* Drawer Header */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-2xl font-bold text-accent-800">
               {drawerTitles[drawerType]}
             </h2>
             <button
