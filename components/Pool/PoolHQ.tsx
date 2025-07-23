@@ -20,6 +20,9 @@ export default function PoolHQ({
   >();
   const [connectedAddressNotPoolAddress, setConnectedAddressNotPoolAddress] =
     useState(false);
+  const [connectedDonor, setConnectedDonor] = useState<
+    PoolData["poolDistributors"][0] | undefined
+  >();
   const {
     data: poolData,
     isLoading,
@@ -36,18 +39,29 @@ export default function PoolHQ({
   }, [connectedMember]);
 
   useEffect(() => {
-    if (!user.data || !poolData || !address) return;
+    if (!user.data || !poolData) return;
     const member = poolData.poolMembers.find(
-      (d) =>
-        d.account.id === user.data?.verified_addresses.primary.eth_address ||
-        d.account.id === user.data?.verified_addresses.eth_addresses[0]
+      (m) =>
+        m.account.id === user.data?.verified_addresses.primary.eth_address ||
+        m.account.id === user.data?.verified_addresses.eth_addresses[0]
     );
 
+    setConnectedMember(member);
     if (member && member.account.id !== address) {
-      setConnectedMember(member);
       setConnectedAddressNotPoolAddress(true);
     }
   }, [poolData, address, user]);
+
+  useEffect(() => {
+    console.log("address", address);
+    if (!address || !poolData) return;
+
+    const donor = poolData.poolDistributors.find((d) => {
+      return d.account.id.toLowerCase() === address.toLowerCase();
+    });
+
+    setConnectedDonor(donor);
+  }, [poolData, address]);
 
   console.log("poolData", poolData);
 
@@ -97,6 +111,7 @@ export default function PoolHQ({
         connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
         connectedMember={connectedMember}
         totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+        connectedDonor={connectedDonor}
       />
     </>
   );

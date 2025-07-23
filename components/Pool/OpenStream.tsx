@@ -1,5 +1,5 @@
 import { usePoolData } from "@/hooks/use-pool-data";
-import { TOKEN_DATA } from "@/lib/constants";
+import { DEV_POOL_ADDRESS, TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
 import sdk from "@farcaster/miniapp-sdk";
 import {
@@ -216,8 +216,40 @@ export default function OpenStream({
       ];
     }
 
-    const flowRate = calculateFlowratePerSecond({
-      amountWei: parseEther(monthlyDonation),
+    let poolMonthlyDonation = parseFloat(monthlyDonation);
+
+    if (donateToDevs) {
+      const devMonthlyDonation =
+        parseFloat(monthlyDonation) * (devDonationPercent / 100);
+      poolMonthlyDonation = parseFloat(monthlyDonation) - devMonthlyDonation;
+
+      const devFlowRate = calculateFlowratePerSecond({
+        amountWei: parseEther(devMonthlyDonation.toString()),
+        timeUnit: TIME_UNIT["month"],
+      });
+
+      operations = [
+        ...operations,
+        prepareOperation({
+          operationType: OPERATION_TYPE.SUPERFLUID_CALL_AGREEMENT,
+          target: network.gdaV1,
+          data: encodeFunctionData({
+            abi: gdaAbi,
+            functionName: "distributeFlow",
+            args: [
+              tokenData.address,
+              address,
+              DEV_POOL_ADDRESS as `0x${string}`,
+              devFlowRate,
+              "0x",
+            ],
+          }),
+        }),
+      ];
+    }
+
+    const poolFlowRate = calculateFlowratePerSecond({
+      amountWei: parseEther(poolMonthlyDonation.toString()),
       timeUnit: TIME_UNIT["month"],
     });
 
@@ -233,14 +265,12 @@ export default function OpenStream({
             tokenData.address,
             address,
             poolAddress as `0x${string}`,
-            flowRate,
+            poolFlowRate,
             "0x",
           ],
         }),
       }),
     ];
-
-    console.log("operations", operations);
 
     batchCall(
       {
@@ -442,10 +472,6 @@ export default function OpenStream({
                   tokenData.underlyingDecimals
                 );
 
-                console.log("underlyingAllowance", underlyingAllowance);
-                console.log("currentAllowance", currentAllowance);
-                console.log("wrapAmountValue", wrapAmountValue);
-
                 if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
                   return (
                     <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
@@ -460,7 +486,7 @@ export default function OpenStream({
               })()}
             </div>
 
-            {/* Donate to Flow Caster devs */}
+            {/* Donate to flowcaster devs */}
             <div>
               <div className="flex items-center mb-3">
                 <input
@@ -474,7 +500,7 @@ export default function OpenStream({
                   htmlFor="donateToDevs"
                   className="ml-2 block text-sm font-medium text-primary-800"
                 >
-                  Donate to Flow Caster devs
+                  Donate to flowcaster devs
                 </label>
               </div>
 

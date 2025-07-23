@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         await setUserNotificationDetails(fid, event.notificationDetails);
         await sendFrameNotification({
           fid,
-          title: `Welcome to Flow Caster`,
+          title: `Welcome to flowcaster`,
           body: `Thank you for adding the app!`,
         });
       } else {
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
       await setUserNotificationDetails(fid, event.notificationDetails);
       await sendFrameNotification({
         fid,
-        title: `Welcome to Flow Caster`,
+        title: `Welcome to flowcaster`,
         body: `Thank you for enabling notifications`,
       });
 

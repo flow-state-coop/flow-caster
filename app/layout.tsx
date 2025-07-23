@@ -12,8 +12,8 @@ const headerFont = Archivo_Black({
 });
 
 export const metadata: Metadata = {
-  title: "Flow Caster",
-  description: "Flow Caster",
+  title: "flowcaster",
+  description: "flowcaster",
 };
 
 export default function RootLayout({

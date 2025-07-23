@@ -22,6 +22,7 @@ interface PoolActionsProps {
   connectedAddressNotPoolAddress: boolean;
   connectedMember?: PoolData["poolMembers"][0];
   totalFlow: string | number;
+  connectedDonor?: PoolData["poolDistributors"][0];
 }
 
 type DrawerTypes = "stream" | "claim" | "info" | "connect";
@@ -41,6 +42,7 @@ export default function PoolActions({
   connectedAddressNotPoolAddress,
   connectedMember,
   totalFlow,
+  connectedDonor,
 }: PoolActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes>("stream");
@@ -85,7 +87,10 @@ export default function PoolActions({
               className="px-4 py-2 rounded-lg bg-brand-light text-base font-bold border-2 border-black"
               onClick={() => handleOpenDrawer("stream")}
             >
-              Open Stream
+              {connectedDonor && Number(connectedDonor.flowRate) > 0
+                ? "Edit"
+                : "Open"}{" "}
+              Stream
             </button>
           </div>
 

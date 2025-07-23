@@ -55,7 +55,9 @@ const archivoBlackBuffer = readFileSync(
 );
 
 // Load logo as base64 (1.8KB file)
-const logoBuffer = readFileSync(path.join(process.cwd(), "static", "icon.png"));
+const logoBuffer = readFileSync(
+  path.join(process.cwd(), "static", "bub-icon.png")
+);
 const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
 const devsBuffer = readFileSync(path.join(process.cwd(), "static", "devs.png"));
@@ -116,7 +118,7 @@ export async function GET(request: NextRequest) {
               style={{ display: "flex", marginBottom: "20px" }}
             >
               <img src={logoBase64} height={20} width={20} alt="logo" />
-              <div style={STYLES.header}>Flow Caster</div>
+              <div style={STYLES.header}>flowcaster</div>
             </div>
 
             <div
