@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import farcasterDevsData from "@/lib/data/farcasterDevs.json";
 import { fetchUsersByEthAddress, NeynarUser } from "@/lib/neynar";
+import { networks } from "@/lib/flowapp/networks";
+import { GraphQLClient } from "graphql-request";
+import {
+  FLOW_SPLITTER_POOL_QUERY,
+  SUPERFLUID_QUERY,
+} from "@/lib/flowapp/queries";
+import { PoolData } from "@/lib/types";
+
+type FlowPoolData = {
+  token: string;
+  poolAddress: string;
+  name: string;
+  symbol: string;
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,11 +22,41 @@ export async function GET(request: NextRequest) {
     const chainId = searchParams.get("chainId");
     const poolId = searchParams.get("poolId");
 
-    // For now, return the static data regardless of parameters
-    // Later this will be replaced with real API calls based on chainId and poolId
     console.log(
       `Fetching pool data for chainId: ${chainId}, poolId: ${poolId}`
     );
+
+    const network = networks.find((network) => network.id === Number(chainId));
+
+    if (!network || !chainId || !poolId) {
+      throw Error("Missing ChainId, PoolId or Network");
+    }
+    const flowUrl = network.flowSplitterSubgraph;
+    const sfUrl = network.superfluidSubgraph;
+    const flowClient = new GraphQLClient(flowUrl);
+    const sfClient = new GraphQLClient(sfUrl);
+
+    const flowSplitterPoolQueryRes = (await flowClient.request(
+      FLOW_SPLITTER_POOL_QUERY,
+      { poolId: `0x${Number(poolId).toString(16)}` }
+    )) as { pools: FlowPoolData[] };
+
+    const pool = flowSplitterPoolQueryRes?.pools[0];
+
+    if (!pool) {
+      throw Error("Missing Pool");
+    }
+
+    const superfluidQueryRes = (await sfClient.request(SUPERFLUID_QUERY, {
+      token: pool.token,
+      gdaPool: pool.poolAddress,
+    })) as { pool: PoolData };
+
+    const farcasterDevsData = superfluidQueryRes?.pool;
+
+    if (!farcasterDevsData) {
+      throw Error("Missing SF Pool");
+    }
 
     // Extract all Ethereum addresses from pool members and distributors
     const memberAddresses = farcasterDevsData.poolMembers.map(
@@ -57,13 +101,17 @@ export async function GET(request: NextRequest) {
             null,
         })
       ),
+      poolMeta: {
+        name: pool.name,
+        symbol: pool.symbol,
+      },
     };
 
     return NextResponse.json(enhancedPoolData);
   } catch (error) {
     console.error("Error fetching pool data:", error);
     return NextResponse.json(
-      { error: "Failed to fetch pool data" },
+      { error: `Failed to fetch pool data. ${error}` },
       { status: 500 }
     );
   }

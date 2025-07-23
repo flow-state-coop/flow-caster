@@ -1,46 +1,79 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useState, ReactNode } from "react";
-import { Award, Info, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Award, Info, Share, X } from "lucide-react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import InfoDrawer from "./InfoDrawer";
 import OpenStream from "./OpenStream";
-import ClaimSup from "./ClaimSup";
 import Link from "next/link";
+import ConnectPool from "./ConnectPool";
+import { PoolData } from "@/lib/types";
+import { formatEther } from "viem";
+import { ratePerMonthFormatted } from "@/lib/pool";
+import ClaimSup from "./ClaimSup";
 
 interface PoolActionsProps {
   onOpenStream: () => void;
   onClaimSup?: () => void;
   chainId: string;
   poolId: string;
+  shouldConnect?: boolean;
+  poolAddress: string;
+  connectedAddressNotPoolAddress: boolean;
+  connectedMember?: PoolData["poolMembers"][0];
+  totalFlow: string | number;
+  connectedDonor?: PoolData["poolDistributors"][0];
 }
+
+type DrawerTypes = "stream" | "claim" | "info" | "connect";
 
 const drawerTitles = {
   stream: "Open Stream",
-  claim: "Claim SUP",
-  info: "About This Pool",
+  claim: "SUP Rewards",
+  info: "What is this?",
+  connect: "Connect To Pool",
 };
 
 export default function PoolActions({
-  onOpenStream,
-  onClaimSup,
   chainId,
   poolId,
+  shouldConnect,
+  poolAddress,
+  connectedAddressNotPoolAddress,
+  connectedMember,
+  totalFlow,
+  connectedDonor,
 }: PoolActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerType, setDrawerType] = useState<"stream" | "claim" | "info">(
-    "stream"
-  );
+  const [drawerType, setDrawerType] = useState<DrawerTypes>("stream");
 
-  const handleOpenDrawer = (type: "stream" | "claim" | "info") => {
+  useEffect(() => {
+    if (shouldConnect) {
+      setDrawerType("connect");
+      setIsDrawerOpen(true);
+    }
+  }, [shouldConnect]);
+
+  const handleOpenDrawer = (type: DrawerTypes) => {
     setDrawerType(type);
     setIsDrawerOpen(true);
-    if (type === "stream") {
-      onOpenStream();
-    }
   };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
+  };
+
+  const handleCast = async () => {
+    await sdk.actions.composeCast({
+      text: "Support Cracked Farcaster Devs",
+      embeds: [
+        `${
+          process.env.NEXT_PUBLIC_URL
+        }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+          totalFlow
+        )}`,
+      ],
+    });
   };
 
   return (
@@ -51,60 +84,48 @@ export default function PoolActions({
           {/* Buttons */}
           <div className="flex gap-3 text-black">
             <button
-              className="px-4 py-2 rounded-lg bg-brand-light text-lg font-bold border-2 border-black"
+              className="px-4 py-2 rounded-lg bg-brand-light text-base font-bold border-2 border-black"
               onClick={() => handleOpenDrawer("stream")}
             >
-              Open Stream
+              {connectedDonor && Number(connectedDonor.flowRate) > 0
+                ? "Edit"
+                : "Open"}{" "}
+              Stream
             </button>
-            {/* <button
-              className="px-4 py-2 rounded-lg bg-brand-light text-sm font-bold border-2 border-black"
-              onClick={() => handleOpenDrawer("claim")}
-            >
-              Claim SUP
-            </button> */}
           </div>
 
           {/* Links */}
           <div className="flex items-center">
-            <a
-              href="https://claim.superfluid.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-black text-xs"
+            <button
+              className="p-2 text-black hover:text-gray-800"
+              onClick={() => handleOpenDrawer("claim")}
             >
-              <button className="flex flex-row items-center gap-1  px-2 py-1 rounded-lg border border-brand-sfGreen bg-brand-light">
-                Claim
+              <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
                 <img
                   src="/images/sup.svg"
                   alt="Farcaster"
                   className="w-6 h-6"
                 />
-              </button>
-            </a>
+              </div>
+            </button>
             <Link
               href={`/pool/${chainId}/${poolId}/leaderboard`}
-              className="p-2 text-black"
+              className="p-2 text-black hover:text-gray-800"
             >
               <Award size={20} />
             </Link>
+            <div
+              className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"
+              onClick={handleCast}
+            >
+              <Share size={20} />
+            </div>
             <button
-              className="p-2 text-black"
+              className="p-2 text-black hover:text-gray-800"
               onClick={() => handleOpenDrawer("info")}
             >
               <Info size={20} />
             </button>
-            <a
-              href="https://flowstate.network/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-black"
-            >
-              <img
-                src="/images/fs-logo-circle-black.svg"
-                alt="Farcaster"
-                className="w-6 h-6"
-              />
-            </a>
           </div>
         </div>
       </div>
@@ -126,7 +147,7 @@ export default function PoolActions({
         <div className="p-6">
           {/* Drawer Header */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-2xl font-bold text-accent-800">
               {drawerTitles[drawerType]}
             </h2>
             <button
@@ -139,10 +160,23 @@ export default function PoolActions({
 
           {/* Drawer Content */}
           {drawerType === "stream" && (
-            <OpenStream onOpenStream={onOpenStream} />
+            <OpenStream
+              chainId={chainId}
+              poolId={poolId}
+              poolAddress={poolAddress}
+            />
           )}
-          {/* {drawerType === "claim" && <ClaimSup onClaimSup={onClaimSup} />} */}
+          {drawerType === "claim" && <ClaimSup />}
           {drawerType === "info" && <InfoDrawer />}
+          {drawerType === "connect" && connectedMember && (
+            <ConnectPool
+              poolAddress={poolAddress}
+              poolId={poolId}
+              chainId={chainId}
+              connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+              connectedMember={connectedMember}
+            />
+          )}
         </div>
       </div>
     </>

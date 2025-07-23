@@ -13,6 +13,7 @@ interface DonorNodeProps {
   rate: string;
   farcasterUser?: NeynarUser | null | undefined;
   index: number;
+  isGroupDonors: boolean;
 }
 
 export default function DonorNode({
@@ -23,19 +24,20 @@ export default function DonorNode({
   rate,
   farcasterUser,
   index,
+  isGroupDonors,
 }: DonorNodeProps) {
-  const isTotalBucket = !accountId || accountId.includes("Total");
+  const iconPath = isGroupDonors
+    ? "/images/badge.svg"
+    : "/images/user-circle.svg";
 
   return (
     <g key={index}>
       {/* Profile image as a clip path */}
-      {farcasterUser?.pfp_url && (
-        <defs>
-          <clipPath id={`donor-clip-${accountId}`}>
-            <circle cx={x} cy={y} r={radius} />
-          </clipPath>
-        </defs>
-      )}
+      <defs>
+        <clipPath id={`donor-clip-${accountId}`}>
+          <circle cx={x} cy={y} r={radius} />
+        </clipPath>
+      </defs>
 
       {/* Background circle */}
       <circle
@@ -47,17 +49,15 @@ export default function DonorNode({
       />
 
       {/* Profile image */}
-      {farcasterUser?.pfp_url && (
-        <image
-          href={farcasterUser.pfp_url}
-          x={x - radius}
-          y={y - radius}
-          width={radius * 2}
-          height={radius * 2}
-          clipPath={`url(#donor-clip-${accountId})`}
-          preserveAspectRatio="xMidYMid slice"
-        />
-      )}
+      <image
+        href={farcasterUser?.pfp_url || iconPath}
+        x={x - radius}
+        y={y - radius}
+        width={radius * 2}
+        height={radius * 2}
+        clipPath={`url(#donor-clip-${accountId})`}
+        preserveAspectRatio="xMidYMid slice"
+      />
     </g>
   );
 }

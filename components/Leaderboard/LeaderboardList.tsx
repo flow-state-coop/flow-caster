@@ -1,8 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import { PoolData } from "@/hooks/use-pool-data";
+import { ratePerMonthFormatted, totalFlowedStatic } from "@/lib/pool";
+import { PoolData } from "@/lib/types";
 import { CircleUserRound, Crown } from "lucide-react";
 import { useMemo } from "react";
 import { formatEther } from "viem";
+import FlowAmount from "../Pool/FlowAmount";
+import { triggerDonationWorkflow } from "@/lib/qstash";
 
 interface LeaderboardListProps {
   poolData?: PoolData;
@@ -23,13 +26,14 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
 
   return (
     <div className="w-full max-w-md mx-auto bg-white">
-      <div className="flex flex-row justify-between items-center w-full mb-4">
-        <p className="text-sm text-black">
-          Cracked Farcaster Devs Donor Leaderboard
-        </p>
-      </div>
-      <div className="grid grid-cols-5 gap-2 text-xs text-gray-500 mb-2 px-2">
-        <div className="col-span-3">&nbsp;</div>
+      <p className="text-sm font-bold text-black mt-3">
+        Cracked Farcaster Devs
+      </p>
+      <h2 className="text-3xl text-primary-500 font-bold mb-3">
+        Donor Leaderboard
+      </h2>
+      <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
+        <div className="col-span-2">&nbsp;</div>
         <div className="text-right">USDCx/mo</div>
         <div className="text-right">Total</div>
       </div>
@@ -42,14 +46,20 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
               key={d.account.id}
               className="flex items-center py-2 px-2 gap-2 text-lg font-mono"
             >
-              <div className="w-5 text-right mr-1 font-bold">{i + 1}</div>
-              <div className="w-8 h-8 flex items-center justify-center relative">
+              <div className="w-5 text-right mr-1 font-bold">
                 {isTop && (
+                  <Crown fill="gold" className="w-6 h-6 text-yellow-400" />
+                )}
+
+                {!isTop && <>{i + 1}</>}
+              </div>
+              <div className="w-8 h-8 flex items-center justify-center relative">
+                {/* {isTop && (
                   <Crown
                     fill="gold"
                     className="w-16 h-16 text-yellow-300 absolute z-0"
                   />
-                )}
+                )} */}
                 {user?.pfp_url ? (
                   <img
                     src={user.pfp_url}
@@ -68,10 +78,24 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
                 </span>
               </div>
               <div className="w-20 text-right tabular-nums text-sm font-bold">
-                {`${Number(formatEther(BigInt(d.flowRate))).toFixed(2)}`}
+                {`~ ${ratePerMonthFormatted(d.flowRate)}`}
               </div>
               <div className="w-24 text-right tabular-nums text-sm font-bold">
-                1202.12
+                {/* {`${Number(
+                  totalFlowedStatic(
+                    d.flowRate,
+                    d.updatedAtTimestamp,
+                    d.totalAmountDistributedUntilUpdatedAt
+                  )
+                ).toFixed(2)}`} */}
+
+                <FlowAmount
+                  startingAmount={BigInt(
+                    d.totalAmountDistributedUntilUpdatedAt || "0"
+                  )}
+                  startingTimestamp={Number(d.updatedAtTimestamp)}
+                  flowRate={BigInt(d.flowRate)}
+                />
               </div>
             </div>
           );

@@ -1,7 +1,7 @@
 import type { MiniAppNotificationDetails } from "@farcaster/miniapp-sdk";
 import { redis } from "./redis";
 
-const notificationServiceKey = "farcaster:miniapp";
+const notificationServiceKey = "flowcaster:miniapp";
 
 function getUserNotificationDetailsKey(fid: number): string {
   return `${notificationServiceKey}:user:${fid}`;
@@ -38,4 +38,23 @@ export async function deleteUserNotificationDetails(
   }
 
   await redis.del(getUserNotificationDetailsKey(fid));
+}
+
+export async function getAllUserNotificationDetails(): Promise<
+  MiniAppNotificationDetails[] | null
+> {
+  if (!redis) {
+    return null;
+  }
+  let allKeys: string[] = [];
+  let current = "1";
+  while (Number(current) > 0) {
+    const [cursor, keys] = await redis.scan(0, {
+      match: `${notificationServiceKey}:*`,
+    });
+    allKeys = [...allKeys, ...keys];
+    current = cursor;
+  }
+
+  return await redis.mget<MiniAppNotificationDetails[]>(allKeys);
 }

@@ -1,9 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useState } from "react";
+import { NeynarUser } from "@/lib/neynar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import gsap from "gsap";
+import { sdk } from "@farcaster/miniapp-sdk";
+import { ArrowRight, CircleArrowRight } from "lucide-react";
+import {
+  displayIndividualFlowPercentage,
+  displayIndividualFlowRate,
+} from "@/lib/pool";
 
 interface RecipientNodeProps {
   x: number;
@@ -12,7 +18,7 @@ interface RecipientNodeProps {
   accountId: string;
   units: number;
   totalUnits: number;
-  recipientCount: number;
+  totalFlowRate: number;
   farcasterUser?: NeynarUser | null;
 }
 
@@ -23,45 +29,18 @@ export default function RecipientNode({
   accountId,
   units,
   totalUnits,
-  recipientCount,
+  totalFlowRate,
   farcasterUser,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
+  const [showing, setShowing] = useState(false);
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
-    if (!circleRef.current) return;
-
-    // Gentle wiggle animation
-    gsap.to([circleRef.current, circleImgRef.current], {
-      x: "random(-2, 1.5)",
-      y: "random(-2, 1.5)",
-      duration: "random(1.5, 2.5)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
+  const handleViewProfile = async (fid: number) => {
+    await sdk.actions.viewProfile({
+      fid,
     });
-
-    // Subtle scale pulse for both glow and main circle
-    // gsap.to([glowRef.current, circleRef.current], {
-    gsap.to([circleRef.current, circleImgRef.current], {
-      scale: 1.1,
-      duration: "random(2, 4)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-
-    // Opacity pulse for the glow
-    gsap.to(circleRef.current, {
-      opacity: 0.6,
-      duration: "random(2, 4)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-  }, [circleRef]);
+  };
 
   return (
     <Tippy
@@ -86,10 +65,26 @@ export default function RecipientNode({
               <b>Account:</b> {accountId}
             </div>
           )}
-          <div className="font-bold text-lg">{units} % Split</div>
-          <button className="px-2 py-1 text-xs rounded-sm bg-primary-800 text-white font-medium hover:bg-primary-700 transition-colors">
-            Profile
-          </button>
+
+          <div className="font-bold text-xl text-accent-800 leading-tight">
+            {displayIndividualFlowPercentage(totalUnits, units)} %{" "}
+            <span className="text-sm text-black font-semibold">of pool</span>
+          </div>
+
+          <div className="font-bold text-xl text-accent-800 leading-tight">
+            {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
+            <span className="text-xs text-black font-semibold">USDCx / mo</span>
+          </div>
+          <div className="font-bold text-xs text-accent-800"></div>
+
+          {farcasterUser && (
+            <button
+              onClick={() => handleViewProfile(Number(farcasterUser.fid))}
+              className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs text-primary-500 hover:text-primary-300"
+            >
+              View Profile <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       }
       trigger="click"
@@ -98,6 +93,8 @@ export default function RecipientNode({
       appendTo={document.body}
       theme="flow"
       className="bg-primary-400"
+      onShow={() => setShowing(true)}
+      onHide={() => setShowing(false)}
     >
       <g>
         {/* Profile image as a clip path */}

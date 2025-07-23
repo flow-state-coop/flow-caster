@@ -1,39 +1,6 @@
 import { NeynarUser } from "@/lib/neynar";
+import { PoolData } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
-
-export interface PoolData {
-  __typename: string;
-  id: string;
-  flowRate: string;
-  totalUnits: string;
-  totalAmountFlowedDistributedUntilUpdatedAt: string;
-  totalAmountInstantlyDistributedUntilUpdatedAt: string;
-  updatedAtTimestamp: string;
-  poolMembers: Array<{
-    __typename: string;
-    account: {
-      __typename: string;
-      id: string;
-    };
-    units: string;
-    isConnected: boolean;
-    farcasterUser: NeynarUser | null;
-  }>;
-  poolDistributors: Array<{
-    __typename: string;
-    account: {
-      __typename: string;
-      id: string;
-    };
-    flowRate: string;
-    farcasterUser: NeynarUser | null;
-  }>;
-  token: {
-    __typename: string;
-    id: string;
-    symbol: string;
-  };
-}
 
 interface UsePoolDataOptions {
   chainId: string;
@@ -48,6 +15,7 @@ export const usePoolData = ({
 }: UsePoolDataOptions) => {
   return useQuery<PoolData>({
     queryKey: ["pool-data", chainId, poolId],
+    // staleTime: 10000,
     queryFn: async () => {
       const params = new URLSearchParams({
         chainId,
