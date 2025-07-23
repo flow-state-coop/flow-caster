@@ -1,5 +1,5 @@
 import { usePoolData } from "@/hooks/use-pool-data";
-import { DEV_POOL_ADDRESS, TOKEN_DATA } from "@/lib/constants";
+import { DEV_POOL_ADDRESS, DEV_POOL_ID, TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
 import sdk from "@farcaster/miniapp-sdk";
 import {
@@ -25,6 +25,7 @@ import gdaAbi from "@/lib/abi/gdaV1.json";
 
 import {
   calculateFlowratePerSecond,
+  ratePerMonthFormatted,
   TIME_UNIT,
   truncateString,
 } from "@/lib/pool";
@@ -32,17 +33,20 @@ import { encodeFunctionData, formatUnits, parseEther, parseUnits } from "viem";
 import { networks } from "@/lib/flowapp/networks";
 import { ArrowRight } from "lucide-react";
 import { useUser } from "@/contexts/user-context";
+import { PoolData } from "@/lib/types";
 
 interface OpenStreamProps {
   chainId: string;
   poolId: string;
   poolAddress: string;
+  connectedDonor?: PoolData["poolDistributors"][0];
 }
 
 export default function OpenStream({
   chainId,
   poolId,
   poolAddress,
+  connectedDonor,
 }: OpenStreamProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -51,7 +55,10 @@ export default function OpenStream({
   const [monthlyDonation, setMonthlyDonation] = useState<string>("");
   const [wrapAmount, setWrapAmount] = useState<string>("");
   const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
-  const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
+  const [currentMonthlyRate, setCurrentMonthlyRate] = useState<
+    string | undefined
+  >();
+  const [currentDevDonor, setCurrentDevDonor] = useState(false);
 
   const { address, isConnected, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
@@ -59,6 +66,11 @@ export default function OpenStream({
     chainId,
     poolId,
   });
+  const { data: devPoolData } = usePoolData({
+    chainId,
+    poolId: DEV_POOL_ID,
+  });
+
   const { connect, connectors } = useConnect();
   const { user } = useUser();
 
@@ -76,6 +88,8 @@ export default function OpenStream({
     });
 
   const tokenData = TOKEN_DATA[chainId];
+  // const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
+  const devDonationPercent = 5;
 
   // Fetch SuperToken balance
   const { data: superTokenBalance } = useReadSuperToken({
@@ -115,8 +129,8 @@ export default function OpenStream({
   const monthlyDonationAmount = parseFloat(monthlyDonation) || 0;
   const wrapAmountValue = parseFloat(wrapAmount) || 0;
   const totalSuperTokenBalance = userBalance + wrapAmountValue;
-
-  const isMonthlyDonationEmpty = monthlyDonationAmount === 0;
+  const isMonthlyDonationEmpty =
+    !currentMonthlyRate && monthlyDonationAmount === 0;
   const isInsufficientBalance =
     monthlyDonationAmount > 0 && totalSuperTokenBalance < monthlyDonationAmount;
   const isWrapAmountExceedsBalance = wrapAmountValue > usdcBalance;
@@ -124,6 +138,24 @@ export default function OpenStream({
     isMonthlyDonationEmpty ||
     isInsufficientBalance ||
     isWrapAmountExceedsBalance;
+
+  useEffect(() => {
+    if (!connectedDonor || !address || !devPoolData) return;
+
+    const donor = devPoolData.poolDistributors.find((d) => {
+      return d.account.id.toLowerCase() === address.toLowerCase();
+    });
+
+    setCurrentDevDonor(!!donor);
+
+    const totalFlowRate = donor
+      ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
+      : connectedDonor.flowRate;
+
+    const rate = ratePerMonthFormatted(totalFlowRate);
+    setCurrentMonthlyRate(rate);
+    setMonthlyDonation(rate);
+  }, [connectedDonor, devPoolData, address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,9 +180,6 @@ export default function OpenStream({
     );
 
     const currentAllowance = Number(underlyingAllowance) || 0;
-
-    console.log("wrapAmountValue", wrapAmountValue);
-    console.log("[currentAllowance", currentAllowance);
 
     // Step 1: Handle approval if needed
     if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
@@ -216,17 +245,30 @@ export default function OpenStream({
       ];
     }
 
-    let poolMonthlyDonation = parseFloat(monthlyDonation);
+    // handle 0 submission for existing stream
+    const _monthlyDonation = monthlyDonation === "" ? "0" : monthlyDonation;
+    let poolMonthlyDonation = parseFloat(_monthlyDonation);
 
-    if (donateToDevs) {
+    console.log("poolMonthlyDonation", poolMonthlyDonation);
+
+    console.log("currentDevDonor", currentDevDonor);
+
+    const zeroOutDevDonation = poolMonthlyDonation == 0 && currentDevDonor;
+
+    console.log("zeroOutDevDonation", zeroOutDevDonation);
+
+    if (donateToDevs || zeroOutDevDonation) {
+      console.log("adding dev donation");
       const devMonthlyDonation =
-        parseFloat(monthlyDonation) * (devDonationPercent / 100);
-      poolMonthlyDonation = parseFloat(monthlyDonation) - devMonthlyDonation;
+        parseFloat(_monthlyDonation) * (devDonationPercent / 100);
+      poolMonthlyDonation = parseFloat(_monthlyDonation) - devMonthlyDonation;
 
       const devFlowRate = calculateFlowratePerSecond({
         amountWei: parseEther(devMonthlyDonation.toString()),
         timeUnit: TIME_UNIT["month"],
       });
+
+      console.log("devFlowRate", devFlowRate);
 
       operations = [
         ...operations,
@@ -372,6 +414,17 @@ export default function OpenStream({
 
   return (
     <div className="max-w-md mx-auto">
+      {currentMonthlyRate && !isSuccess && (
+        <div className="mb-4 text-primary-800">
+          <div className="font-bold text-base leading-none">
+            Currently streaming ~ {currentMonthlyRate} USDCx / mo
+          </div>
+          <span className="text-xs font-normal text-primary-700">
+            {" "}
+            *set to 0 to close your stream.
+          </span>
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         {!isSuccess && (
           <>
@@ -500,33 +553,9 @@ export default function OpenStream({
                   htmlFor="donateToDevs"
                   className="ml-2 block text-sm font-medium text-primary-800"
                 >
-                  Donate to flowcaster devs
+                  Donate 5% to flowcaster devs
                 </label>
               </div>
-
-              {donateToDevs && (
-                <div className="ml-6 space-y-3">
-                  <div className="flex space-x-3">
-                    {[5, 10, 15].map((percent) => (
-                      <label key={percent} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="devDonationPercent"
-                          value={percent}
-                          checked={devDonationPercent === percent}
-                          onChange={(e) =>
-                            setDevDonationPercent(Number(e.target.value))
-                          }
-                          className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-accent-300 accent-accent-600 checked:bg-accent-600 checked:border-accent-600"
-                        />
-                        <span className="ml-2 text-sm text-primary-800">
-                          {percent}%
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             {error && (

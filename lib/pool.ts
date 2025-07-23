@@ -109,6 +109,11 @@ export const streamGranularityInSeconds = {
 export const ratePerMonth = (flowRate: number | string) => {
   return BigInt(flowRate) * BigInt(streamGranularityInSeconds.month);
 };
+export const ratePerMonthWei = (flowRate: number | string) => {
+  return formatEther(
+    BigInt(flowRate) * BigInt(streamGranularityInSeconds.month)
+  );
+};
 export const ratePerMonthFormatted = (flowRate: number | string) => {
   return Number(
     formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month))
