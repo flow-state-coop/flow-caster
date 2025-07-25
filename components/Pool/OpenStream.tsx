@@ -261,8 +261,9 @@ export default function OpenStream({
 
     if (donateToDevs || zeroOutDevDonation) {
       console.log("adding dev donation");
-      const devMonthlyDonation =
-        parseFloat(_monthlyDonation) * (devDonationPercent / 100);
+      const devMonthlyDonation = zeroOutDevDonation
+        ? 0
+        : parseFloat(_monthlyDonation) * (devDonationPercent / 100);
       poolMonthlyDonation = parseFloat(_monthlyDonation) - devMonthlyDonation;
 
       const devFlowRate = calculateFlowratePerSecond({
@@ -623,7 +624,7 @@ export default function OpenStream({
         {isSuccess && (
           <>
             <p className="text-accent-800 text-3xl font-bold">Success! 🫡</p>
-            <div className="flex flew-col gap-1">
+            <div className="flex flex-col gap-1">
               <p className="text-primary-500 text-sm mb-0">
                 You&apos;ve joined the galaxy of cracked dev supporters and have
                 started earning SUP rewards.
