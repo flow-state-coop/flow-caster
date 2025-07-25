@@ -1,3 +1,5 @@
+"use client";
+
 import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
 import { networks } from "@/lib/flowapp/networks";
 import {

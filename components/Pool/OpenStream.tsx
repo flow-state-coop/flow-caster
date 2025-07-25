@@ -1,3 +1,5 @@
+"use client";
+
 import { usePoolData } from "@/hooks/use-pool-data";
 import { DEV_POOL_ADDRESS, DEV_POOL_ID, TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
@@ -573,7 +575,7 @@ export default function OpenStream({
 
             {error && (
               <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-                {truncateString(error, 100)}
+                {truncateString(error, 50)}
               </div>
             )}
 

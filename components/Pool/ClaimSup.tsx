@@ -1,3 +1,5 @@
+"use client";
+
 import { useSupPoints } from "@/hooks/use-sup-points";
 import { useAccount } from "wagmi";
 import { sdk } from "@farcaster/miniapp-sdk";
