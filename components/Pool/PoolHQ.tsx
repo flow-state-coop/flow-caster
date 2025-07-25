@@ -102,7 +102,7 @@ export default function PoolHQ({
 
   return (
     <>
-      <PoolCircle poolData={poolData} connectedUser={user.data} />
+      <PoolCircle poolData={poolData} connectedUser={user.data || null} />
       <PoolActions
         onOpenStream={handleOpenStream}
         onClaimSup={handleClaimSup}

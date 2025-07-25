@@ -19,7 +19,7 @@ interface RecipientNodeProps {
   units: number;
   totalUnits: number;
   totalFlowRate: number;
-  farcasterUser?: NeynarUser | null;
+  farcasterUser?: NeynarUser | null | undefined;
 }
 
 export default function RecipientNode({

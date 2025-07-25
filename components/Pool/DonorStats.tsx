@@ -1,4 +1,5 @@
-import { formatEther } from "viem";
+"use client";
+
 import FlowAmount from "./FlowAmount";
 import { ratePerMonthFormatted } from "@/lib/pool";
 import { useSupPoints } from "@/hooks/use-sup-points";

@@ -9,6 +9,7 @@ import {
 import { PoolData } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type FlowPoolData = {
   token: string;
