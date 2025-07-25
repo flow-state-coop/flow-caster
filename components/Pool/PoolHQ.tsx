@@ -47,7 +47,10 @@ export default function PoolHQ({
     );
 
     setConnectedMember(member);
-    if (member && member.account.id !== address) {
+    if (
+      member &&
+      member.account.id.toLowerCase() !== address?.toLocaleLowerCase()
+    ) {
       setConnectedAddressNotPoolAddress(true);
     }
   }, [poolData, address, user]);
@@ -99,7 +102,7 @@ export default function PoolHQ({
 
   return (
     <>
-      <PoolCircle poolData={poolData} connectedUser={user.data} />
+      <PoolCircle poolData={poolData} connectedUser={user.data || null} />
       <PoolActions
         onOpenStream={handleOpenStream}
         onClaimSup={handleClaimSup}

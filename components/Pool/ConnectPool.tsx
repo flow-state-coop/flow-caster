@@ -1,3 +1,5 @@
+"use client";
+
 import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
 import { networks } from "@/lib/flowapp/networks";
 import {
@@ -133,8 +135,8 @@ export default function ConnectPool({
       <div className="mb-6">
         {!isSuccess && (
           <p className="text-black">
-            You&apos;re a recipient in this pool but haven&apos;t connected your
-            shares. Run the connection transaction to start receiving tokens.
+            Cracked dev rewards are already flowing. Complete a one-time
+            transaction to receive your token stream split in real-time.
           </p>
         )}
       </div>
@@ -163,14 +165,10 @@ export default function ConnectPool({
       {connectedAddressNotPoolAddress && (
         <div className="flex flex-col gap-2 mb-4 p-3 bg-accent-200 border border-accent-900 text-xs text-accent-900 rounded break-words">
           <div>
-            Your connected wallet is not the receiving wallet for this pool.
+            Switch to your Farcaster wallet in the mini app menu to connect.
           </div>
           <div>Connected Wallet: {address}</div>
           <div>Recipient Wallet: {connectedMember.account.id}</div>
-          <div className="font-bold">
-            If connected outside the Farcaster Wallet you&apos;ll need to
-            disconnect in that wallet and reconnect here.
-          </div>
         </div>
       )}
 

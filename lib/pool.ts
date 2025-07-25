@@ -1,6 +1,5 @@
-import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import { NeynarUser } from "./neynar";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import { PoolData } from "./types";
 
 export const getTotalFlow = (
@@ -20,7 +19,7 @@ export const getTotalFlow = (
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
-  connectedUser?: NeynarUser
+  connectedUser: NeynarUser | null | undefined
 ) => {
   const topDonor = poolDistributors.reduce((highest, current) => {
     const currentRate = parseFloat(current.flowRate);
@@ -33,11 +32,13 @@ export const createDonorBuckets = (
     return currentRate > highestRate ? current : highest;
   });
 
-  const connectedDonor = poolDistributors.find(
+  let connectedDonor = poolDistributors.find(
     (d) =>
       d.account.id === connectedUser?.verified_addresses.primary.eth_address ||
       d.account.id === connectedUser?.verified_addresses.eth_addresses[0]
   );
+
+  console.log("connectedDonor", connectedDonor);
 
   const totalFlow = getTotalFlow(poolDistributors);
 

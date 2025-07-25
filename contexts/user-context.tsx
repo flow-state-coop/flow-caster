@@ -17,7 +17,7 @@ import { useMiniApp } from "./miniapp-context";
 const UserProviderContext = createContext<
   | {
       user: {
-        data: NeynarUser | undefined;
+        data: NeynarUser | null | undefined;
         refetch: () => Promise<QueryObserverResult<NeynarUser>>;
         isLoading: boolean;
         error: Error | null;

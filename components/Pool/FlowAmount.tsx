@@ -1,3 +1,5 @@
+"use client";
+
 import useFlowingAmount from "@/hooks/use-flowing-amount";
 import { formatEther } from "viem";
 

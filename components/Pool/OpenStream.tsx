@@ -1,3 +1,5 @@
+"use client";
+
 import { usePoolData } from "@/hooks/use-pool-data";
 import { DEV_POOL_ADDRESS, DEV_POOL_ID, TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
@@ -147,6 +149,7 @@ export default function OpenStream({
     });
 
     setCurrentDevDonor(!!donor);
+    setDonateToDevs(!!donor);
 
     const totalFlowRate = donor
       ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
@@ -252,15 +255,17 @@ export default function OpenStream({
     console.log("poolMonthlyDonation", poolMonthlyDonation);
 
     console.log("currentDevDonor", currentDevDonor);
-
-    const zeroOutDevDonation = poolMonthlyDonation == 0 && currentDevDonor;
+    const zeroOutDevDonation =
+      (poolMonthlyDonation == 0 && currentDevDonor) ||
+      (currentDevDonor && !donateToDevs);
 
     console.log("zeroOutDevDonation", zeroOutDevDonation);
 
     if (donateToDevs || zeroOutDevDonation) {
       console.log("adding dev donation");
-      const devMonthlyDonation =
-        parseFloat(_monthlyDonation) * (devDonationPercent / 100);
+      const devMonthlyDonation = zeroOutDevDonation
+        ? 0
+        : parseFloat(_monthlyDonation) * (devDonationPercent / 100);
       poolMonthlyDonation = parseFloat(_monthlyDonation) - devMonthlyDonation;
 
       const devFlowRate = calculateFlowratePerSecond({
@@ -376,7 +381,7 @@ export default function OpenStream({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: "I'm supporting Cracked Farcaster Devs",
+      text: `Forget weekly tips. I'm supporting 78 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\n Instant + Consistent Funding = More Builders Building`,
       embeds: [
         `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
       ],
@@ -392,6 +397,7 @@ export default function OpenStream({
       return `${tokenData.underlyingSymbol} balance too low`;
     if (isInsufficientBalance)
       return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}`;
+    if (connectedDonor) return "Edit Stream";
     return "Open Stream";
   };
 
@@ -452,7 +458,9 @@ export default function OpenStream({
               </div>
               <p className="mt-2 text-xs text-primary-700">
                 Streaming token ({tokenData.symbol}) balance:{" "}
-                {userBalance.toFixed(2)}
+                {userBalance.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
 
@@ -482,7 +490,10 @@ export default function OpenStream({
                 </div>
               </div>
               <p className="mt-2 text-xs text-primary-700">
-                {tokenData.underlyingSymbol} balance: {usdcBalance.toFixed(2)}
+                {tokenData.underlyingSymbol} balance:{" "}
+                {usdcBalance.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
               </p>
               <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
                 <p className="text-primary-800 font-bold">
@@ -500,10 +511,15 @@ export default function OpenStream({
                     if (monthlyAmount > 0 && totalBalance > 0) {
                       const monthsSupported = totalBalance / monthlyAmount;
                       if (monthsSupported >= 1) {
-                        return `${totalBalance} ${
+                        return `${totalBalance.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })} ${
                           tokenData.symbol
-                        } will support your stream for ~ ${monthsSupported.toFixed(
-                          1
+                        } will support your stream for ~ ${monthsSupported.toLocaleString(
+                          "en-US",
+                          {
+                            maximumFractionDigits: 2,
+                          }
                         )} months.`;
                       } else {
                         const daysSupported = Math.floor(monthsSupported * 30);
@@ -560,7 +576,7 @@ export default function OpenStream({
 
             {error && (
               <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-                {truncateString(error, 100)}
+                {truncateString(error, 50)}
               </div>
             )}
 
@@ -611,10 +627,17 @@ export default function OpenStream({
         {isSuccess && (
           <>
             <p className="text-accent-800 text-3xl font-bold">Success! 🫡</p>
-            <p className="text-primary-500 text-sm">
-              You&apos;ve joined the galaxy of cracked dev supporters and have
-              started earning SUP rewards.
-            </p>
+            <div className="flex flex-col gap-1">
+              <p className="text-primary-500 text-sm mb-0">
+                You&apos;ve joined the galaxy of cracked dev supporters and have
+                started earning SUP rewards.
+              </p>
+
+              <p className="text-primary-400 text-xs">
+                If flow data does not update immediately it is likely due to
+                slow indexing and should show up soon.
+              </p>
+            </div>
 
             <p className="text-primary-500 text-sm font-bold">
               Cast about it to help grow the flow.

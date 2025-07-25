@@ -7,6 +7,9 @@ import { networks } from "@/lib/flowapp/networks";
 import { GraphQLClient } from "graphql-request";
 import { SF_SUP_TOKEN_SNAPSHOT } from "@/lib/flowapp/queries";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // Find the Base network config
 const BASE_NETWORK_ID = 8453;
 const baseNetwork = networks.find((n) => n.id === BASE_NETWORK_ID);

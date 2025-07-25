@@ -55,9 +55,7 @@ const archivoBlackBuffer = readFileSync(
 );
 
 // Load logo as base64 (1.8KB file)
-const logoBuffer = readFileSync(
-  path.join(process.cwd(), "static", "bub-icon.png")
-);
+const logoBuffer = readFileSync(path.join(process.cwd(), "static", "icon.png"));
 const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
 const devsBuffer = readFileSync(path.join(process.cwd(), "static", "devs.png"));

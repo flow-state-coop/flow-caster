@@ -1,21 +1,19 @@
 "use client";
 import { useMemo, useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
-import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import FlowLine from "./Flowline";
 import gsap from "gsap";
 import { NeynarUser } from "@/lib/neynar";
-import { createDonorBuckets, truncateString } from "@/lib/pool";
-import { formatEther } from "viem";
+import { createDonorBuckets } from "@/lib/pool";
 import { Crown } from "lucide-react";
 import { PoolData } from "@/lib/types";
 import DonorStats from "./DonorStats";
 
 interface PoolCircleProps {
   poolData: PoolData;
-  connectedUser?: NeynarUser;
+  connectedUser: NeynarUser | null | undefined;
 }
 
 export default function PoolCircle({
@@ -316,6 +314,7 @@ export default function PoolCircle({
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
+          const isUserDonor = i === 0;
           const isMiddleDonor = i === 1; // 2nd donor (index 1) is the middle one
           const isGroupDonors = i === 2; // 2nd donor (index 1) is the middle one
 
@@ -332,10 +331,10 @@ export default function PoolCircle({
                 x={x}
                 y={y}
                 accountId={donor?.accountId}
-                rate={donor.rate}
                 radius={60}
                 farcasterUser={donor?.farcasterUser}
                 isGroupDonors={isGroupDonors}
+                connectedUserFallback={isUserDonor ? connectedUser : undefined}
               />
             </g>
           );

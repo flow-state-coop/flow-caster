@@ -19,7 +19,7 @@ export interface PoolData {
     isConnected: boolean;
     poolTotalAmountDistributedUntilUpdatedAt: string;
     updatedAtTimestamp: string;
-    farcasterUser: NeynarUser | null;
+    farcasterUser: NeynarUser | null | undefined;
   }>;
   poolDistributors: Array<{
     __typename: string;
@@ -30,7 +30,7 @@ export interface PoolData {
     flowRate: string;
     totalAmountDistributedUntilUpdatedAt: string;
     updatedAtTimestamp: string;
-    farcasterUser: NeynarUser | null;
+    farcasterUser: NeynarUser | null | undefined;
   }>;
   token: {
     __typename: string;
