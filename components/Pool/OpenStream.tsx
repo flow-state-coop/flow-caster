@@ -623,8 +623,8 @@ export default function OpenStream({
         {isSuccess && (
           <>
             <p className="text-accent-800 text-3xl font-bold">Success! 🫡</p>
-            <div>
-              <p className="text-primary-500 text-sm">
+            <div className="flex flew-col gap-1">
+              <p className="text-primary-500 text-sm mb-0">
                 You&apos;ve joined the galaxy of cracked dev supporters and have
                 started earning SUP rewards.
               </p>
