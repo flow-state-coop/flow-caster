@@ -147,6 +147,7 @@ export default function OpenStream({
     });
 
     setCurrentDevDonor(!!donor);
+    setDonateToDevs(!!donor);
 
     const totalFlowRate = donor
       ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
@@ -252,8 +253,9 @@ export default function OpenStream({
     console.log("poolMonthlyDonation", poolMonthlyDonation);
 
     console.log("currentDevDonor", currentDevDonor);
-
-    const zeroOutDevDonation = poolMonthlyDonation == 0 && currentDevDonor;
+    const zeroOutDevDonation =
+      (poolMonthlyDonation == 0 && currentDevDonor) ||
+      (currentDevDonor && !donateToDevs);
 
     console.log("zeroOutDevDonation", zeroOutDevDonation);
 
@@ -614,6 +616,11 @@ export default function OpenStream({
             <p className="text-primary-500 text-sm">
               You&apos;ve joined the galaxy of cracked dev supporters and have
               started earning SUP rewards.
+            </p>
+
+            <p className="text-primary-400 text-xs">
+              If flow data does not update immediately it is likely due to slow
+              indexing and should show up soon.
             </p>
 
             <p className="text-primary-500 text-sm font-bold">
