@@ -1,8 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { NeynarUser } from "@/lib/neynar";
-import { truncateAddress } from "@/lib/pool";
-import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 
 interface DonorNodeProps {
@@ -10,10 +8,10 @@ interface DonorNodeProps {
   y: number;
   radius?: number;
   accountId?: string;
-  rate: string;
   farcasterUser?: NeynarUser | null | undefined;
   index: number;
   isGroupDonors: boolean;
+  connectedUserFallback?: NeynarUser;
 }
 
 export default function DonorNode({
@@ -21,10 +19,10 @@ export default function DonorNode({
   y,
   radius = 18,
   accountId,
-  rate,
   farcasterUser,
   index,
   isGroupDonors,
+  connectedUserFallback,
 }: DonorNodeProps) {
   const iconPath = isGroupDonors
     ? "/images/badge.svg"
@@ -50,7 +48,9 @@ export default function DonorNode({
 
       {/* Profile image */}
       <image
-        href={farcasterUser?.pfp_url || iconPath}
+        href={
+          farcasterUser?.pfp_url || connectedUserFallback?.pfp_url || iconPath
+        }
         x={x - radius}
         y={y - radius}
         width={radius * 2}

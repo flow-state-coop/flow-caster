@@ -8,6 +8,8 @@ import {
 } from "@/lib/flowapp/queries";
 import { PoolData } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 type FlowPoolData = {
   token: string;
   poolAddress: string;

@@ -22,7 +22,7 @@ export default function DonorStats({
 }: DonorStatsProps) {
   const { data } = useSupPoints({
     userAddress:
-      donorAddress && donorAddress.startsWith("0x0") ? donorAddress : undefined,
+      donorAddress && donorAddress.startsWith("0x") ? donorAddress : undefined,
   });
 
   return (

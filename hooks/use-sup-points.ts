@@ -15,6 +15,8 @@ export const useSupPoints = ({ userAddress }: UseSupPointsOptions) => {
     queryKey: ["sup-points", userAddress],
     queryFn: async () => {
       const res = await fetch(`/api/sup-balance?address=${userAddress}`);
+
+      console.log("res", res);
       if (!res.ok) throw new Error("Failed to fetch SUP points");
       return res.json();
     },

@@ -16,30 +16,29 @@ export default function InfoDrawer() {
   return (
     <>
       <div className="mb-6 flex flex-col gap-2 text-primary-800">
-        <p>Flow Caster is a mini app for supporting builders on Farcaster.</p>
         <p>
-          Start by opening a token stream to a curated list of 78 cracked
+          Open a token stream that&apos;s split in real-time to 78 cracked
           Farcaster devs{" "}
           <span
             onClick={handleViewProfile}
             className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
           >
-            (h/t @Curie).
+            (h/t @Curie curation).
           </span>
         </p>
         <p>
-          Streams are split & distributed in real-time providing sustainable
-          income for these builders to keep building.
+          Your stream delivers instant & consistent income so these builders can
+          focus on building.
         </p>
         <p>
-          Donors are eligible for SUP Rewards based on volume, so keep
-          streaming.
-        </p>
-        <p
-          onClick={onClaimSup}
-          className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
-        >
-          Open SUP mini app
+          Donors are eligible for
+          <span
+            onClick={onClaimSup}
+            className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
+          >
+            {" "}
+            SUP Rewards.
+          </span>
         </p>
       </div>
     </>

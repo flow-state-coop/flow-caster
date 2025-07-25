@@ -316,6 +316,7 @@ export default function PoolCircle({
           const donorStartX = centerX - donorSpacing;
           const x = donorStartX + i * donorSpacing;
           const y = donorY;
+          const isUserDonor = i === 0;
           const isMiddleDonor = i === 1; // 2nd donor (index 1) is the middle one
           const isGroupDonors = i === 2; // 2nd donor (index 1) is the middle one
 
@@ -332,10 +333,10 @@ export default function PoolCircle({
                 x={x}
                 y={y}
                 accountId={donor?.accountId}
-                rate={donor.rate}
                 radius={60}
                 farcasterUser={donor?.farcasterUser}
                 isGroupDonors={isGroupDonors}
+                connectedUserFallback={isUserDonor ? connectedUser : undefined}
               />
             </g>
           );
