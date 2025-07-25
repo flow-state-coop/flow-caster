@@ -38,7 +38,7 @@ export default function PoolActions({
   connectedDonor,
 }: PoolActionsProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerType, setDrawerType] = useState<DrawerTypes>("stream");
+  const [drawerType, setDrawerType] = useState<DrawerTypes>("info");
 
   useEffect(() => {
     if (shouldConnect) {
