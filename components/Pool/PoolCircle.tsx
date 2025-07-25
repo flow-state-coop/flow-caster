@@ -15,7 +15,7 @@ import DonorStats from "./DonorStats";
 
 interface PoolCircleProps {
   poolData: PoolData;
-  connectedUser?: NeynarUser;
+  connectedUser: NeynarUser | null | undefined;
 }
 
 export default function PoolCircle({

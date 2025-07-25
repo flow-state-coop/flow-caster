@@ -8,7 +8,6 @@ import OpenStream from "./OpenStream";
 import Link from "next/link";
 import ConnectPool from "./ConnectPool";
 import { PoolData } from "@/lib/types";
-import { formatEther } from "viem";
 import { ratePerMonthFormatted } from "@/lib/pool";
 import ClaimSup from "./ClaimSup";
 
@@ -74,7 +73,7 @@ export default function PoolActions({
       stream: "Open Stream",
       claim: "SUP Rewards",
       info: "What is this?",
-      connect: "Connect To Pool",
+      connect: "You're getting paid",
       edit: "Edit Stream",
     };
 

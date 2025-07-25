@@ -76,7 +76,7 @@ export function MiniAppProvider({
   useEffect(() => {
     // on load, set the frame as ready
     if (isMiniAppReady && !context?.client?.added && addMiniAppOnLoad) {
-      // handleAddMiniApp();
+      handleAddMiniApp();
     }
   }, [
     isMiniAppReady,

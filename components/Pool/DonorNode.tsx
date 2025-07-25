@@ -11,7 +11,7 @@ interface DonorNodeProps {
   farcasterUser?: NeynarUser | null | undefined;
   index: number;
   isGroupDonors: boolean;
-  connectedUserFallback?: NeynarUser;
+  connectedUserFallback?: NeynarUser | null | undefined;
 }
 
 export default function DonorNode({

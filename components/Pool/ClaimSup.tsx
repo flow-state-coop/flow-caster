@@ -34,7 +34,7 @@ export default function ClaimSup(params: ClaimSupProps) {
 
       {data && (
         <div className="flex flex-col items-center w-full gap-1 mb-6">
-          <p className="font-bold text-black">Your Reserve Balance</p>
+          <p className="font-bold text-black">Your Rewards Rate</p>
           <div className="text-2xl font-bold text-brand-sfGreen mb-5">
             <FlowAmount
               textBefore="+"

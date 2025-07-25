@@ -20,7 +20,7 @@ export const getTotalFlow = (
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
-  connectedUser: NeynarUser | null
+  connectedUser: NeynarUser | null | undefined
 ) => {
   const topDonor = poolDistributors.reduce((highest, current) => {
     const currentRate = parseFloat(current.flowRate);

@@ -12,9 +12,9 @@ export default async function middleware(req: NextRequest) {
     req.nextUrl.pathname === "/api/auth/sign-in" ||
     req.nextUrl.pathname.includes("/api/og") ||
     req.nextUrl.pathname.includes("/api/share") ||
-    req.nextUrl.pathname.includes("/api/webhook") ||
-    req.nextUrl.pathname.includes("/api/pool") ||
-    req.nextUrl.pathname.includes("/api/sup-balance")
+    req.nextUrl.pathname.includes("/api/webhook")
+    // req.nextUrl.pathname.includes("/api/pool") ||
+    // req.nextUrl.pathname.includes("/api/sup-balance")
   ) {
     return NextResponse.next();
   }

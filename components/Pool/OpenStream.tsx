@@ -378,7 +378,7 @@ export default function OpenStream({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: "I'm supporting Cracked Farcaster Devs",
+      text: `Forget weekly tips. I'm supporting 78 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\n Instant + Consistent Funding = More Builders Building`,
       embeds: [
         `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
       ],
@@ -454,7 +454,9 @@ export default function OpenStream({
               </div>
               <p className="mt-2 text-xs text-primary-700">
                 Streaming token ({tokenData.symbol}) balance:{" "}
-                {userBalance.toFixed(2)}
+                {userBalance.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
 
@@ -484,7 +486,10 @@ export default function OpenStream({
                 </div>
               </div>
               <p className="mt-2 text-xs text-primary-700">
-                {tokenData.underlyingSymbol} balance: {usdcBalance.toFixed(2)}
+                {tokenData.underlyingSymbol} balance:{" "}
+                {usdcBalance.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
               </p>
               <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
                 <p className="text-primary-800 font-bold">
@@ -502,10 +507,15 @@ export default function OpenStream({
                     if (monthlyAmount > 0 && totalBalance > 0) {
                       const monthsSupported = totalBalance / monthlyAmount;
                       if (monthsSupported >= 1) {
-                        return `${totalBalance} ${
+                        return `${totalBalance.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })} ${
                           tokenData.symbol
-                        } will support your stream for ~ ${monthsSupported.toFixed(
-                          1
+                        } will support your stream for ~ ${monthsSupported.toLocaleString(
+                          "en-US",
+                          {
+                            maximumFractionDigits: 2,
+                          }
                         )} months.`;
                       } else {
                         const daysSupported = Math.floor(monthsSupported * 30);
