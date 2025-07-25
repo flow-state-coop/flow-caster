@@ -73,7 +73,7 @@ export default function PoolActions({
       stream: "Open Stream",
       claim: "SUP Rewards",
       info: "What is this?",
-      connect: "You're getting paid",
+      connect: "You're getting paid!",
       edit: "Edit Stream",
     };
 

@@ -397,6 +397,7 @@ export default function OpenStream({
       return `${tokenData.underlyingSymbol} balance too low`;
     if (isInsufficientBalance)
       return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}`;
+    if (connectedDonor) return "Edit Stream";
     return "Open Stream";
   };
 
