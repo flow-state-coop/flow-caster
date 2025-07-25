@@ -623,15 +623,17 @@ export default function OpenStream({
         {isSuccess && (
           <>
             <p className="text-accent-800 text-3xl font-bold">Success! 🫡</p>
-            <p className="text-primary-500 text-sm">
-              You&apos;ve joined the galaxy of cracked dev supporters and have
-              started earning SUP rewards.
-            </p>
+            <div>
+              <p className="text-primary-500 text-sm">
+                You&apos;ve joined the galaxy of cracked dev supporters and have
+                started earning SUP rewards.
+              </p>
 
-            <p className="text-primary-400 text-xs">
-              If flow data does not update immediately it is likely due to slow
-              indexing and should show up soon.
-            </p>
+              <p className="text-primary-400 text-xs">
+                If flow data does not update immediately it is likely due to
+                slow indexing and should show up soon.
+              </p>
+            </div>
 
             <p className="text-primary-500 text-sm font-bold">
               Cast about it to help grow the flow.

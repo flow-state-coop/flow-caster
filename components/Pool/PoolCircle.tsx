@@ -1,14 +1,12 @@
 "use client";
 import { useMemo, useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
-import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import FlowLine from "./Flowline";
 import gsap from "gsap";
 import { NeynarUser } from "@/lib/neynar";
-import { createDonorBuckets, truncateString } from "@/lib/pool";
-import { formatEther } from "viem";
+import { createDonorBuckets } from "@/lib/pool";
 import { Crown } from "lucide-react";
 import { PoolData } from "@/lib/types";
 import DonorStats from "./DonorStats";
