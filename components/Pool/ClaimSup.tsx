@@ -23,7 +23,7 @@ export default function ClaimSup(params: ClaimSupProps) {
     console.log("claiming");
 
     await sdk.actions.openMiniApp({
-      url: "https://farcaster.xyz/miniapps/qva4-LdCMptX/sup",
+      url: "https://farcaster.xyz/miniapps/1NTJKdUZCsPI/superfluid-claim-app",
     });
   };
   return (

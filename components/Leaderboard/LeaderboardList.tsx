@@ -78,7 +78,7 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
                 </span>
               </div>
               <div className="w-20 text-right tabular-nums text-sm font-bold">
-                {`~ ${ratePerMonthFormatted(d.flowRate)}`}
+                {`${ratePerMonthFormatted(d.flowRate)}`}
               </div>
               <div className="w-24 text-right tabular-nums text-sm font-bold">
                 {/* {`${Number(

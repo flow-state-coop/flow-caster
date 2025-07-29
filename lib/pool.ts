@@ -118,7 +118,9 @@ export const ratePerMonthWei = (flowRate: number | string) => {
 export const ratePerMonthFormatted = (flowRate: number | string) => {
   return Number(
     formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month))
-  ).toFixed(0);
+  ).toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+  });
 };
 
 export const totalFlowedStatic = (

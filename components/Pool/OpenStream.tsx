@@ -423,7 +423,7 @@ export default function OpenStream({
       {currentMonthlyRate && !isSuccess && (
         <div className="mb-4 text-primary-800">
           <div className="font-bold text-base leading-none">
-            Currently streaming ~ {currentMonthlyRate} USDCx / mo
+            Currently streaming {currentMonthlyRate} USDCx / mo
           </div>
           <span className="text-xs font-normal text-primary-700">
             {" "}
@@ -515,7 +515,7 @@ export default function OpenStream({
                           maximumFractionDigits: 2,
                         })} ${
                           tokenData.symbol
-                        } will support your stream for ~ ${monthsSupported.toLocaleString(
+                        } will support your stream for ${monthsSupported.toLocaleString(
                           "en-US",
                           {
                             maximumFractionDigits: 2,

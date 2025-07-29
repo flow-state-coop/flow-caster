@@ -28,7 +28,7 @@ export default function DonorStats({
 
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">
-      <div>{`~ ${ratePerMonthFormatted(rate)} USDCx / mo`}</div>
+      <div>{`${ratePerMonthFormatted(rate)} USDCx / mo`}</div>
 
       {showTotalFlow && (
         <FlowAmount
@@ -42,7 +42,6 @@ export default function DonorStats({
       {showSup && data && (
         <div className="text-brand-sfGreen">
           <FlowAmount
-            textBefore="+"
             textAfter="SUP / mo"
             startingAmount={BigInt(data.balanceUntilUpdatedAt || "0")}
             startingTimestamp={Number(data.updatedAtTimestamp)}

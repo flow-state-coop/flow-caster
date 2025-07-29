@@ -28,7 +28,9 @@ export default function FlowAmount({
     <>
       <div>{`${textBefore ? textBefore : ""} ${Number(
         formatEther(flowingAmount)
-      ).toFixed(3)} ${textAfter ? textAfter : ""}`}</div>
+      ).toLocaleString("en-US", {
+        maximumFractionDigits: 2,
+      })} ${textAfter ? textAfter : ""}`}</div>
     </>
   );
 }

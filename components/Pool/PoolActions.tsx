@@ -57,7 +57,7 @@ export default function PoolActions({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: "Support Cracked Farcaster Devs",
+      text: `Forget weekly tips. Open a real-time stream split to 78 Cracked Farcaster Devs with @flowstatecoop. \n Instant + Consistent Funding = More Builders Building`,
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL
