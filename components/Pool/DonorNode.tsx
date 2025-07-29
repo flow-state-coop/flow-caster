@@ -26,7 +26,7 @@ export default function DonorNode({
   donorCount,
   connectedUserFallback,
 }: DonorNodeProps) {
-  const iconPath = "/images/user-circle.svg";
+  const iconPath = "/images/icon.svg";
 
   return (
     <g key={index}>
@@ -46,7 +46,7 @@ export default function DonorNode({
         cy={y}
         r={radius}
         strokeWidth="2"
-        className="stroke-primary-500 fill-primary-500"
+        className="stroke-black fill-black"
       />
 
       {/* Profile image */}
@@ -74,11 +74,21 @@ export default function DonorNode({
               fontSize: "75px",
               fontWeight: "700",
               fontFamily: "sans-serif",
+              fill: "#ffffff",
             }}
           >
             {donorCount}
           </text>
-          <text x={x - 30} y={y + 40} className="text-xl">
+          <text
+            x={x - 31}
+            y={y + 40}
+            style={{
+              fontSize: "18px",
+              fontFamily: "sans-serif",
+              fontWeight: "700",
+              fill: "#ffffff",
+            }}
+          >
             donors
           </text>
         </>
