@@ -28,7 +28,7 @@ export async function getFarcasterManifest() {
     frame: {
       version: "1",
       name: frameName,
-      iconUrl: `${appUrl}/images/icon_1024.png`,
+      iconUrl: `${appUrl}/images/icon_blue.png`,
       homeUrl: appUrl,
       imageUrl: `${appUrl}/images/feed.png`,
       buttonTitle: `Launch App`,

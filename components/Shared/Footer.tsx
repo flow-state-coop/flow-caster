@@ -1,19 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect } from "react";
-import { Award, Info, Share } from "lucide-react";
+import { Award, Info, Share, House } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
-import InfoDrawer from "./InfoDrawer";
-import OpenStream from "./OpenStream";
+import InfoDrawer from "../Pool/InfoDrawer";
+import OpenStream from "../Pool/OpenStream";
 import Link from "next/link";
-import ConnectPool from "./ConnectPool";
+import ConnectPool from "../Pool/ConnectPool";
 import { PoolData } from "@/lib/types";
 import { ratePerMonthFormatted } from "@/lib/pool";
-import ClaimSup from "./ClaimSup";
+import ClaimSup from "../Pool/ClaimSup";
+import { usePathname } from "next/navigation";
+import Leaderboard from "../Leaderboard";
 
 interface PoolActionsProps {
-  onOpenStream: () => void;
-  onClaimSup?: () => void;
   chainId: string;
   poolId: string;
   shouldConnect?: boolean;
@@ -26,7 +26,7 @@ interface PoolActionsProps {
 
 type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
-export default function PoolActions({
+export default function Footer({
   chainId,
   poolId,
   shouldConnect,
@@ -36,8 +36,11 @@ export default function PoolActions({
   totalFlow,
   connectedDonor,
 }: PoolActionsProps) {
+  const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes>("info");
+
+  console.log("pathname", pathname);
 
   useEffect(() => {
     if (shouldConnect) {
@@ -57,7 +60,7 @@ export default function PoolActions({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Forget weekly tips. Open a real-time stream split to 78 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Forget weekly tips. Open a real-time stream split to 82 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL
@@ -68,17 +71,7 @@ export default function PoolActions({
     });
   };
 
-  const getDrawerTitle = () => {
-    const drawerTitles = {
-      stream: "Open Stream",
-      claim: "SUP Rewards",
-      info: "What is this?",
-      connect: "You're getting paid!",
-      edit: "Edit Stream",
-    };
-
-    return drawerTitles[drawerType];
-  };
+  const isLeaderboard = pathname.includes("leaderboard");
 
   return (
     <>
@@ -106,6 +99,23 @@ export default function PoolActions({
 
           {/* Links */}
           <div className="flex items-center">
+            {!isLeaderboard && (
+              <Link
+                href={`/pool/${chainId}/${poolId}/leaderboard`}
+                className="p-2 text-black hover:text-gray-800"
+              >
+                <Award size={20} />
+              </Link>
+            )}
+
+            {isLeaderboard && (
+              <Link
+                href={`/pool/${chainId}/${poolId}`}
+                className="p-2 text-black hover:text-gray-800"
+              >
+                <House size={20} />
+              </Link>
+            )}
             <button
               className="p-2 text-black hover:text-gray-800"
               onClick={() => handleOpenDrawer("claim")}
@@ -114,16 +124,11 @@ export default function PoolActions({
                 <img
                   src="/images/sup.svg"
                   alt="Farcaster"
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                 />
               </div>
             </button>
-            <Link
-              href={`/pool/${chainId}/${poolId}/leaderboard`}
-              className="p-2 text-black hover:text-gray-800"
-            >
-              <Award size={20} />
-            </Link>
+
             <div
               className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"
               onClick={handleCast}

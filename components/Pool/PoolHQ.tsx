@@ -1,12 +1,12 @@
 "use client";
 import PoolCircle from "@/components/Pool/PoolCircle";
-import PoolActions from "@/components/Pool/PoolActions";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { PoolData } from "@/lib/types";
 import { getTotalFlow } from "@/lib/pool";
+import Footer from "../Shared/Footer";
 
 export default function PoolHQ({
   chainId,
@@ -67,15 +67,6 @@ export default function PoolHQ({
 
   console.log("poolData", poolData);
 
-  const handleOpenStream = () => {
-    // This will be called from PoolActions component
-    console.log("Opening stream from PoolActions");
-  };
-  const handleClaimSup = () => {
-    // This will be called from PoolActions component
-    console.log("Opening stream from PoolActions");
-  };
-
   if (error) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
@@ -103,9 +94,7 @@ export default function PoolHQ({
   return (
     <>
       <PoolCircle poolData={poolData} connectedUser={user.data || null} />
-      <PoolActions
-        onOpenStream={handleOpenStream}
-        onClaimSup={handleClaimSup}
+      <Footer
         chainId={chainId}
         poolId={poolId}
         shouldConnect={shouldConnect}
