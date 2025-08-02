@@ -28,7 +28,7 @@ import gdaAbi from "@/lib/abi/gdaV1.json";
 
 import {
   calculateFlowratePerSecond,
-  ratePerMonthFormatted,
+  ratePerMonthFormattedNoLocale,
   TIME_UNIT,
   truncateString,
 } from "@/lib/pool";
@@ -79,21 +79,27 @@ export default function OpenStream({
   const { connect, connectors } = useConnect();
   const { user } = useUser();
 
-  const { writeContract: approve, data: approvalHash } = useWriteContract();
+  const {
+    writeContract: approve,
+    data: approvalHash,
+    reset: resetApproval,
+  } = useWriteContract();
   const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
     useWaitForTransactionReceipt({
       hash: approvalHash,
     });
 
-  // const { writeContract: batchCall, data: batchHash } = useWriteHost();
-  const { writeContract: batchCall, data: batchHash } = useWriteContract();
+  const {
+    writeContract: batchCall,
+    data: batchHash,
+    reset: resetBatch,
+  } = useWriteContract();
   const { isLoading: isBatchConfirming, isSuccess: isBatchSuccess } =
     useWaitForTransactionReceipt({
       hash: batchHash,
     });
 
   const tokenData = TOKEN_DATA[chainId];
-  // const [devDonationPercent, setDevDonationPercent] = useState<number>(5);
   const devDonationPercent = 5;
 
   // Fetch SuperToken balance
@@ -145,6 +151,10 @@ export default function OpenStream({
     isWrapAmountExceedsBalance;
 
   useEffect(() => {
+    console.log("connectedDonor", connectedDonor);
+    console.log("address", address);
+    console.log("devPoolData", devPoolData);
+
     if (!connectedDonor || !address || !devPoolData) return;
 
     const donor = devPoolData.poolDistributors.find((d) => {
@@ -158,7 +168,9 @@ export default function OpenStream({
       ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
       : connectedDonor.flowRate;
 
-    const rate = ratePerMonthFormatted(totalFlowRate);
+    const rate = ratePerMonthFormattedNoLocale(totalFlowRate);
+
+    console.log("setting rate", rate);
     setCurrentMonthlyRate(rate);
     setMonthlyDonation(rate);
   }, [connectedDonor, devPoolData, address]);
@@ -397,6 +409,18 @@ export default function OpenStream({
     });
   };
 
+  const closeDrawer = () => {
+    if (isSuccess) {
+      setIsLoading(false);
+      setIsConfirming(false);
+      setError(null);
+      setIsSuccess(false);
+      resetApproval();
+      resetBatch();
+    }
+    handleCloseDrawer();
+  };
+
   const getButtonText = () => {
     if (isLoading) return "Preparing...";
     if (isConfirming || isApprovalConfirming) return "Confirming...";
@@ -412,7 +436,7 @@ export default function OpenStream({
 
   const getButtonClass = () => {
     const baseClass =
-      "w-full px-4 py-3 rounded-lg text-black border-2 border-black font-medium text-xl transition-colors";
+      "w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors";
 
     if (
       isLoading ||
@@ -440,7 +464,7 @@ export default function OpenStream({
           {getDrawerTitle()}
         </h2>
         <button
-          onClick={handleCloseDrawer}
+          onClick={closeDrawer}
           className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <X size={20} />
@@ -639,7 +663,7 @@ export default function OpenStream({
                   >
                     {getButtonText()}
                   </button>
-                  {!connectedDonor && (
+                  {connectedDonor && (
                     <p
                       className="font-sm underline text-primary-500 hover:cursor-pointer text-center"
                       onClick={handleCancel}
@@ -667,7 +691,7 @@ export default function OpenStream({
               <button
                 onClick={handleCast}
                 type="button"
-                className="w-full px-4 py-3 rounded-lg text-black border-2 border-black font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
+                className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
               >
                 Cast
               </button>

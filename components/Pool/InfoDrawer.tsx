@@ -32,7 +32,7 @@ export default function InfoDrawer({ handleCloseDrawer }: InfoProps) {
       </div>
       <div className="mb-6 flex flex-col gap-2 text-primary-800">
         <p>
-          Open a token stream that&apos;s split in real-time to 78 cracked
+          Open a token stream that&apos;s split in real-time to 82 cracked
           Farcaster devs{" "}
           <span
             onClick={handleViewProfile}

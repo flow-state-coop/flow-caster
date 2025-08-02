@@ -125,6 +125,12 @@ export const ratePerMonthFormatted = (flowRate: number | string) => {
   });
 };
 
+export const ratePerMonthFormattedNoLocale = (flowRate: number | string) => {
+  return Number(
+    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month))
+  ).toFixed(2);
+};
+
 export const totalFlowedStatic = (
   flowRate: number | string,
   startingTimestamp: string | number,
