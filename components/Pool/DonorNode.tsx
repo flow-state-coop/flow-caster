@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { NeynarUser } from "@/lib/neynar";
+import { formatPoolCount } from "@/lib/pool";
 import "tippy.js/dist/tippy.css";
 
 interface DonorNodeProps {
@@ -27,6 +28,40 @@ export default function DonorNode({
   connectedUserFallback,
 }: DonorNodeProps) {
   const iconPath = "/images/icon.svg";
+
+  const donorCountTmp = 3333;
+
+  const formattedCount = formatPoolCount(donorCountTmp);
+
+  console.log("formattedCount", formattedCount);
+
+  const donorCountValuesList: Record<
+    number,
+    { fontSize: string; xOffset: number; yOffset: number }
+  > = {
+    1: {
+      fontSize: "75px",
+      xOffset: 21,
+      yOffset: 20,
+    },
+    2: {
+      fontSize: "75px",
+      xOffset: 42,
+      yOffset: 20,
+    },
+    3: {
+      fontSize: "60px",
+      xOffset: 49,
+      yOffset: 18,
+    },
+    4: {
+      fontSize: "50px",
+      xOffset: 45,
+      yOffset: 12,
+    },
+  };
+  const donorCountValues =
+    donorCountValuesList[formattedCount.length] || donorCountValuesList[4];
 
   return (
     <g key={index}>
@@ -68,20 +103,20 @@ export default function DonorNode({
       {isGroupDonors && (
         <>
           <text
-            x={x - 21}
-            y={y + 20}
+            x={x - donorCountValues.xOffset}
+            y={y + donorCountValues.yOffset}
             style={{
-              fontSize: "75px",
+              fontSize: donorCountValues.fontSize,
               fontWeight: "700",
               fontFamily: "sans-serif",
               fill: "#ffffff",
             }}
           >
-            {donorCount}
+            {formattedCount}
           </text>
           <text
             x={x - 31}
-            y={y + 40}
+            y={y + 42}
             style={{
               fontSize: "18px",
               fontFamily: "sans-serif",
