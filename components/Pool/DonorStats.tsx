@@ -41,12 +41,15 @@ export default function DonorStats({
 
       {showSup && data && (
         <div className="text-brand-sfGreen">
-          <FlowAmount
+          {/* <FlowAmount
             textAfter="SUP / mo"
             startingAmount={BigInt(data.balanceUntilUpdatedAt || "0")}
             startingTimestamp={Number(data.updatedAtTimestamp)}
-            flowRate={BigInt(data.totalNetFlowRate)}
-          />
+            flowRate={BigInt(data.totalInflowRate)}
+          /> */}
+          <div>{`${ratePerMonthFormatted(
+            data.totalNetFlowRate
+          )} SUP / mo`}</div>
         </div>
       )}
     </div>

@@ -122,6 +122,7 @@ export const SF_SUP_TOKEN_SNAPSHOT = gql`
       totalNetFlowRate
       updatedAtTimestamp
       totalInflowRate
+      totalOutflowRate
       account {
         id
       }

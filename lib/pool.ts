@@ -32,6 +32,8 @@ export const createDonorBuckets = (
     return currentRate > highestRate ? current : highest;
   });
 
+  console.log("connectedUser", connectedUser);
+
   let connectedDonor = poolDistributors.find(
     (d) =>
       d.account.id === connectedUser?.verified_addresses.primary.eth_address ||

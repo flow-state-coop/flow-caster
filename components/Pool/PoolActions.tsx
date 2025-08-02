@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect } from "react";
-import { Award, Info, Share, X } from "lucide-react";
+import { Award, Info, Share } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import InfoDrawer from "./InfoDrawer";
 import OpenStream from "./OpenStream";
@@ -57,7 +57,7 @@ export default function PoolActions({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Forget weekly tips. Open a real-time stream split to 78 Cracked Farcaster Devs with @flowstatecoop. \n Instant + Consistent Funding = More Builders Building`,
+      text: `Forget weekly tips. Open a real-time stream split to 78 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL
@@ -88,7 +88,7 @@ export default function PoolActions({
           {/* Buttons */}
           <div className="flex gap-3 text-black">
             <button
-              className="px-4 py-2 rounded-lg bg-brand-light text-base font-bold border-2 border-black"
+              className="px-4 py-2 rounded-lg bg-accent-800 text-white font-bold"
               onClick={() =>
                 handleOpenDrawer(
                   connectedDonor && Number(connectedDonor.flowRate) > 0
@@ -155,19 +155,6 @@ export default function PoolActions({
         }`}
       >
         <div className="p-6">
-          {/* Drawer Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-accent-800">
-              {getDrawerTitle()}
-            </h2>
-            <button
-              onClick={handleCloseDrawer}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
           {/* Drawer Content */}
           {drawerType === "stream" || drawerType === "edit" ? (
             <OpenStream
@@ -175,10 +162,15 @@ export default function PoolActions({
               poolId={poolId}
               poolAddress={poolAddress}
               connectedDonor={connectedDonor}
+              handleCloseDrawer={handleCloseDrawer}
             />
           ) : null}
-          {drawerType === "claim" && <ClaimSup />}
-          {drawerType === "info" && <InfoDrawer />}
+          {drawerType === "claim" && (
+            <ClaimSup handleCloseDrawer={handleCloseDrawer} />
+          )}
+          {drawerType === "info" && (
+            <InfoDrawer handleCloseDrawer={handleCloseDrawer} />
+          )}
           {drawerType === "connect" && connectedMember && (
             <ConnectPool
               poolAddress={poolAddress}
@@ -186,6 +178,7 @@ export default function PoolActions({
               chainId={chainId}
               connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
               connectedMember={connectedMember}
+              handleCloseDrawer={handleCloseDrawer}
             />
           )}
         </div>

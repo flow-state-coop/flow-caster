@@ -45,6 +45,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log("lockerAddress", lockerAddress);
+
     if (
       !lockerAddress ||
       lockerAddress === "0x0000000000000000000000000000000000000000"
@@ -88,6 +90,7 @@ export async function GET(request: NextRequest) {
       totalNetFlowRate: snapshot.totalNetFlowRate,
       updatedAtTimestamp: snapshot.updatedAtTimestamp,
       totalInflowRate: snapshot.totalInflowRate,
+      totalOutflowRate: snapshot.totalOutflowRate,
     });
   } catch (error) {
     return NextResponse.json(

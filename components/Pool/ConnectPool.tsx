@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import sdk from "@farcaster/miniapp-sdk";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { PoolData } from "@/lib/types";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 
 export default function ConnectPool({
   poolAddress,
@@ -21,12 +21,14 @@ export default function ConnectPool({
   poolId,
   connectedAddressNotPoolAddress,
   connectedMember,
+  handleCloseDrawer,
 }: {
   poolAddress: string;
   chainId: string;
   poolId: string;
   connectedAddressNotPoolAddress: boolean;
   connectedMember: PoolData["poolMembers"][0];
+  handleCloseDrawer: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -132,13 +134,17 @@ export default function ConnectPool({
 
   return (
     <>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-accent-800">SUP Rewards</h2>
+        <button
+          onClick={handleCloseDrawer}
+          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
       <div className="mb-6">
-        {!isSuccess && (
-          <p className="text-black">
-            Cracked dev rewards are already flowing. Complete a one-time
-            transaction to receive your token stream split in real-time.
-          </p>
-        )}
+        {!isSuccess && <p className="text-black">SUCCESS</p>}
       </div>
 
       {error && (
