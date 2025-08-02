@@ -64,7 +64,7 @@ export default function DonorNode({
 
       {!isGroupDonors && (
         <defs>
-          <clipPath id={`donor-clip-${accountId}`}>
+          <clipPath id={`donor-clip-${accountId}-${x}`}>
             <circle cx={x} cy={y} r={radius} />
           </clipPath>
         </defs>
@@ -90,7 +90,7 @@ export default function DonorNode({
           y={y - radius}
           width={radius * 2}
           height={radius * 2}
-          clipPath={`url(#donor-clip-${accountId})`}
+          clipPath={`url(#donor-clip-${accountId}-${x})`}
           preserveAspectRatio="xMidYMid slice"
         />
       )}
