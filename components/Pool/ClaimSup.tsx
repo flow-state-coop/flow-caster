@@ -3,13 +3,15 @@
 import { useSupPoints } from "@/hooks/use-sup-points";
 import { useAccount } from "wagmi";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { X } from "lucide-react";
+
 import FlowAmount from "./FlowAmount";
 
 interface ClaimSupProps {
-  // onClaimSup: () => void;
+  handleCloseDrawer: () => void;
 }
 
-export default function ClaimSup(params: ClaimSupProps) {
+export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
   const { address } = useAccount();
   const { data } = useSupPoints({
     userAddress: address,
@@ -28,6 +30,17 @@ export default function ClaimSup(params: ClaimSupProps) {
   };
   return (
     <>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-accent-800">
+          You&apos;re getting paid!
+        </h2>
+        <button
+          onClick={handleCloseDrawer}
+          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
       <div className="mb-6">
         <p className="text-primary-500 text-sm">
           Open donation streams to earn SUP.

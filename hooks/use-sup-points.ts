@@ -4,6 +4,7 @@ interface SupPointsData {
   balanceUntilUpdatedAt: string;
   totalNetFlowRate: string;
   updatedAtTimestamp: string;
+  totalInflowRate: string;
 }
 
 interface UseSupPointsOptions {

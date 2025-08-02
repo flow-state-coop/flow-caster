@@ -10,6 +10,7 @@ import { createDonorBuckets } from "@/lib/pool";
 import { Crown } from "lucide-react";
 import { PoolData } from "@/lib/types";
 import DonorStats from "./DonorStats";
+import { VIZ_PAUSED } from "@/lib/constants";
 
 interface PoolCircleProps {
   poolData: PoolData;
@@ -173,7 +174,7 @@ export default function PoolCircle({
   ];
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VIS === "paused") return;
+    if (VIZ_PAUSED) return;
     // Only run particle animations when data is loaded
     if (!poolData) return;
 

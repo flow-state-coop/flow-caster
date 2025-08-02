@@ -26,12 +26,12 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
 
   return (
     <div className="w-full max-w-md mx-auto bg-white">
-      <p className="text-sm font-bold text-black mt-3">
-        Cracked Farcaster Devs
-      </p>
       <h2 className="text-3xl text-primary-500 font-bold mb-3">
         Donor Leaderboard
       </h2>
+      <p className="text-sm font-bold text-black mt-3">
+        Cracked Farcaster Devs
+      </p>
       <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
         <div className="col-span-2">&nbsp;</div>
         <div className="text-right">USDCx/mo</div>
@@ -64,10 +64,10 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
                   <img
                     src={user.pfp_url}
                     alt={user.display_name || user.username}
-                    className="w-8 h-8 rounded-full border-2 border-primary-500 relative z-10"
+                    className="w-8 h-8 rounded-full relative z-10"
                   />
                 ) : (
-                  <CircleUserRound className="w-8 h-8 text-primary-500 relative z-10" />
+                  <CircleUserRound className="w-8 h-8 text-black relative z-10" />
                 )}
               </div>
               <div className="flex-1 min-w-0">

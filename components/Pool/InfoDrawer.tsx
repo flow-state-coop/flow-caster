@@ -1,7 +1,12 @@
 "use client";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { X } from "lucide-react";
 
-export default function InfoDrawer() {
+interface InfoProps {
+  handleCloseDrawer: () => void;
+}
+
+export default function InfoDrawer({ handleCloseDrawer }: InfoProps) {
   const handleViewProfile = async () => {
     await sdk.actions.viewCast({
       hash: "0xcd9b0113",
@@ -16,6 +21,15 @@ export default function InfoDrawer() {
 
   return (
     <>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-accent-800">What is this?</h2>
+        <button
+          onClick={handleCloseDrawer}
+          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
       <div className="mb-6 flex flex-col gap-2 text-primary-800">
         <p>
           Open a token stream that&apos;s split in real-time to 78 cracked
