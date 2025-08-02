@@ -29,12 +29,7 @@ export default function DonorNode({
 }: DonorNodeProps) {
   const iconPath = "/images/icon.svg";
 
-  const donorCountTmp = 3333;
-
-  const formattedCount = formatPoolCount(donorCountTmp);
-
-  console.log("formattedCount", formattedCount);
-
+  const formattedCount = formatPoolCount(donorCount);
   const donorCountValuesList: Record<
     number,
     { fontSize: string; xOffset: number; yOffset: number }

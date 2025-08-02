@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
 interface SupPointsData {
-  balanceUntilUpdatedAt: string;
-  totalNetFlowRate: string;
-  updatedAtTimestamp: string;
-  totalInflowRate: string;
+  flowRate: string;
+  lockerAddress: string;
 }
 
 interface UseSupPointsOptions {

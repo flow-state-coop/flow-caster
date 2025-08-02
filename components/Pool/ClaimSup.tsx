@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { X } from "lucide-react";
 
-import FlowAmount from "./FlowAmount";
+import { ratePerMonthFormatted } from "@/lib/pool";
 
 interface ClaimSupProps {
   handleCloseDrawer: () => void;
@@ -17,13 +17,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
     userAddress: address,
   });
 
-  console.log("address", address);
-
-  console.log("data", data);
-
   const onClaimSup = async () => {
-    console.log("claiming");
-
     await sdk.actions.openMiniApp({
       url: "https://farcaster.xyz/miniapps/1NTJKdUZCsPI/superfluid-claim-app",
     });
@@ -51,13 +45,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
         <div className="flex flex-col items-center w-full gap-1 mb-6">
           <p className="font-bold text-black">Your Rewards Rate</p>
           <div className="text-2xl font-bold text-brand-sfGreen mb-5">
-            <FlowAmount
-              textBefore="+"
-              textAfter="SUP / mo"
-              startingAmount={BigInt(data.balanceUntilUpdatedAt || "0")}
-              startingTimestamp={Number(data.updatedAtTimestamp)}
-              flowRate={BigInt(data.totalNetFlowRate)}
-            />
+            <div>{`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}</div>
           </div>
         </div>
       )}

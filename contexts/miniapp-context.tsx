@@ -10,7 +10,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import MiniAppWalletContext from "./miniapp-wallet-context";
 import MiniAppWalletProvider from "./miniapp-wallet-context";
 
 interface MiniAppContextType {

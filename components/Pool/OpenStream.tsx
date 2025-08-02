@@ -163,6 +163,12 @@ export default function OpenStream({
     setMonthlyDonation(rate);
   }, [connectedDonor, devPoolData, address]);
 
+  const handleCancel = () => {
+    setWrapAmount("0");
+    setMonthlyDonation("0");
+    proceedWithMainTransaction();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -619,22 +625,33 @@ export default function OpenStream({
               )}
 
               {isConnected && (
-                <button
-                  type="submit"
-                  className={getButtonClass()}
-                  disabled={
-                    isLoading ||
-                    isConfirming ||
-                    isApprovalConfirming ||
-                    isSuccess ||
-                    isButtonDisabled
-                  }
-                >
-                  {getButtonText()}
-                </button>
+                <>
+                  <button
+                    type="submit"
+                    className={getButtonClass()}
+                    disabled={
+                      isLoading ||
+                      isConfirming ||
+                      isApprovalConfirming ||
+                      isSuccess ||
+                      isButtonDisabled
+                    }
+                  >
+                    {getButtonText()}
+                  </button>
+                  {!connectedDonor && (
+                    <p
+                      className="font-sm underline text-primary-500 hover:cursor-pointer text-center"
+                      onClick={handleCancel}
+                    >
+                      Cancel Stream
+                    </p>
+                  )}
+                </>
               )}
             </>
           )}
+
           {isSuccess && (
             <>
               <div className="flex flex-col gap-1">
