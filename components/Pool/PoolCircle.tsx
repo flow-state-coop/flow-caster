@@ -48,6 +48,8 @@ export default function PoolCircle({
       connectedUser
     );
 
+    console.log("formattedDonors", formattedDonors);
+
     return formattedDonors;
   }, [poolData, connectedUser]);
 
