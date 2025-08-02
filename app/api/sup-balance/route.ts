@@ -40,6 +40,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log("address", address);
+
     console.log("lockerAddress", lockerAddress);
 
     if (

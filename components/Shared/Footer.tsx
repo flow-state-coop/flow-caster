@@ -40,8 +40,6 @@ export default function Footer({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes>("info");
 
-  console.log("pathname", pathname);
-
   useEffect(() => {
     if (shouldConnect) {
       setDrawerType("connect");

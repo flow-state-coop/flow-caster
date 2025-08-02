@@ -335,7 +335,7 @@ export default function PoolCircle({
                 radius={60}
                 farcasterUser={donor?.farcasterUser}
                 isGroupDonors={isGroupDonors}
-                donorCount={donors.length}
+                donorCount={poolData.poolDistributors.length}
                 connectedUserFallback={isUserDonor ? connectedUser : undefined}
               />
             </g>

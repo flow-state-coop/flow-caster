@@ -1,11 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import { ratePerMonthFormatted, totalFlowedStatic } from "@/lib/pool";
+import { ratePerMonthFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
-import { CircleUserRound, Crown } from "lucide-react";
+import { Crown } from "lucide-react";
 import { useMemo } from "react";
-import { formatEther } from "viem";
 import FlowAmount from "../Pool/FlowAmount";
-import { triggerDonationWorkflow } from "@/lib/qstash";
 
 interface LeaderboardListProps {
   poolData?: PoolData;
@@ -54,12 +52,6 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
                 {!isTop && <>{i + 1}</>}
               </div>
               <div className="w-8 h-8 flex items-center justify-center relative">
-                {/* {isTop && (
-                  <Crown
-                    fill="gold"
-                    className="w-16 h-16 text-yellow-300 absolute z-0"
-                  />
-                )} */}
                 {user?.pfp_url ? (
                   <img
                     src={user.pfp_url}
@@ -67,7 +59,11 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
                     className="w-8 h-8 rounded-full relative z-10"
                   />
                 ) : (
-                  <CircleUserRound className="w-8 h-8 text-black relative z-10" />
+                  <img
+                    src="/images/icon.png"
+                    alt="fs logo"
+                    className="w-8 h-8 rounded-full relative z-10"
+                  />
                 )}
               </div>
               <div className="flex-1 min-w-0">

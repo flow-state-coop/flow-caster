@@ -43,7 +43,8 @@ export const DEFAULT_CHAIN_ID = "11155420";
 export const DEFAULT_POOL_ID = "71";
 // export const DEFAULT_POOL_ID = "32";
 
-export const SUP_PROGRAM_ID = 7743;
+export const SUP_PROGRAM_ID = 7742;
+// export const SUP_PROGRAM_ID = 7743;
 
 // "Update to the production config:
 // - Cracked Devs: 0x9ef9fe8bf503b10698322e3a135c0fa6decc5b5b / https://flowstate.network/flow-splitters/8453/32

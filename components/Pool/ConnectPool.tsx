@@ -144,7 +144,7 @@ export default function ConnectPool({
         </button>
       </div>
       <div className="mb-6">
-        {!isSuccess && <p className="text-black">SUCCESS</p>}
+        {isSuccess && <p className="text-black">SUCCESS</p>}
       </div>
 
       {error && (
