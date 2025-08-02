@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
+import fluidLockerFactoryAbi from "@/lib/abi/fluidLockerFactory.json";
 import fluidLockerAbi from "@/lib/abi/fluidLocker.json";
-import { FLUID_LOCKER_CONTRACT } from "@/lib/constants";
-import { networks } from "@/lib/flowapp/networks";
-import { GraphQLClient } from "graphql-request";
-import { SF_SUP_TOKEN_SNAPSHOT } from "@/lib/flowapp/queries";
+
+import { FLUID_LOCKER_CONTRACT, SUP_PROGRAM_ID } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-// Find the Base network config
-const BASE_NETWORK_ID = 8453;
-const baseNetwork = networks.find((n) => n.id === BASE_NETWORK_ID);
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +29,7 @@ export async function GET(request: NextRequest) {
       });
       lockerAddress = (await client.readContract({
         address: FLUID_LOCKER_CONTRACT as `0x${string}`,
-        abi: fluidLockerAbi,
+        abi: fluidLockerFactoryAbi,
         functionName: "getLockerAddress",
         args: [address],
       })) as string;
@@ -57,40 +52,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Query the Superfluid subgraph for the SUP token snapshot
-    if (!baseNetwork?.superfluidSubgraph) {
-      return NextResponse.json(
-        { error: "Base network subgraph not configured" },
-        { status: 500 }
-      );
-    }
-    const sfClient = new GraphQLClient(baseNetwork.superfluidSubgraph);
-    let snapshotRes: any;
+    let flowRate: bigint | undefined;
     try {
-      snapshotRes = await sfClient.request(SF_SUP_TOKEN_SNAPSHOT, {
-        address: lockerAddress.toLowerCase(),
+      const client = createPublicClient({
+        chain: base,
+        transport: http(),
       });
+      flowRate = (await client.readContract({
+        address: lockerAddress as `0x${string}`,
+        abi: fluidLockerAbi,
+        functionName: "getFlowRatePerProgram",
+        args: [SUP_PROGRAM_ID],
+      })) as bigint;
+
+      console.log("*****flowRate", flowRate);
     } catch (err) {
       return NextResponse.json(
-        { error: "Failed to query Superfluid subgraph", details: String(err) },
+        { error: "Failed to read flow rate", details: String(err) },
         { status: 500 }
       );
     }
-    const snapshot = snapshotRes?.accountTokenSnapshots?.[0];
-    if (!snapshot) {
-      return NextResponse.json(
-        { error: "No SUP token snapshot found for this locker address" },
-        { status: 404 }
-      );
-    }
-    console.log("snapshot", snapshot);
-    // Only return the relevant fields
+
+    console.log("RETURN!!!!!!!!!!!");
+
     return NextResponse.json({
-      balanceUntilUpdatedAt: snapshot.balanceUntilUpdatedAt,
-      totalNetFlowRate: snapshot.totalNetFlowRate,
-      updatedAtTimestamp: snapshot.updatedAtTimestamp,
-      totalInflowRate: snapshot.totalInflowRate,
-      totalOutflowRate: snapshot.totalOutflowRate,
+      flowRate: flowRate.toString(),
+      lockerAddress,
     });
   } catch (error) {
     return NextResponse.json(

@@ -1,48 +1,165 @@
 [
   {
     "inputs": [
-      { "internalType": "address", "name": "lockerBeacon", "type": "address" },
+      {
+        "internalType": "contract ISuperToken",
+        "name": "fluid",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ISuperfluidPool",
+        "name": "taxDistributionPool",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IEPProgramManager",
+        "name": "programManager",
+        "type": "address"
+      },
       {
         "internalType": "contract IStakingRewardController",
         "name": "stakingRewardController",
         "type": "address"
       },
-      { "internalType": "bool", "name": "pauseStatus", "type": "bool" }
+      {
+        "internalType": "address",
+        "name": "fontaineBeacon",
+        "type": "address"
+      },
+      { "internalType": "bool", "name": "isUnlockAvailable", "type": "bool" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "target", "type": "address" }
-    ],
-    "name": "AddressEmptyCode",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "implementation", "type": "address" }
-    ],
-    "name": "ERC1967InvalidImplementation",
-    "type": "error"
-  },
-  { "inputs": [], "name": "ERC1967NonPayable", "type": "error" },
-  { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+  { "inputs": [], "name": "FORBIDDEN", "type": "error" },
+  { "inputs": [], "name": "INVALID_UNLOCK_PERIOD", "type": "error" },
   { "inputs": [], "name": "InvalidInitialization", "type": "error" },
-  { "inputs": [], "name": "LOCKER_CREATION_PAUSED", "type": "error" },
-  { "inputs": [], "name": "NOT_GOVERNOR", "type": "error" },
+  { "inputs": [], "name": "NOT_LOCKER_OWNER", "type": "error" },
+  { "inputs": [], "name": "NO_FLUID_TO_STAKE", "type": "error" },
+  { "inputs": [], "name": "NO_FLUID_TO_UNLOCK", "type": "error" },
+  { "inputs": [], "name": "NO_FLUID_TO_UNSTAKE", "type": "error" },
   { "inputs": [], "name": "NotInitializing", "type": "error" },
+  { "inputs": [], "name": "Reentrancy", "type": "error" },
+  { "inputs": [], "name": "STAKING_COOLDOWN_NOT_ELAPSED", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "bits", "type": "uint8" },
+      { "internalType": "int256", "name": "value", "type": "int256" }
+    ],
+    "name": "SafeCastOverflowedIntDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TAX_DISTRIBUTION_POOL_HAS_NO_UNITS",
+    "type": "error"
+  },
+  { "inputs": [], "name": "TTE_NOT_ACTIVATED", "type": "error" },
   {
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FluidLocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "newTotalStakedBalance",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "addedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FluidStaked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "programId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "totalProgramUnits",
+        "type": "uint256"
+      }
+    ],
+    "name": "FluidStreamClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256[]",
+        "name": "programId",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256[]",
+        "name": "totalProgramUnits",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "FluidStreamsClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint128",
+        "name": "unlockPeriod",
+        "type": "uint128"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "availableBalance",
+        "type": "uint256"
+      },
+      {
         "indexed": false,
         "internalType": "address",
-        "name": "newGovernor",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fontaine",
         "type": "address"
       }
     ],
-    "name": "GovernorUpdated",
+    "name": "FluidUnlocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "FluidUnstaked",
     "type": "event"
   },
   {
@@ -59,47 +176,30 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "lockerOwner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "lockerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LockerCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "implementation",
-        "type": "address"
-      }
-    ],
-    "name": "Upgraded",
-    "type": "event"
-  },
-  {
     "inputs": [],
-    "name": "IS_PAUSED",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "name": "EP_PROGRAM_MANAGER",
+    "outputs": [
+      {
+        "internalType": "contract IEPProgramManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "LOCKER_BEACON",
+    "name": "FLUID",
+    "outputs": [
+      { "internalType": "contract ISuperToken", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "FONTAINE_BEACON",
     "outputs": [
       {
         "internalType": "contract UpgradeableBeacon",
@@ -124,43 +224,12 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" }
-    ],
-    "name": "createLockerContract",
-    "outputs": [
-      { "internalType": "address", "name": "lockerInstance", "type": "address" }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "createLockerContract",
-    "outputs": [
-      { "internalType": "address", "name": "lockerInstance", "type": "address" }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" }
-    ],
-    "name": "getLockerAddress",
-    "outputs": [
-      { "internalType": "address", "name": "lockerAddress", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getLockerBeaconImplementation",
+    "name": "TAX_DISTRIBUTION_POOL",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "lockerBeaconImpl",
+        "internalType": "contract ISuperfluidPool",
+        "name": "",
         "type": "address"
       }
     ],
@@ -168,27 +237,166 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "UNLOCK_AVAILABLE",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" }
+      { "internalType": "uint256", "name": "programId", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "totalProgramUnits",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+      { "internalType": "bytes", "name": "stackSignature", "type": "bytes" }
     ],
-    "name": "getUserLocker",
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "programIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "totalProgramUnits",
+        "type": "uint256[]"
+      },
+      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+      { "internalType": "bytes", "name": "stackSignature", "type": "bytes" }
+    ],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "programId", "type": "uint256" }
+    ],
+    "name": "connectToPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "programId", "type": "uint256" }
+    ],
+    "name": "disconnectFromPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fontaineCount",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "unlockId", "type": "uint256" }
+    ],
+    "name": "fontaines",
     "outputs": [
-      { "internalType": "bool", "name": "isCreated", "type": "bool" },
-      { "internalType": "address", "name": "lockerAddress", "type": "address" }
+      {
+        "internalType": "contract IFontaine",
+        "name": "fontaine",
+        "type": "address"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "governor",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "getAvailableBalance",
+    "outputs": [
+      { "internalType": "uint256", "name": "aBalance", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_governor", "type": "address" }
+      { "internalType": "uint256[]", "name": "programIds", "type": "uint256[]" }
+    ],
+    "name": "getFlowRatePerProgram",
+    "outputs": [
+      { "internalType": "int96[]", "name": "flowRates", "type": "int96[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "programId", "type": "uint256" }
+    ],
+    "name": "getFlowRatePerProgram",
+    "outputs": [
+      { "internalType": "int96", "name": "flowRate", "type": "int96" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFontaineBeaconImplementation",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "fontaineBeaconImpl",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getStakedBalance",
+    "outputs": [
+      { "internalType": "uint256", "name": "sBalance", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "programId", "type": "uint256" }
+    ],
+    "name": "getUnitsPerProgram",
+    "outputs": [
+      { "internalType": "uint128", "name": "units", "type": "uint128" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "programIds", "type": "uint256[]" }
+    ],
+    "name": "getUnitsPerProgram",
+    "outputs": [
+      { "internalType": "uint128[]", "name": "units", "type": "uint128[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
     ],
     "name": "initialize",
     "outputs": [],
@@ -197,23 +405,47 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "newGovernor", "type": "address" }
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "setGovernor",
+    "name": "lock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "lockerOwner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakingUnlocksAt",
+    "outputs": [{ "internalType": "uint80", "name": "", "type": "uint80" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "newImplementation",
-        "type": "address"
-      },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
+      { "internalType": "uint128", "name": "unlockPeriod", "type": "uint128" },
+      { "internalType": "address", "name": "recipient", "type": "address" }
     ],
-    "name": "upgradeTo",
+    "name": "unlock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unstake",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
