@@ -32,6 +32,8 @@ export const createDonorBuckets = (
     return currentRate > highestRate ? current : highest;
   });
 
+  console.log("topDonor", topDonor);
+
   console.log("connectedUser", connectedUser);
 
   let connectedDonor = poolDistributors.find(
@@ -46,16 +48,13 @@ export const createDonorBuckets = (
 
   const totalDonor = {
     accountId: `${poolDistributors.length} Total`,
-    // rate: formatUnits(totalFlow, 18),
     rate: totalFlow.toString(),
     farcasterUser: null,
   };
 
   const connectAndTop = [connectedDonor, topDonor].map((distributor) => ({
     accountId: distributor?.account.id,
-    // rate: formatUnits(BigInt(distributor?.flowRate || "0"), 18),
     rate: distributor?.flowRate || "0",
-
     farcasterUser: distributor?.farcasterUser,
   }));
 
