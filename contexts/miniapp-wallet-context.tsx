@@ -5,7 +5,7 @@ import { createConfig, http, WagmiProvider } from "wagmi";
 import { base, optimismSepolia } from "wagmi/chains";
 
 export const config = createConfig({
-  chains: DEFAULT_CHAIN_ID === "11155420" ? [optimismSepolia] : [base],
+  chains: DEFAULT_CHAIN_ID === "8453" ? [base] : [optimismSepolia],
   transports: {
     [base.id]: http(),
     [optimismSepolia.id]: http(),
