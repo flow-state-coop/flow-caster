@@ -19,18 +19,22 @@ export const getTotalFlow = (
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
-  connectedUser: NeynarUser | null | undefined
+  connectedUser: NeynarUser | null | undefined,
+  connectedAddress: `0x${string}` | undefined
 ) => {
-  const topDonor = poolDistributors.reduce((highest, current) => {
-    const currentRate = parseFloat(current.flowRate);
-    const highestRate = parseFloat(highest.flowRate);
+  const topDonor =
+    poolDistributors.length > 0
+      ? poolDistributors.reduce((highest, current) => {
+          const currentRate = parseFloat(current.flowRate);
+          const highestRate = parseFloat(highest.flowRate);
 
-    // Skip invalid numbers
-    if (isNaN(currentRate)) return highest;
-    if (isNaN(highestRate)) return current;
+          // Skip invalid numbers
+          if (isNaN(currentRate)) return highest;
+          if (isNaN(highestRate)) return current;
 
-    return currentRate > highestRate ? current : highest;
-  });
+          return currentRate > highestRate ? current : highest;
+        })
+      : undefined;
 
   console.log("topDonor", topDonor);
 
@@ -38,8 +42,11 @@ export const createDonorBuckets = (
 
   let connectedDonor = poolDistributors.find(
     (d) =>
-      d.account.id === connectedUser?.verified_addresses.primary.eth_address ||
-      d.account.id === connectedUser?.verified_addresses.eth_addresses[0]
+      d.account.id.toLowerCase() === connectedAddress?.toLowerCase() ||
+      d.account.id.toLowerCase() ===
+        connectedUser?.verified_addresses.primary.eth_address.toLowerCase() ||
+      d.account.id.toLowerCase() ===
+        connectedUser?.verified_addresses.eth_addresses[0].toLowerCase()
   );
 
   console.log("connectedDonor", connectedDonor);

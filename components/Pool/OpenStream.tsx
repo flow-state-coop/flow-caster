@@ -178,7 +178,7 @@ export default function OpenStream({
   const handleCancel = () => {
     setWrapAmount("0");
     setMonthlyDonation("0");
-    proceedWithMainTransaction();
+    proceedWithMainTransaction(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -231,12 +231,12 @@ export default function OpenStream({
       );
     } else {
       // No approval needed, proceed with main transaction
-      proceedWithMainTransaction();
+      proceedWithMainTransaction(false);
     }
   };
 
   // Function to handle the main transaction after approval
-  const proceedWithMainTransaction = async () => {
+  const proceedWithMainTransaction = async (cancel?: boolean) => {
     setIsSuccess(false);
     setIsLoading(false);
     setIsConfirming(true);
@@ -248,14 +248,20 @@ export default function OpenStream({
       return;
     }
 
+    console.log("setting up batch for wrapAmountValue", wrapAmount);
+    console.log("and monthlyDonation", monthlyDonation);
+
     let operations: Operation[] = [];
 
+    const _wrapAmount = cancel ? "0" : wrapAmount;
+
     const wrapAmountValue = parseUnits(
-      wrapAmount,
+      _wrapAmount,
       tokenData.underlyingDecimals
     );
 
     if (wrapAmountValue > 0) {
+      console.log("adding upgrade/wrap function");
       operations = [
         prepareOperation({
           operationType: OPERATION_TYPE.SUPERTOKEN_UPGRADE,
@@ -270,12 +276,13 @@ export default function OpenStream({
     }
 
     // handle 0 submission for existing stream
-    const _monthlyDonation = monthlyDonation === "" ? "0" : monthlyDonation;
+    const _monthlyDonation =
+      cancel || monthlyDonation === "" ? "0" : monthlyDonation;
     let poolMonthlyDonation = parseFloat(_monthlyDonation);
 
     console.log("poolMonthlyDonation", poolMonthlyDonation);
-
     console.log("currentDevDonor", currentDevDonor);
+
     const zeroOutDevDonation =
       (poolMonthlyDonation == 0 && currentDevDonor) ||
       (currentDevDonor && !donateToDevs);
@@ -320,6 +327,8 @@ export default function OpenStream({
       amountWei: parseEther(poolMonthlyDonation.toString()),
       timeUnit: TIME_UNIT["month"],
     });
+
+    console.log("adding main donation poolFlowRate", poolFlowRate);
 
     operations = [
       ...operations,
@@ -642,7 +651,7 @@ export default function OpenStream({
               {!isConnected && (
                 <button
                   onClick={() => connect({ connector: connectors[0] })}
-                  className="w-full px-4 py-3 bg-accent-800 text-white font-bold font-medium text-xl transition-colors"
+                  className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
                 >
                   Connect Wallet
                 </button>

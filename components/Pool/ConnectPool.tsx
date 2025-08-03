@@ -123,7 +123,7 @@ export default function ConnectPool({
 
   const getButtonClass = () => {
     const baseClass =
-      "w-full px-4 py-3 rounded-lg border-2 border-black font-medium text-xl transition-colors";
+      "w-full px-4 py-3 rounded-lg text-white text-bold font-medium text-xl transition-colors";
 
     if (isLoading || isConfirming || isSuccess) {
       return `${baseClass} bg-gray-400 text-white cursor-not-allowed`;
@@ -135,13 +135,19 @@ export default function ConnectPool({
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-accent-800">SUP Rewards</h2>
+        <h2 className="text-2xl font-bold text-accent-800">Connect To Pool</h2>
         <button
           onClick={handleCloseDrawer}
           className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <X size={20} />
         </button>
+      </div>
+      <div className="mb-6 flex flex-col gap-2 text-primary-800">
+        <div>
+          Cracked dev rewards are already flowing. Complete a one-time
+          transaction to receive your token stream split in real-time.
+        </div>
       </div>
       <div className="mb-6">
         {isSuccess && <p className="text-black">SUCCESS</p>}
@@ -173,15 +179,17 @@ export default function ConnectPool({
           <div>
             Switch to your Farcaster wallet in the mini app menu to connect.
           </div>
-          <div>Connected Wallet: {address}</div>
-          <div>Recipient Wallet: {connectedMember.account.id}</div>
+          <div>Connected Wallet: {address?.toLowerCase()}</div>
+          <div>
+            Recipient Wallet: {connectedMember.account.id.toLowerCase()}
+          </div>
         </div>
       )}
 
       {!isConnected && (
         <button
           onClick={() => connect({ connector: connectors[0] })}
-          className="w-full px-4 py-3 text-black rounded-lg border-2 border-black font-medium text-xl transition-colors"
+          className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
         >
           Connect Wallet
         </button>

@@ -15,11 +15,13 @@ import { VIZ_PAUSED } from "@/lib/constants";
 interface PoolCircleProps {
   poolData: PoolData;
   connectedUser: NeynarUser | null | undefined;
+  connectedAddress?: `0x${string}`;
 }
 
 export default function PoolCircle({
   poolData,
   connectedUser,
+  connectedAddress,
 }: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
@@ -45,13 +47,14 @@ export default function PoolCircle({
 
     const formattedDonors = createDonorBuckets(
       poolData.poolDistributors,
-      connectedUser
+      connectedUser,
+      connectedAddress
     );
 
     console.log("formattedDonors", formattedDonors);
 
     return formattedDonors;
-  }, [poolData, connectedUser]);
+  }, [poolData, connectedUser, connectedAddress]);
 
   useEffect(() => {
     // Calculate sizes first

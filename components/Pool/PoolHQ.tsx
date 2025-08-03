@@ -46,11 +46,12 @@ export default function PoolHQ({
         m.account.id === user.data?.verified_addresses.eth_addresses[0]
     );
 
+    console.log("member", member?.account.id.toLowerCase());
+    console.log("address", address?.toLowerCase());
+    console.log("user", user);
+
     setConnectedMember(member);
-    if (
-      member &&
-      member.account.id.toLowerCase() !== address?.toLocaleLowerCase()
-    ) {
+    if (member && member.account.id.toLowerCase() !== address?.toLowerCase()) {
       setConnectedAddressNotPoolAddress(true);
     }
   }, [poolData, address, user]);
@@ -93,7 +94,11 @@ export default function PoolHQ({
 
   return (
     <>
-      <PoolCircle poolData={poolData} connectedUser={user.data || null} />
+      <PoolCircle
+        poolData={poolData}
+        connectedUser={user.data || null}
+        connectedAddress={address}
+      />
       <Footer
         chainId={chainId}
         poolId={poolId}
