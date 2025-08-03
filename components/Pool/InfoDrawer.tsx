@@ -46,12 +46,11 @@ export default function InfoDrawer({ handleCloseDrawer }: InfoProps) {
           focus on building.
         </p>
         <p>
-          Donors are eligible for
+          Donors are eligible for{" "}
           <span
             onClick={onClaimSup}
             className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
           >
-            {" "}
             SUP Rewards.
           </span>
         </p>
