@@ -18,6 +18,12 @@ interface PoolCircleProps {
   connectedAddress?: `0x${string}`;
 }
 
+interface PoolDonor {
+  rate: string;
+  farcasterUser: NeynarUser | null | undefined;
+  accountId: string | undefined;
+}
+
 export default function PoolCircle({
   poolData,
   connectedUser,
@@ -28,6 +34,7 @@ export default function PoolCircle({
   const centerY = 170; // Move pool higher
 
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
+  const [donors, setDonors] = useState<PoolDonor[] | undefined[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
 
   // Transform pool data to component format
@@ -42,8 +49,22 @@ export default function PoolCircle({
     }));
   }, [poolData]);
 
-  const donors = useMemo(() => {
-    if (!poolData) return [];
+  // const donors = useMemo(() => {
+  //   if (!poolData) return [];
+
+  //   const formattedDonors = createDonorBuckets(
+  //     poolData.poolDistributors,
+  //     connectedUser,
+  //     connectedAddress
+  //   );
+
+  //   console.log("formattedDonors", formattedDonors);
+
+  //   return formattedDonors;
+  // }, [poolData, connectedUser, connectedAddress]);
+
+  useEffect(() => {
+    if (!poolData) return;
 
     const formattedDonors = createDonorBuckets(
       poolData.poolDistributors,
@@ -52,8 +73,7 @@ export default function PoolCircle({
     );
 
     console.log("formattedDonors", formattedDonors);
-
-    return formattedDonors;
+    setDonors(formattedDonors);
   }, [poolData, connectedUser, connectedAddress]);
 
   useEffect(() => {
