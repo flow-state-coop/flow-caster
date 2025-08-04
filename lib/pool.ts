@@ -40,13 +40,17 @@ export const createDonorBuckets = (
 
   console.log("connectedUser", connectedUser);
 
+  // let connectedDonor = poolDistributors.find(
+  //   (d) =>
+  //     d.account.id.toLowerCase() === connectedAddress?.toLowerCase() ||
+  //     d.account.id.toLowerCase() ===
+  //       connectedUser?.verified_addresses.primary.eth_address.toLowerCase() ||
+  //     d.account.id.toLowerCase() ===
+  //       connectedUser?.verified_addresses.eth_addresses[0].toLowerCase()
+  // );
+
   let connectedDonor = poolDistributors.find(
-    (d) =>
-      d.account.id.toLowerCase() === connectedAddress?.toLowerCase() ||
-      d.account.id.toLowerCase() ===
-        connectedUser?.verified_addresses.primary.eth_address.toLowerCase() ||
-      d.account.id.toLowerCase() ===
-        connectedUser?.verified_addresses.eth_addresses[0].toLowerCase()
+    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
   );
 
   console.log("connectedDonor", connectedDonor);

@@ -142,8 +142,9 @@ export default function OpenStream({
   const totalSuperTokenBalance = userBalance + wrapAmountValue;
   const isMonthlyDonationEmpty =
     !currentMonthlyRate && monthlyDonationAmount === 0;
+  const twoDayDonationAmount = (monthlyDonationAmount / 30) * 2;
   const isInsufficientBalance =
-    monthlyDonationAmount > 0 && totalSuperTokenBalance < monthlyDonationAmount;
+    monthlyDonationAmount > 0 && totalSuperTokenBalance < twoDayDonationAmount;
   const isWrapAmountExceedsBalance = wrapAmountValue > usdcBalance;
   const isButtonDisabled =
     isMonthlyDonationEmpty ||
@@ -389,22 +390,26 @@ export default function OpenStream({
       console.log(
         "Batch transaction confirmed, proceeding with main transaction"
       );
-      refetch();
-      setIsSuccess(true);
 
-      if (Number(monthlyDonation) > 0) {
-        const options = {
-          method: "POST",
-          body: JSON.stringify({
-            poolid: poolId,
-            chainid: chainId,
-            poolname: "Farcaster Cracked Devs",
-            username: user?.data?.username || "A mystery donor",
-            flowrate: monthlyDonation,
-          }),
-        };
-        fetch(`/api/notify-donation`, options);
-      }
+      setTimeout(() => {
+        console.log("Delayed for 3 seconds.");
+        refetch();
+        setIsSuccess(true);
+
+        if (Number(monthlyDonation) > 0) {
+          const options = {
+            method: "POST",
+            body: JSON.stringify({
+              poolid: poolId,
+              chainid: chainId,
+              poolname: "Farcaster Cracked Devs",
+              username: user?.data?.username || "A mystery donor",
+              flowrate: monthlyDonation,
+            }),
+          };
+          fetch(`/api/notify-donation`, options);
+        }
+      }, 3000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBatchSuccess, isBatchConfirming]);
@@ -442,7 +447,7 @@ export default function OpenStream({
     if (isWrapAmountExceedsBalance)
       return `${tokenData.underlyingSymbol} balance too low`;
     if (isInsufficientBalance)
-      return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}`;
+      return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}.`;
     if (connectedDonor) return "Edit Stream";
     return "Open Stream";
   };
