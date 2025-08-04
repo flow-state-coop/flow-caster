@@ -87,6 +87,7 @@ export default function ConnectPool({
         },
         onError: (error) => {
           setIsLoading(false);
+          setIsConfirming(false);
           console.log("tx error", error);
           setError(error.message || "Transaction failed");
         },
@@ -118,7 +119,7 @@ export default function ConnectPool({
     if (isLoading) return "Preparing...";
     if (isConfirming) return "Confirming...";
     if (isSuccess) return "Success!";
-    return "Start Receiving";
+    return "Connect to Pool";
   };
 
   const getButtonClass = () => {
@@ -135,7 +136,9 @@ export default function ConnectPool({
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-accent-800">Connect To Pool</h2>
+        <h2 className="text-2xl font-bold text-accent-800">
+          Your&apos;re getting paid
+        </h2>
         <button
           onClick={handleCloseDrawer}
           className="p-2 text-gray-400 hover:text-gray-600 transition-colors"

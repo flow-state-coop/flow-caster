@@ -46,10 +46,6 @@ export default function PoolHQ({
         m.account.id === user.data?.verified_addresses.eth_addresses[0]
     );
 
-    console.log("member", member?.account.id.toLowerCase());
-    console.log("address", address?.toLowerCase());
-    console.log("user", user);
-
     setConnectedMember(member);
     if (member && member.account.id.toLowerCase() !== address?.toLowerCase()) {
       setConnectedAddressNotPoolAddress(true);

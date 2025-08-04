@@ -33,7 +33,7 @@ export const FLUID_LOCKER_CONTRACT =
 
 // op-sepolia
 // export const DEV_POOL_ADDRESS = "0x592834dfaa81dc050dc5ac46f4fc87d594faeb75";
-// export const DEFAULT_CHAIN_ID = "11155420";
+// export const DEFAULT_CHAIN_ID: "8453" | "11155420" = "11155420";
 // export const DEV_POOL_ID = "73";
 // export const DEFAULT_POOL_ID = "71";
 // export const SUP_PROGRAM_ID = 7742;
