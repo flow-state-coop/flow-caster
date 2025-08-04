@@ -15,7 +15,7 @@ export const usePoolData = ({
 }: UsePoolDataOptions) => {
   return useQuery<PoolData>({
     queryKey: ["pool-data", chainId, poolId],
-    staleTime: 10000,
+    // staleTime: 10000,
     queryFn: async () => {
       const params = new URLSearchParams({
         chainId,

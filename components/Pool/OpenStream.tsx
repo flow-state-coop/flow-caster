@@ -358,6 +358,7 @@ export default function OpenStream({
       },
       {
         onSuccess: () => {
+          setIsConfirming(false);
           console.log("batch transaction sent successfully");
           // The approval will be handled by the useWaitForTransactionReceipt hook
         },
@@ -365,6 +366,7 @@ export default function OpenStream({
           console.error("batch failed:", error);
           setError(`batch failed: ${error.message}`);
           setIsLoading(false);
+          setIsConfirming(false);
         },
       }
     );
@@ -390,17 +392,19 @@ export default function OpenStream({
       refetch();
       setIsSuccess(true);
 
-      const options = {
-        method: "POST",
-        body: JSON.stringify({
-          poolid: poolId,
-          chainid: chainId,
-          poolname: "Farcaster Cracked Devs",
-          username: user?.data?.username || "A myster donor",
-          flowrate: monthlyDonation,
-        }),
-      };
-      fetch(`/api/notify-donation`, options);
+      if (Number(monthlyDonation) > 0) {
+        const options = {
+          method: "POST",
+          body: JSON.stringify({
+            poolid: poolId,
+            chainid: chainId,
+            poolname: "Farcaster Cracked Devs",
+            username: user?.data?.username || "A mystery donor",
+            flowrate: monthlyDonation,
+          }),
+        };
+        fetch(`/api/notify-donation`, options);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBatchSuccess, isBatchConfirming]);
@@ -673,19 +677,27 @@ export default function OpenStream({
                     {getButtonText()}
                   </button>
                   {connectedDonor && (
-                    <p
-                      className="font-sm underline text-primary-500 hover:cursor-pointer text-center"
+                    <button
+                      type="button"
+                      className="w-full font-sm underline text-primary-500 hover:cursor-pointer text-center"
                       onClick={handleCancel}
+                      disabled={
+                        isLoading ||
+                        isConfirming ||
+                        isApprovalConfirming ||
+                        isSuccess ||
+                        isButtonDisabled
+                      }
                     >
                       Cancel Stream
-                    </p>
+                    </button>
                   )}
                 </>
               )}
             </>
           )}
 
-          {isSuccess && (
+          {isSuccess && Number(monthlyDonation) > 0 && (
             <>
               <div className="flex flex-col gap-1">
                 <p className="text-primary-500 text-sm">
@@ -704,6 +716,14 @@ export default function OpenStream({
               >
                 Cast
               </button>
+            </>
+          )}
+
+          {isSuccess && Number(monthlyDonation) <= 0 && (
+            <>
+              <div className="flex flex-col gap-1 mb-5">
+                <p className="text-primary-500 text-sm">Stream cancelled</p>
+              </div>
             </>
           )}
         </form>
