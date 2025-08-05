@@ -85,19 +85,6 @@ export const displayIndividualFlowPercentage = (
   return ((100 / Number(totalUnits)) * Number(units)).toFixed(2);
 };
 
-export const getMemberFlowRate = (
-  totalUnits: number | string,
-  units: number | string,
-  flowRate: number | string
-) => {
-  const perc = ((100 / Number(totalUnits)) * Number(units)) / 100;
-
-  const dude = BigInt(perc * Number(flowRate));
-  console.log("dude", dude);
-  return dude;
-  // return Number(eth).toFixed(6);
-};
-
 export const displayIndividualFlowRate = (
   totalUnits: number | string,
   units: number | string,
@@ -105,9 +92,11 @@ export const displayIndividualFlowRate = (
 ) => {
   const perc = ((100 / Number(totalUnits)) * Number(units)) / 100;
 
-  const eth = formatEther(BigInt(perc * Number(flowRate)));
+  const rate = ratePerMonth(flowRate);
 
-  return Number(eth).toFixed(6);
+  const eth = formatEther(BigInt(perc * Number(rate)));
+
+  return Number(eth).toFixed(2);
 };
 
 export const streamGranularityInSeconds = {
@@ -117,6 +106,14 @@ export const streamGranularityInSeconds = {
   day: 86400,
   week: 86400 * 7,
   month: 2628000,
+};
+
+export const individualRatePerMonth = (
+  totalUnits: number | string,
+  units: number | string,
+  flowRate: number | string
+) => {
+  return BigInt(flowRate) * BigInt(streamGranularityInSeconds.month);
 };
 
 export const ratePerMonth = (flowRate: number | string) => {

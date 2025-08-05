@@ -5,7 +5,7 @@ import { NeynarUser } from "@/lib/neynar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { sdk } from "@farcaster/miniapp-sdk";
-import { ArrowRight, CircleArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
