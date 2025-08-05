@@ -14,12 +14,20 @@ import { VIZ_PAUSED } from "@/lib/constants";
 
 interface PoolCircleProps {
   poolData: PoolData;
+  poolDistributors: PoolData["poolDistributors"];
   connectedUser: NeynarUser | null | undefined;
   connectedAddress?: `0x${string}`;
 }
 
+interface PoolDonor {
+  rate: string;
+  farcasterUser: NeynarUser | null | undefined;
+  accountId: string | undefined;
+}
+
 export default function PoolCircle({
   poolData,
+  poolDistributors,
   connectedUser,
   connectedAddress,
 }: PoolCircleProps) {
@@ -28,6 +36,7 @@ export default function PoolCircle({
   const centerY = 170; // Move pool higher
 
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
+  const [donors, setDonors] = useState<PoolDonor[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
 
   // Transform pool data to component format
@@ -42,19 +51,32 @@ export default function PoolCircle({
     }));
   }, [poolData]);
 
-  const donors = useMemo(() => {
-    if (!poolData) return [];
+  // const donors = useMemo(() => {
+  //   if (!poolData) return [];
+
+  //   const formattedDonors = createDonorBuckets(
+  //     poolData.poolDistributors,
+  //     connectedUser,
+  //     connectedAddress
+  //   );
+
+  //   console.log("formattedDonors", formattedDonors);
+
+  //   return formattedDonors;
+  // }, [poolData, connectedUser, connectedAddress]);
+
+  useEffect(() => {
+    if (!poolData || !poolDistributors) return;
 
     const formattedDonors = createDonorBuckets(
-      poolData.poolDistributors,
+      poolDistributors,
       connectedUser,
       connectedAddress
     );
 
-    console.log("formattedDonors", formattedDonors);
-
-    return formattedDonors;
-  }, [poolData, connectedUser, connectedAddress]);
+    console.log("**** formattedDonors", formattedDonors);
+    setDonors(formattedDonors);
+  }, [poolData, poolDistributors, connectedUser, connectedAddress]);
 
   useEffect(() => {
     // Calculate sizes first
@@ -301,7 +323,7 @@ export default function PoolCircle({
           }
 
           return (
-            <g key={`${donor.accountId}-${donor.rate}`}>
+            <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               <FlowLine
                 x1={x}
                 y1={y}
@@ -325,7 +347,7 @@ export default function PoolCircle({
           const isGroupDonors = i === 2; // 2nd donor (index 1) is the middle one
 
           return (
-            <g key={`${donor.accountId}-${donor.rate}`}>
+            <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               {/* Crown for middle donor */}
               {isMiddleDonor && (
                 <g transform={`translate(${x + 54}, ${y - 140}) rotate(45)`}>
@@ -407,7 +429,7 @@ export default function PoolCircle({
         {donors.map((donor, i) => {
           return (
             <DonorStats
-              key={`${donor.accountId}-${donor.rate}`}
+              key={`${donor.accountId}-${donor.rate}-${i}`}
               rate={donor.rate}
               showSup={i < 2}
               showTotalFlow={i > 1}
