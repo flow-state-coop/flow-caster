@@ -59,7 +59,7 @@ export default function Leaderboard() {
     setConnectedDonor(donor);
   }, [poolDistributors, address]);
 
-  if (isLoading) {
+  if (isLoading || !poolData) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <p className="text-lg">Loading pool data...</p>
