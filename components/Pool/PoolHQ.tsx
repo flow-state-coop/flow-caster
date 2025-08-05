@@ -25,6 +25,8 @@ export default function PoolHQ({
   >();
   const {
     data: poolData,
+    poolDistributors,
+    poolMembers,
     isLoading,
     error,
   } = usePoolData({
@@ -39,8 +41,8 @@ export default function PoolHQ({
   }, [connectedMember]);
 
   useEffect(() => {
-    if (!user.data || !poolData) return;
-    const member = poolData.poolMembers.find(
+    if (!user.data || !poolMembers) return;
+    const member = poolMembers.find(
       (m) =>
         m.account.id === user.data?.verified_addresses.primary.eth_address ||
         m.account.id === user.data?.verified_addresses.eth_addresses[0]
@@ -50,19 +52,17 @@ export default function PoolHQ({
     if (member && member.account.id.toLowerCase() !== address?.toLowerCase()) {
       setConnectedAddressNotPoolAddress(true);
     }
-  }, [poolData, address, user]);
+  }, [poolMembers, address, user]);
 
   useEffect(() => {
-    if (!address || !poolData) return;
+    if (!address || !poolDistributors) return;
 
-    const donor = poolData.poolDistributors.find((d) => {
+    const donor = poolDistributors.find((d) => {
       return d.account.id.toLowerCase() === address.toLowerCase();
     });
 
     setConnectedDonor(donor);
-  }, [poolData, address]);
-
-  console.log("poolData", poolData);
+  }, [poolDistributors, address]);
 
   if (error) {
     return (
@@ -74,7 +74,7 @@ export default function PoolHQ({
     );
   }
 
-  if (isLoading || !poolData) {
+  if (isLoading || !poolData || !poolDistributors) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <p className="text-lg">Loading pool data...</p>
@@ -92,7 +92,7 @@ export default function PoolHQ({
     <>
       <PoolCircle
         poolData={poolData}
-        poolDistributors={poolData.poolDistributors}
+        poolDistributors={poolDistributors}
         connectedUser={user.data || null}
         connectedAddress={address}
       />

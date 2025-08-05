@@ -13,9 +13,9 @@ export const usePoolData = ({
   poolId,
   enabled = true,
 }: UsePoolDataOptions) => {
-  return useQuery<PoolData>({
+  const { data, ...rest } = useQuery<PoolData>({
     queryKey: ["pool-data", chainId, poolId],
-    // staleTime: 10000,
+    staleTime: 10000,
     queryFn: async () => {
       const params = new URLSearchParams({
         chainId,
@@ -36,4 +36,13 @@ export const usePoolData = ({
     },
     enabled,
   });
+
+  console.log("data", data);
+
+  return {
+    data: data,
+    poolDistributors: data?.poolDistributors,
+    poolMembers: data?.poolMembers,
+    ...rest,
+  };
 };

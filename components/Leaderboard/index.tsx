@@ -21,6 +21,8 @@ export default function Leaderboard() {
   >();
   const {
     data: poolData,
+    poolDistributors,
+    poolMembers,
     isLoading,
     error,
   } = usePoolData({
@@ -31,8 +33,8 @@ export default function Leaderboard() {
   const { address } = useAccount();
 
   useEffect(() => {
-    if (!user.data || !poolData) return;
-    const member = poolData.poolMembers.find(
+    if (!user.data || !poolMembers) return;
+    const member = poolMembers.find(
       (m) =>
         m.account.id === user.data?.verified_addresses.primary.eth_address ||
         m.account.id === user.data?.verified_addresses.eth_addresses[0]
@@ -45,17 +47,17 @@ export default function Leaderboard() {
     ) {
       setConnectedAddressNotPoolAddress(true);
     }
-  }, [poolData, address, user]);
+  }, [poolMembers, address, user]);
 
   useEffect(() => {
-    if (!address || !poolData) return;
+    if (!address || !poolDistributors) return;
 
-    const donor = poolData.poolDistributors.find((d) => {
+    const donor = poolDistributors.find((d) => {
       return d.account.id.toLowerCase() === address.toLowerCase();
     });
 
     setConnectedDonor(donor);
-  }, [poolData, address]);
+  }, [poolDistributors, address]);
 
   if (isLoading || !poolData) {
     return (
