@@ -17,7 +17,6 @@ export const useSupPoints = ({ userAddress }: UseSupPointsOptions) => {
         cache: "no-store",
       });
 
-      console.log("res", res);
       if (!res.ok) throw new Error("Failed to fetch SUP points");
       return res.json();
     },

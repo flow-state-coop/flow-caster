@@ -14,6 +14,7 @@ import { VIZ_PAUSED } from "@/lib/constants";
 
 interface PoolCircleProps {
   poolData: PoolData;
+  poolDistributors: PoolData["poolDistributors"];
   connectedUser: NeynarUser | null | undefined;
   connectedAddress?: `0x${string}`;
 }
@@ -26,6 +27,7 @@ interface PoolDonor {
 
 export default function PoolCircle({
   poolData,
+  poolDistributors,
   connectedUser,
   connectedAddress,
 }: PoolCircleProps) {
@@ -34,7 +36,7 @@ export default function PoolCircle({
   const centerY = 170; // Move pool higher
 
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
-  const [donors, setDonors] = useState<PoolDonor[] | undefined[]>([]);
+  const [donors, setDonors] = useState<PoolDonor[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
 
   // Transform pool data to component format
@@ -64,17 +66,17 @@ export default function PoolCircle({
   // }, [poolData, connectedUser, connectedAddress]);
 
   useEffect(() => {
-    if (!poolData) return;
+    if (!poolData || !poolDistributors) return;
 
     const formattedDonors = createDonorBuckets(
-      poolData.poolDistributors,
+      poolDistributors,
       connectedUser,
       connectedAddress
     );
 
-    console.log("formattedDonors", formattedDonors);
+    console.log("**** formattedDonors", formattedDonors);
     setDonors(formattedDonors);
-  }, [poolData, connectedUser, connectedAddress]);
+  }, [poolData, poolDistributors, connectedUser, connectedAddress]);
 
   useEffect(() => {
     // Calculate sizes first

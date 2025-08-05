@@ -391,6 +391,8 @@ export default function OpenStream({
         "Batch transaction confirmed, proceeding with main transaction"
       );
 
+      console.log("Delaying");
+
       setTimeout(() => {
         console.log("Delayed for 3 seconds.");
         refetch();

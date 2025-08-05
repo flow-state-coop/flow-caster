@@ -92,6 +92,7 @@ export default function PoolHQ({
     <>
       <PoolCircle
         poolData={poolData}
+        poolDistributors={poolData.poolDistributors}
         connectedUser={user.data || null}
         connectedAddress={address}
       />
