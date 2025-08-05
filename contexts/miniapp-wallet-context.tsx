@@ -7,7 +7,7 @@ import { base, optimismSepolia } from "wagmi/chains";
 export const config = createConfig({
   chains: DEFAULT_CHAIN_ID === "8453" ? [base] : [optimismSepolia],
   transports: {
-    [base.id]: http("https://base.llamarpc.com"),
+    [base.id]: http(),
     [optimismSepolia.id]: http(),
   },
   connectors: [miniAppConnector()],
