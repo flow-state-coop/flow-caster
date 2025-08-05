@@ -220,7 +220,7 @@ export default function OpenStream({
           onSuccess: () => {
             console.log("Approval transaction sent successfully");
             // The approval will be handled by the useWaitForTransactionReceipt hook
-            setIsConfirming(false);
+            // setIsConfirming(false);
           },
           onError: (error) => {
             console.error("Approval failed:", error);
@@ -359,7 +359,7 @@ export default function OpenStream({
       },
       {
         onSuccess: () => {
-          setIsConfirming(false);
+          // setIsConfirming(false);
           console.log("batch transaction sent successfully");
           // The approval will be handled by the useWaitForTransactionReceipt hook
         },
@@ -379,6 +379,7 @@ export default function OpenStream({
       console.log(
         "Approval transaction confirmed, proceeding with main transaction"
       );
+      setIsConfirming(false);
       proceedWithMainTransaction();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -394,9 +395,10 @@ export default function OpenStream({
       console.log("Delaying");
 
       setTimeout(() => {
-        console.log("Delayed for 3 seconds.");
-        refetch();
+        console.log("Delayed for 4 seconds.");
+        setIsConfirming(false);
         setIsSuccess(true);
+        refetch();
 
         if (Number(monthlyDonation) > 0) {
           const options = {
@@ -411,7 +413,7 @@ export default function OpenStream({
           };
           fetch(`/api/notify-donation`, options);
         }
-      }, 3000);
+      }, 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBatchSuccess, isBatchConfirming]);
@@ -443,7 +445,8 @@ export default function OpenStream({
 
   const getButtonText = () => {
     if (isLoading) return "Preparing...";
-    if (isConfirming || isApprovalConfirming) return "Confirming...";
+    if (isConfirming || isApprovalConfirming || isBatchConfirming)
+      return "Confirming...";
     if (isSuccess) return "Success!";
     if (isMonthlyDonationEmpty) return "Add streaming amount";
     if (isWrapAmountExceedsBalance)

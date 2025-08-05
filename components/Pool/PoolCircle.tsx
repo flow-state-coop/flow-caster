@@ -323,7 +323,7 @@ export default function PoolCircle({
           }
 
           return (
-            <g key={`${donor.accountId}-${donor.rate}`}>
+            <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               <FlowLine
                 x1={x}
                 y1={y}
@@ -347,7 +347,7 @@ export default function PoolCircle({
           const isGroupDonors = i === 2; // 2nd donor (index 1) is the middle one
 
           return (
-            <g key={`${donor.accountId}-${donor.rate}`}>
+            <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               {/* Crown for middle donor */}
               {isMiddleDonor && (
                 <g transform={`translate(${x + 54}, ${y - 140}) rotate(45)`}>
@@ -429,7 +429,7 @@ export default function PoolCircle({
         {donors.map((donor, i) => {
           return (
             <DonorStats
-              key={`${donor.accountId}-${donor.rate}`}
+              key={`${donor.accountId}-${donor.rate}-${i}`}
               rate={donor.rate}
               showSup={i < 2}
               showTotalFlow={i > 1}
