@@ -198,11 +198,7 @@ export default function OpenStream({
       return;
     }
 
-    // const wrapAmountValue = parseFloat(wrapAmount) || 0;
-    const wrapAmountValue = parseUnits(
-      wrapAmount,
-      tokenData.underlyingDecimals
-    );
+    const wrapAmountValue = parseEther(wrapAmount);
 
     const currentAllowance = Number(underlyingAllowance) || 0;
 
@@ -214,7 +210,10 @@ export default function OpenStream({
           address: tokenData.underlyingAddress as `0x${string}`,
           abi: erc20Abi,
           functionName: "approve",
-          args: [tokenData.address, BigInt(wrapAmountValue)],
+          args: [
+            tokenData.address,
+            parseUnits(wrapAmount, tokenData.underlyingDecimals),
+          ],
         },
         {
           onSuccess: () => {
@@ -256,10 +255,7 @@ export default function OpenStream({
 
     const _wrapAmount = cancel ? "0" : wrapAmount;
 
-    const wrapAmountValue = parseUnits(
-      _wrapAmount,
-      tokenData.underlyingDecimals
-    );
+    const wrapAmountValue = parseEther(_wrapAmount);
 
     if (wrapAmountValue > 0) {
       console.log("adding upgrade/wrap function");
@@ -426,7 +422,7 @@ export default function OpenStream({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Forget weekly tips. I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Streaming tips?! I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
       ],
@@ -598,7 +594,6 @@ export default function OpenStream({
                 </div>
                 {(() => {
                   const currentAllowance = Number(underlyingAllowance) || 0;
-                  // const wrapAmountValue = parseFloat(wrapAmount) || 0;
                   const wrapAmountValue = parseUnits(
                     wrapAmount,
                     tokenData.underlyingDecimals
