@@ -385,30 +385,32 @@ export default function OpenStream({
   useEffect(() => {
     if (isBatchSuccess && isBatchConfirming === false) {
       console.log(
-        "Batch transaction confirmed, proceeding with main transaction"
+        "Batch transaction confirmed, monthlyDonation",
+        monthlyDonation
       );
+
+      if (Number(monthlyDonation) > 0) {
+        const options = {
+          method: "POST",
+          body: JSON.stringify({
+            poolid: poolId,
+            chainid: chainId,
+            poolname: "Farcaster Cracked Devs",
+            username: user?.data?.username || "A mystery donor",
+            flowrate: monthlyDonation,
+          }),
+        };
+        fetch(`/api/notify-donation`, options);
+      }
 
       console.log("Delaying");
 
       setTimeout(() => {
         console.log("Delayed for 4 seconds.");
+
         setIsConfirming(false);
         setIsSuccess(true);
         refetch();
-
-        if (Number(monthlyDonation) > 0) {
-          const options = {
-            method: "POST",
-            body: JSON.stringify({
-              poolid: poolId,
-              chainid: chainId,
-              poolname: "Farcaster Cracked Devs",
-              username: user?.data?.username || "A mystery donor",
-              flowrate: monthlyDonation,
-            }),
-          };
-          fetch(`/api/notify-donation`, options);
-        }
       }, 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
