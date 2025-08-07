@@ -430,7 +430,7 @@ export default function OpenStream({
   };
 
   const closeDrawer = () => {
-    if (isSuccess) {
+    if (!isConfirming && !isLoading) {
       setIsLoading(false);
       setIsConfirming(false);
       setError(null);

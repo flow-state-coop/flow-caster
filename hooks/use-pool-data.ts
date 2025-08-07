@@ -37,8 +37,6 @@ export const usePoolData = ({
     enabled,
   });
 
-  console.log("data", data);
-
   return {
     data: data,
     poolDistributors: data?.poolDistributors,
