@@ -389,7 +389,7 @@ export default function OpenStream({
         monthlyDonation
       );
 
-      if (Number(monthlyDonation) > 0) {
+      if (Number(monthlyDonation) > 99) {
         const options = {
           method: "POST",
           body: JSON.stringify({
