@@ -46,15 +46,20 @@ export async function getAllUserNotificationDetails(): Promise<
   if (!redis) {
     return null;
   }
-  let allKeys: string[] = [];
-  let current = "1";
-  while (Number(current) > 0) {
-    const [cursor, keys] = await redis.scan(0, {
-      match: `${notificationServiceKey}:*`,
+  const allKeys: string[] = [];
+  let cursor = "0";
+
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, {
+      match: `${notificationServiceKey}:user:*`,
+      count: 100,
     });
-    allKeys = [...allKeys, ...keys];
-    current = cursor;
-  }
+
+    cursor = nextCursor;
+    allKeys.push(...keys);
+  } while (cursor !== "0");
+
+  console.log("allKeys", allKeys.length);
 
   return await redis.mget<MiniAppNotificationDetails[]>(allKeys);
 }
