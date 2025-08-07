@@ -58,7 +58,7 @@ export default function Footer({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Forget weekly tips. Open a real-time stream split to 82 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Streaming tips?! Open a real-time stream split to 82 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL

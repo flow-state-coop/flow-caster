@@ -420,7 +420,7 @@ export default function OpenStream({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Forget weekly tips. I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Streaming tips?! I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
       ],
