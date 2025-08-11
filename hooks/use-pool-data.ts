@@ -30,8 +30,6 @@ export const usePoolData = ({
         throw new Error(`Failed to fetch pool data: ${response.statusText}`);
       }
 
-      console.log("fetched");
-
       return response.json();
     },
     enabled,

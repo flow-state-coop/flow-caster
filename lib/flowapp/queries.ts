@@ -21,6 +21,8 @@ export const FLOW_SPLITTER_POOL_QUERY = gql`
   }
 `;
 
+// poolMembers(first: 1000, where: { units_not: "0" }) {
+
 export const SUPERFLUID_QUERY = gql`
   query SuperfluidQuery($token: String!, $gdaPool: String!) {
     token(id: $token) {
@@ -36,7 +38,7 @@ export const SUPERFLUID_QUERY = gql`
       totalAmountInstantlyDistributedUntilUpdatedAt
       totalFlowAdjustmentAmountDistributedUntilUpdatedAt
       updatedAtTimestamp
-      poolMembers(first: 1000, where: { units_not: "0" }) {
+      poolMembers(first: 1000) {
         account {
           id
         }

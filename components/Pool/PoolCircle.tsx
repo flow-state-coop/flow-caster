@@ -42,28 +42,18 @@ export default function PoolCircle({
   // Transform pool data to component format
   const recipients = useMemo(() => {
     if (!poolData) return [];
-    return poolData.poolMembers.map((member) => ({
+    const formattedRecipients = poolData.poolMembers.map((member) => ({
       accountId: member.account.id,
       units: parseInt(member.units),
       startingAmount: member.poolTotalAmountDistributedUntilUpdatedAt,
       udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
     }));
+
+    console.log("**** formattedRecipients", formattedRecipients);
+
+    return formattedRecipients;
   }, [poolData]);
-
-  // const donors = useMemo(() => {
-  //   if (!poolData) return [];
-
-  //   const formattedDonors = createDonorBuckets(
-  //     poolData.poolDistributors,
-  //     connectedUser,
-  //     connectedAddress
-  //   );
-
-  //   console.log("formattedDonors", formattedDonors);
-
-  //   return formattedDonors;
-  // }, [poolData, connectedUser, connectedAddress]);
 
   useEffect(() => {
     if (!poolData || !poolDistributors) return;

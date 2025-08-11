@@ -36,10 +36,6 @@ export const createDonorBuckets = (
         })
       : undefined;
 
-  console.log("topDonor", topDonor);
-
-  console.log("connectedUser", connectedUser);
-
   // let connectedDonor = poolDistributors.find(
   //   (d) =>
   //     d.account.id.toLowerCase() === connectedAddress?.toLowerCase() ||
@@ -52,8 +48,6 @@ export const createDonorBuckets = (
   let connectedDonor = poolDistributors.find(
     (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
   );
-
-  console.log("connectedDonor", connectedDonor);
 
   const totalFlow = getTotalFlow(poolDistributors);
 
@@ -151,17 +145,8 @@ export const totalFlowedStatic = (
     BigInt(startingAmount) +
     (BigInt(flowRate) * elapsedTimeInMilliseconds) / BigInt(1000);
 
-  console.log("flowingAmount", flowingAmount);
-
   return flowingAmount;
 };
-
-// const elapsedTimeInMilliseconds = BigInt(
-//   Date.now() - startingTimestamp * 1000
-// );
-// const flowingAmount =
-//   startingAmount +
-//   (flowRate * elapsedTimeInMilliseconds) / BigInt(1000);
 
 export const TIME_UNIT = {
   second: 1,
