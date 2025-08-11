@@ -95,6 +95,8 @@ export default function PoolHQ({
         poolDistributors={poolDistributors}
         connectedUser={user.data || null}
         connectedAddress={address}
+        chainId={chainId}
+        poolId={poolId}
       />
       <Footer
         chainId={chainId}

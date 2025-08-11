@@ -38,7 +38,7 @@ export default function Footer({
 }: PoolActionsProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerType, setDrawerType] = useState<DrawerTypes>("info");
+  const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
 
   useEffect(() => {
     if (shouldConnect) {
@@ -54,6 +54,7 @@ export default function Footer({
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
+    setDrawerType(undefined);
   };
 
   const handleCast = async () => {
@@ -166,6 +167,7 @@ export default function Footer({
               poolAddress={poolAddress}
               connectedDonor={connectedDonor}
               handleCloseDrawer={handleCloseDrawer}
+              isOpen={isDrawerOpen}
             />
           ) : null}
           {drawerType === "claim" && (
