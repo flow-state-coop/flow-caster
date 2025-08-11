@@ -18,8 +18,6 @@ export const { POST } = serve(async (context) => {
   }
 
   await context.run("notifyDonate", () => {
-    console.log("notifyDonate step started");
-
     sendFrameNotificationToAllUsers({
       title: "A stream has been opened!",
       body: `${username} is streaming ${flowrate} USDCx/mo to ${poolname}.`,

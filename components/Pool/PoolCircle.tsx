@@ -11,12 +11,15 @@ import { Crown } from "lucide-react";
 import { PoolData } from "@/lib/types";
 import DonorStats from "./DonorStats";
 import { VIZ_PAUSED } from "@/lib/constants";
+import Link from "next/link";
 
 interface PoolCircleProps {
   poolData: PoolData;
   poolDistributors: PoolData["poolDistributors"];
   connectedUser: NeynarUser | null | undefined;
   connectedAddress?: `0x${string}`;
+  chainId: string;
+  poolId: string;
 }
 
 interface PoolDonor {
@@ -30,6 +33,8 @@ export default function PoolCircle({
   poolDistributors,
   connectedUser,
   connectedAddress,
+  chainId,
+  poolId,
 }: PoolCircleProps) {
   const radius = 370;
   const centerX = 400;
@@ -42,28 +47,18 @@ export default function PoolCircle({
   // Transform pool data to component format
   const recipients = useMemo(() => {
     if (!poolData) return [];
-    return poolData.poolMembers.map((member) => ({
+    const formattedRecipients = poolData.poolMembers.map((member) => ({
       accountId: member.account.id,
       units: parseInt(member.units),
       startingAmount: member.poolTotalAmountDistributedUntilUpdatedAt,
       udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
     }));
+
+    console.log("**** formattedRecipients", formattedRecipients);
+
+    return formattedRecipients;
   }, [poolData]);
-
-  // const donors = useMemo(() => {
-  //   if (!poolData) return [];
-
-  //   const formattedDonors = createDonorBuckets(
-  //     poolData.poolDistributors,
-  //     connectedUser,
-  //     connectedAddress
-  //   );
-
-  //   console.log("formattedDonors", formattedDonors);
-
-  //   return formattedDonors;
-  // }, [poolData, connectedUser, connectedAddress]);
 
   useEffect(() => {
     if (!poolData || !poolDistributors) return;
@@ -354,17 +349,39 @@ export default function PoolCircle({
                   <Crown width={120} height={120} fill="gold" />
                 </g>
               )}
-              <DonorNode
-                index={i}
-                x={x}
-                y={y}
-                accountId={donor?.accountId}
-                radius={60}
-                farcasterUser={donor?.farcasterUser}
-                isGroupDonors={isGroupDonors}
-                donorCount={poolData.poolDistributors.length}
-                connectedUserFallback={isUserDonor ? connectedUser : undefined}
-              />
+
+              {isGroupDonors && (
+                <Link href={`/pool/${chainId}/${poolId}/leaderboard`}>
+                  <DonorNode
+                    index={i}
+                    x={x}
+                    y={y}
+                    accountId={donor?.accountId}
+                    radius={60}
+                    farcasterUser={donor?.farcasterUser}
+                    isGroupDonors={isGroupDonors}
+                    donorCount={poolData.poolDistributors.length}
+                    connectedUserFallback={
+                      isUserDonor ? connectedUser : undefined
+                    }
+                  />
+                </Link>
+              )}
+              {!isGroupDonors && (
+                <DonorNode
+                  index={i}
+                  x={x}
+                  y={y}
+                  accountId={donor?.accountId}
+                  radius={60}
+                  farcasterUser={donor?.farcasterUser}
+                  isGroupDonors={isGroupDonors}
+                  donorCount={poolData.poolDistributors.length}
+                  connectedUserFallback={
+                    isUserDonor ? connectedUser : undefined
+                  }
+                />
+              )}
             </g>
           );
         })}

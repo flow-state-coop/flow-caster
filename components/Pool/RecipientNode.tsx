@@ -9,6 +9,7 @@ import { ArrowRight } from "lucide-react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
+  truncateAddress,
 } from "@/lib/pool";
 
 interface RecipientNodeProps {
@@ -62,25 +63,41 @@ export default function RecipientNode({
             </>
           ) : (
             <div>
-              <b>Account:</b> {accountId}
+              <b>Account:</b> {truncateAddress(accountId)}
             </div>
           )}
 
-          <div className="font-bold text-xl text-accent-800 leading-tight">
-            {displayIndividualFlowPercentage(totalUnits, units)} %{" "}
-            <span className="text-sm text-black font-semibold">of pool</span>
-          </div>
+          {units > 0 ? (
+            <>
+              <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
+                {displayIndividualFlowPercentage(totalUnits, units)} %{" "}
+                <span className="text-sm text-black font-semibold">
+                  of pool
+                </span>
+              </div>
 
-          <div className="font-bold text-xl text-accent-800 leading-tight">
-            {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
-            <span className="text-xs text-black font-semibold">USDCx / mo</span>
-          </div>
-          <div className="font-bold text-xs text-accent-800"></div>
+              <div className="font-bold text-xl text-accent-800 leading-tight">
+                {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
+                <span className="text-xs text-black font-semibold">
+                  USDCx / mo
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-xs text-black font-semibold mt-3">
+                For sure cracked.
+              </div>
+              <div className="text-xs text-black font-semibold mt-1">
+                Hasn&apos;t opted into funding yet.
+              </div>
+            </>
+          )}
 
           {farcasterUser && (
             <button
               onClick={() => handleViewProfile(Number(farcasterUser.fid))}
-              className="flex flew-row items-center gap-1 mt-3 px-2 py-1 text-xs text-primary-500 hover:text-primary-300"
+              className="flex flew-row items-center gap-1 mt-3 py-1 text-xs text-primary-500 hover:text-primary-300"
             >
               View Profile <ArrowRight className="w-4 h-4" />
             </button>

@@ -3,6 +3,7 @@ import { ratePerMonthFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
 import { Crown } from "lucide-react";
 import { useMemo } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import FlowAmount from "../Pool/FlowAmount";
 
 interface LeaderboardListProps {
@@ -22,6 +23,13 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
     );
   }, [poolData]);
 
+  const handleViewProfile = async (fid?: string) => {
+    if (!fid) return;
+    await sdk.actions.viewProfile({
+      fid: Number(fid),
+    });
+  };
+
   return (
     <div className="w-full max-w-md mx-auto bg-white">
       <h2 className="text-3xl text-primary-500 font-bold mb-3">
@@ -35,16 +43,19 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
         <div className="text-right">USDCx/mo</div>
         <div className="text-right">Total</div>
       </div>
-      <div className="divide-y divide-primary-200 text-black bg-brand-light rounded-lg py-3">
+      <div className="divide-y divide-primary-200 text-black bg-brand-light rounded-lg py-3 mb-24">
         {sorted.map((d, i) => {
           const isTop = i === 0;
           const user = d.farcasterUser;
           return (
             <div
               key={d.account.id}
-              className="flex items-center py-2 px-2 gap-2 text-lg font-mono"
+              className={`flex items-center py-2 px-2 gap-2 text-base font-mono ${
+                user?.fid && "hover:bg-primary-200"
+              }`}
+              onClick={() => handleViewProfile(user?.fid)}
             >
-              <div className="w-5 text-right mr-1 font-bold">
+              <div className="w-5 text-right mr-2 font-bold">
                 {isTop && (
                   <Crown fill="gold" className="w-6 h-6 text-yellow-400" />
                 )}

@@ -86,7 +86,7 @@ export async function POST(request: Request) {
         await sendFrameNotification({
           fid,
           title: `Welcome to flowcaster`,
-          body: `Thank you for adding the app!`,
+          body: `Open a stream to support the Cracked Devs. Claim $SUP when you've crossed $1 streamed.`,
         });
       } else {
         await deleteUserNotificationDetails(fid);

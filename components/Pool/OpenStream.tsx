@@ -44,6 +44,7 @@ interface OpenStreamProps {
   poolAddress: string;
   connectedDonor?: PoolData["poolDistributors"][0];
   handleCloseDrawer: () => void;
+  isOpen: boolean;
 }
 
 export default function OpenStream({
@@ -52,6 +53,7 @@ export default function OpenStream({
   poolAddress,
   connectedDonor,
   handleCloseDrawer,
+  isOpen,
 }: OpenStreamProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -59,7 +61,7 @@ export default function OpenStream({
   const [isSuccess, setIsSuccess] = useState(false);
   const [monthlyDonation, setMonthlyDonation] = useState<string>("0");
   const [wrapAmount, setWrapAmount] = useState<string>("");
-  const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
+  const [donateToDevs, setDonateToDevs] = useState<boolean>(true);
   const [currentMonthlyRate, setCurrentMonthlyRate] = useState<
     string | undefined
   >();
@@ -152,11 +154,12 @@ export default function OpenStream({
     isWrapAmountExceedsBalance;
 
   useEffect(() => {
+    if (!connectedDonor || !address || !devPoolData || !isOpen) return;
+
+    console.log("setting defaults");
     console.log("connectedDonor", connectedDonor);
     console.log("address", address);
     console.log("devPoolData", devPoolData);
-
-    if (!connectedDonor || !address || !devPoolData) return;
 
     const donor = devPoolData.poolDistributors.find((d) => {
       return d.account.id.toLowerCase() === address.toLowerCase();
@@ -174,7 +177,7 @@ export default function OpenStream({
     console.log("setting rate", rate);
     setCurrentMonthlyRate(rate);
     setMonthlyDonation(rate);
-  }, [connectedDonor, devPoolData, address]);
+  }, [connectedDonor, devPoolData, address, isOpen]);
 
   const handleCancel = () => {
     setWrapAmount("0");
@@ -404,7 +407,6 @@ export default function OpenStream({
       }
 
       console.log("Delaying");
-
       setTimeout(() => {
         console.log("Delayed for 4 seconds.");
 
@@ -421,11 +423,15 @@ export default function OpenStream({
   };
 
   const handleCast = async () => {
+    let targetUrl = `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?flowRate=${monthlyDonationAmount}`;
+
+    if (user?.data?.fid) {
+      targetUrl += `&fid=${user.data.fid}`;
+    }
+
     await sdk.actions.composeCast({
       text: `Streaming tips?! I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
-      embeds: [
-        `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?fid=${user?.data?.fid}&flowRate=${monthlyDonationAmount}`,
-      ],
+      embeds: [targetUrl],
     });
   };
 
