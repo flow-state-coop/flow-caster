@@ -23,10 +23,10 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
     );
   }, [poolData]);
 
-  const handleViewProfile = async (fid?: number) => {
+  const handleViewProfile = async (fid?: string) => {
     if (!fid) return;
     await sdk.actions.viewProfile({
-      fid,
+      fid: Number(fid),
     });
   };
 
@@ -53,7 +53,7 @@ export default function LeaderboardList({ poolData }: LeaderboardListProps) {
               className={`flex items-center py-2 px-2 gap-2 text-base font-mono ${
                 user?.fid && "hover:bg-primary-200"
               }`}
-              onClick={() => handleViewProfile(user.fid)}
+              onClick={() => handleViewProfile(user?.fid)}
             >
               <div className="w-5 text-right mr-2 font-bold">
                 {isTop && (
