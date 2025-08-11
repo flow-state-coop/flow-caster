@@ -59,7 +59,7 @@ export default function OpenStream({
   const [isSuccess, setIsSuccess] = useState(false);
   const [monthlyDonation, setMonthlyDonation] = useState<string>("0");
   const [wrapAmount, setWrapAmount] = useState<string>("");
-  const [donateToDevs, setDonateToDevs] = useState<boolean>(false);
+  const [donateToDevs, setDonateToDevs] = useState<boolean>(true);
   const [currentMonthlyRate, setCurrentMonthlyRate] = useState<
     string | undefined
   >();

@@ -13,11 +13,16 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log("notification", notification);
+    console.log("process.env.NEXT_PUBLIC_URL", process.env.NEXT_PUBLIC_URL);
+
     const result = await sendFrameNotificationToAllUsers({
       title: notification.title,
       body: notification.body,
-      notificationDetails: notification.notificationDetails,
+      targetUrl: notification.targetUrl || `${process.env.NEXT_PUBLIC_URL}`,
     });
+
+    console.log("result", result);
 
     if (result.state === "error") {
       return NextResponse.json({ error: result.error }, { status: 500 });
