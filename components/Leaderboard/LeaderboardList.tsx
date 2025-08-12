@@ -8,20 +8,42 @@ import FlowAmount from "../Pool/FlowAmount";
 
 interface LeaderboardListProps {
   poolData?: PoolData;
+  devPoolList?: Record<string, string>;
 }
 
 function truncateAddress(address: string, length = 6) {
   return address.slice(0, length) + "..." + address.slice(-4);
 }
 
-export default function LeaderboardList({ poolData }: LeaderboardListProps) {
+export default function LeaderboardList({
+  poolData,
+  devPoolList,
+}: LeaderboardListProps) {
   const sorted = useMemo(() => {
+    const devPoleRateList = devPoolList || {};
     const distributors = poolData?.poolDistributors || [];
     // Sort by flowRate (descending)
-    return [...distributors].sort(
+
+    const withDevPoolRate = distributors.reduce((acc, d) => {
+      // const donor = {...d, rate}
+      const devRate = devPoleRateList[d.account.id];
+      if (devRate) {
+        acc.push({
+          ...d,
+          flowRate: (Number(d.flowRate) + Number(devRate)).toString(),
+        });
+      } else {
+        acc.push(d);
+      }
+      return acc;
+    }, [] as PoolData["poolDistributors"]);
+
+    const sorted = [...withDevPoolRate].sort(
       (a, b) => parseFloat(b.flowRate) - parseFloat(a.flowRate)
     );
-  }, [poolData]);
+
+    return sorted;
+  }, [poolData, devPoolList]);
 
   const handleViewProfile = async (fid?: string) => {
     if (!fid) return;

@@ -75,10 +75,11 @@ export async function GET(request: NextRequest) {
      * and effective way to make parameterized templates.
      */
     const { searchParams } = new URL(request.url);
-    const fid = searchParams.get("fid") ?? "868887";
+    let fid = searchParams.get("fid");
+    if (!fid || fid === "undefined") {
+      fid = "868887";
+    }
     const flowRate = searchParams.get("flowRate");
-
-    console.log("*******flowRate", flowRate);
 
     let user;
 

@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { PoolData } from "@/lib/types";
 import { getTotalFlow } from "@/lib/pool";
 import Footer from "../Shared/Footer";
+import { DEV_POOL_ID } from "@/lib/constants";
 
 export default function PoolHQ({
   chainId,
@@ -33,6 +34,12 @@ export default function PoolHQ({
     chainId: chainId,
     poolId: poolId,
   });
+
+  const { poolDistributors: devPoolistributors } = usePoolData({
+    chainId,
+    poolId: DEV_POOL_ID,
+  });
+
   const { user, signIn } = useUser();
   const { address } = useAccount();
 
@@ -74,7 +81,7 @@ export default function PoolHQ({
     );
   }
 
-  if (isLoading || !poolData || !poolDistributors) {
+  if (isLoading || !poolData || !poolDistributors || !devPoolistributors) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <p className="text-lg">Loading pool data...</p>
@@ -92,6 +99,7 @@ export default function PoolHQ({
     <>
       <PoolCircle
         poolData={poolData}
+        devPoolistributors={devPoolistributors}
         poolDistributors={poolDistributors}
         connectedUser={user.data || null}
         connectedAddress={address}

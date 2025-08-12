@@ -21,6 +21,7 @@ interface RecipientNodeProps {
   totalUnits: number;
   totalFlowRate: number;
   farcasterUser?: NeynarUser | null | undefined;
+  connected: boolean;
 }
 
 export default function RecipientNode({
@@ -32,6 +33,7 @@ export default function RecipientNode({
   totalUnits,
   totalFlowRate,
   farcasterUser,
+  connected,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
@@ -94,17 +96,24 @@ export default function RecipientNode({
             </>
           )}
 
+          {!connected && (
+            <div className="text-[10px] text-black mt-2">Not connected</div>
+          )}
+          {connected && (
+            <div className="text-[10px] text-black mt-2">Connected</div>
+          )}
+
           {farcasterUser && (
             <button
               onClick={() => handleViewProfile(Number(farcasterUser.fid))}
-              className="flex flew-row items-center gap-1 mt-3 py-1 text-xs text-primary-500 hover:text-primary-300"
+              className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
             >
               View Profile <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </div>
       }
-      trigger="click"
+      trigger="mouseenter click"
       interactive={true}
       placement="top"
       appendTo={document.body}

@@ -18,9 +18,13 @@ export async function generateMetadata({
     imageUrl += `?totalFlow=${search.totalFlow}`;
   }
 
+  const finalUrl = new URL(imageUrl);
+
+  console.log("finalUrl", finalUrl.toString());
+
   const frame = {
     version: "next",
-    imageUrl: imageUrl,
+    imageUrl: encodeURI(imageUrl),
     button: {
       title: "Launch flowcaster",
       action: {

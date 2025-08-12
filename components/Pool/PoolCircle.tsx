@@ -16,6 +16,7 @@ import Link from "next/link";
 interface PoolCircleProps {
   poolData: PoolData;
   poolDistributors: PoolData["poolDistributors"];
+  devPoolistributors: PoolData["poolDistributors"];
   connectedUser: NeynarUser | null | undefined;
   connectedAddress?: `0x${string}`;
   chainId: string;
@@ -26,10 +27,13 @@ interface PoolDonor {
   rate: string;
   farcasterUser: NeynarUser | null | undefined;
   accountId: string | undefined;
+  startingAmount?: string;
+  startingTimestamp?: string;
 }
 
 export default function PoolCircle({
   poolData,
+  devPoolistributors,
   poolDistributors,
   connectedUser,
   connectedAddress,
@@ -53,6 +57,7 @@ export default function PoolCircle({
       startingAmount: member.poolTotalAmountDistributedUntilUpdatedAt,
       udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
+      connected: member.isConnected,
     }));
 
     console.log("**** formattedRecipients", formattedRecipients);
@@ -65,13 +70,13 @@ export default function PoolCircle({
 
     const formattedDonors = createDonorBuckets(
       poolDistributors,
-      connectedUser,
+      devPoolistributors,
       connectedAddress
     );
 
     console.log("**** formattedDonors", formattedDonors);
     setDonors(formattedDonors);
-  }, [poolData, poolDistributors, connectedUser, connectedAddress]);
+  }, [poolData, poolDistributors, devPoolistributors, connectedAddress]);
 
   useEffect(() => {
     // Calculate sizes first
@@ -350,6 +355,43 @@ export default function PoolCircle({
                 </g>
               )}
 
+              {isUserDonor && (
+                <DonorNode
+                  index={i}
+                  x={x}
+                  y={y}
+                  accountId={donor?.accountId}
+                  radius={60}
+                  farcasterUser={donor?.farcasterUser}
+                  isGroupDonors={isGroupDonors}
+                  isMiddleDonor={isMiddleDonor}
+                  donorCount={poolData.poolDistributors.length}
+                  connectedUserFallback={
+                    isUserDonor ? connectedUser : undefined
+                  }
+                />
+              )}
+
+              {isMiddleDonor && (
+                <DonorNode
+                  index={i}
+                  x={x}
+                  y={y}
+                  accountId={donor?.accountId}
+                  radius={60}
+                  farcasterUser={donor?.farcasterUser}
+                  isGroupDonors={isGroupDonors}
+                  isMiddleDonor={isMiddleDonor}
+                  donorCount={poolData.poolDistributors.length}
+                  connectedUserFallback={
+                    isUserDonor ? connectedUser : undefined
+                  }
+                  rate={donor?.rate}
+                  startingAmount={donor?.startingAmount}
+                  startingTimestamp={donor?.startingTimestamp}
+                />
+              )}
+
               {isGroupDonors && (
                 <Link href={`/pool/${chainId}/${poolId}/leaderboard`}>
                   <DonorNode
@@ -360,27 +402,13 @@ export default function PoolCircle({
                     radius={60}
                     farcasterUser={donor?.farcasterUser}
                     isGroupDonors={isGroupDonors}
+                    isMiddleDonor={isMiddleDonor}
                     donorCount={poolData.poolDistributors.length}
                     connectedUserFallback={
                       isUserDonor ? connectedUser : undefined
                     }
                   />
                 </Link>
-              )}
-              {!isGroupDonors && (
-                <DonorNode
-                  index={i}
-                  x={x}
-                  y={y}
-                  accountId={donor?.accountId}
-                  radius={60}
-                  farcasterUser={donor?.farcasterUser}
-                  isGroupDonors={isGroupDonors}
-                  donorCount={poolData.poolDistributors.length}
-                  connectedUserFallback={
-                    isUserDonor ? connectedUser : undefined
-                  }
-                />
               )}
             </g>
           );
@@ -397,6 +425,7 @@ export default function PoolCircle({
             totalUnits={Number(poolData.totalUnits)}
             farcasterUser={recipient.farcasterUser}
             totalFlowRate={Number(poolData.flowRate)}
+            connected={recipient.connected}
           />
         ))}
         {/* Pool circle particles */}
