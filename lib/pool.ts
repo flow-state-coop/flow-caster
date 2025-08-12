@@ -19,7 +19,7 @@ export const getTotalFlow = (
 
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
-  connectedUser: NeynarUser | null | undefined,
+  devPoolistributors: PoolData["poolDistributors"],
   connectedAddress: `0x${string}` | undefined
 ) => {
   const topDonor =
@@ -49,6 +49,19 @@ export const createDonorBuckets = (
     (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
   );
 
+  let connectedDevPoolDonor = devPoolistributors.find(
+    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
+  );
+
+  if (connectedDonor && connectedDevPoolDonor) {
+    connectedDonor = {
+      ...connectedDonor,
+      flowRate: (
+        Number(connectedDonor.flowRate) + Number(connectedDevPoolDonor.flowRate)
+      ).toString(),
+    };
+  }
+
   const totalFlow = getTotalFlow(poolDistributors);
 
   const totalDonor = {
@@ -61,6 +74,8 @@ export const createDonorBuckets = (
     accountId: distributor?.account.id,
     rate: distributor?.flowRate || "0",
     farcasterUser: distributor?.farcasterUser,
+    startingAmount: distributor?.totalAmountDistributedUntilUpdatedAt,
+    startingTimestamp: distributor?.updatedAtTimestamp,
   }));
 
   return [...connectAndTop, totalDonor];

@@ -8,6 +8,7 @@ import Footer from "../Shared/Footer";
 import { PoolData } from "@/lib/types";
 import { useUser } from "@/contexts/user-context";
 import { useAccount } from "wagmi";
+import { DEV_POOL_ID } from "@/lib/constants";
 
 export default function Leaderboard() {
   const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();
@@ -19,6 +20,9 @@ export default function Leaderboard() {
   const [connectedDonor, setConnectedDonor] = useState<
     PoolData["poolDistributors"][0] | undefined
   >();
+  const [devPoolList, setDevPoolList] = useState<
+    Record<string, string> | undefined
+  >();
   const {
     data: poolData,
     poolDistributors,
@@ -29,7 +33,11 @@ export default function Leaderboard() {
     chainId: chainId,
     poolId: poolId,
   });
-  const { user, signIn } = useUser();
+  const { poolDistributors: devPoolistributors } = usePoolData({
+    chainId,
+    poolId: DEV_POOL_ID,
+  });
+  const { user } = useUser();
   const { address } = useAccount();
 
   useEffect(() => {
@@ -59,6 +67,17 @@ export default function Leaderboard() {
     setConnectedDonor(donor);
   }, [poolDistributors, address]);
 
+  useEffect(() => {
+    if (!devPoolistributors) return;
+
+    const rateList = devPoolistributors.reduce((acc, d) => {
+      acc[d.account.id] = d.flowRate;
+      return acc;
+    }, {} as Record<string, string>);
+
+    setDevPoolList(rateList);
+  }, [devPoolistributors]);
+
   if (isLoading || !poolData) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
@@ -79,7 +98,7 @@ export default function Leaderboard() {
 
   return (
     <main className="relative">
-      <LeaderboardList poolData={poolData} />
+      <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
       <Footer
         chainId={chainId}
         poolId={poolId}
