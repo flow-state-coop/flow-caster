@@ -35,7 +35,7 @@ export default function DonorStats({
           startingAmount={BigInt(startingAmount || "0")}
           startingTimestamp={Number(startingTimestamp)}
           flowRate={BigInt(rate)}
-          textAfter="Total Streamed"
+          textAfter="Total"
         />
       )}
 
