@@ -41,4 +41,5 @@ export interface PoolData {
     name: string;
     symbol: string;
   };
+  activeMemberCount: number;
 }

@@ -1,3 +1,4 @@
+import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
 import { NeynarUser } from "@/lib/neynar";
 import { PoolData } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +23,10 @@ export const usePoolData = ({
         poolId,
       });
 
+      if (poolId === DEFAULT_POOL_ID && chainId === DEFAULT_CHAIN_ID) {
+        params.append("isCrackedDevs", "true");
+      }
+
       const response = await fetch(`/api/pool?${params}`, {
         cache: "no-store",
       });
@@ -35,10 +40,13 @@ export const usePoolData = ({
     enabled,
   });
 
+  console.log("data", data);
+
   return {
     data: data,
     poolDistributors: data?.poolDistributors,
     poolMembers: data?.poolMembers,
+    activeMemberCount: data?.activeMemberCount,
     ...rest,
   };
 };

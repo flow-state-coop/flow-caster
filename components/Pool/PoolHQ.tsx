@@ -28,6 +28,7 @@ export default function PoolHQ({
     data: poolData,
     poolDistributors,
     poolMembers,
+    activeMemberCount,
     isLoading,
     error,
   } = usePoolData({
@@ -44,16 +45,32 @@ export default function PoolHQ({
   const { address } = useAccount();
 
   const shouldConnect = useMemo(() => {
-    return connectedMember && !connectedMember.isConnected;
+    const notConnected = connectedMember && !connectedMember.isConnected;
+    const zeroUnits = Number(connectedMember?.units) === 0;
+    console.log(
+      "shouldConnect connectedMember",
+      connectedMember,
+      notConnected,
+      zeroUnits
+    );
+    return notConnected || zeroUnits;
+  }, [connectedMember]);
+
+  const noUnits = useMemo(() => {
+    if (!connectedMember) return false;
+    return Number(connectedMember.units) === 0;
   }, [connectedMember]);
 
   useEffect(() => {
     if (!user.data || !poolMembers) return;
     const member = poolMembers.find(
-      (m) =>
-        m.account.id === user.data?.verified_addresses.primary.eth_address ||
-        m.account.id === user.data?.verified_addresses.eth_addresses[0]
+      (m) => m.account.id === user.data?.verified_addresses.primary.eth_address
     );
+
+    console.log("poolMembers", poolMembers);
+
+    console.log("member", member);
+    console.log("address", address);
 
     setConnectedMember(member);
     if (member && member.account.id.toLowerCase() !== address?.toLowerCase()) {
@@ -115,6 +132,8 @@ export default function PoolHQ({
         connectedMember={connectedMember}
         totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
         connectedDonor={connectedDonor}
+        noUnits={noUnits}
+        activeMemberCount={activeMemberCount}
       />
     </>
   );

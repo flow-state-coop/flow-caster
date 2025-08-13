@@ -7,20 +7,14 @@ export const FLOW_SPLITTER_POOL_QUERY = gql`
       name
       symbol
       token
-      poolAdminRemovedEvents(orderBy: timestamp, orderDirection: asc) {
+      poolAdmins {
         address
-        timestamp
-        transactionHash
-      }
-      poolAdminAddedEvents(orderBy: timestamp, orderDirection: asc) {
-        address
-        timestamp
-        transactionHash
       }
     }
   }
 `;
 
+// TODO: no need for non zero on non cracked dev instance
 // poolMembers(first: 1000, where: { units_not: "0" }) {
 
 export const SUPERFLUID_QUERY = gql`
@@ -72,35 +66,6 @@ export const SUPERFLUID_QUERY = gql`
         units
         oldUnits
         poolMember {
-          account {
-            id
-          }
-        }
-        timestamp
-        transactionHash
-      }
-      flowDistributionUpdatedEvents(
-        first: 1000
-        orderBy: timestamp
-        orderDirection: desc
-      ) {
-        newDistributorToPoolFlowRate
-        oldFlowRate
-        poolDistributor {
-          account {
-            id
-          }
-        }
-        timestamp
-        transactionHash
-      }
-      instantDistributionUpdatedEvents(
-        first: 1000
-        orderBy: timestamp
-        orderDirection: desc
-      ) {
-        requestedAmount
-        poolDistributor {
           account {
             id
           }

@@ -16,6 +16,9 @@ type FlowPoolData = {
   poolAddress: string;
   name: string;
   symbol: string;
+  poolAdmins: {
+    address: string;
+  }[];
 };
 
 export async function GET(request: NextRequest) {
@@ -23,6 +26,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const chainId = searchParams.get("chainId");
     const poolId = searchParams.get("poolId");
+    const isCrackedDevs = searchParams.get("isCrackedDevs") === "true";
 
     console.log(
       `Fetching pool data for chainId: ${chainId}, poolId: ${poolId}`
@@ -44,6 +48,8 @@ export async function GET(request: NextRequest) {
     )) as { pools: FlowPoolData[] };
 
     const pool = flowSplitterPoolQueryRes?.pools[0];
+
+    console.log("pool", pool);
 
     if (!pool) {
       throw Error("Missing Pool");
@@ -84,10 +90,21 @@ export async function GET(request: NextRequest) {
       // Continue without Farcaster data if the API call fails
     }
 
+    const splitterAdmins = pool.poolAdmins.map((a) => a.address.toLowerCase());
+
     // Enhance the pool data with Farcaster user information
+
+    console.log("member count", farcasterDevsData.poolMembers.length);
+
+    const members = isCrackedDevs
+      ? farcasterDevsData.poolMembers.filter((member) => {
+          // return false;
+          return !splitterAdmins.includes(member.account.id.toLowerCase());
+        })
+      : farcasterDevsData.poolMembers;
     const enhancedPoolData = {
       ...farcasterDevsData,
-      poolMembers: farcasterDevsData.poolMembers.map((member) => ({
+      poolMembers: members.map((member) => ({
         ...member,
         farcasterUser:
           (farcasterUsers[member.account.id.toLowerCase()] &&
@@ -107,6 +124,7 @@ export async function GET(request: NextRequest) {
         name: pool.name,
         symbol: pool.symbol,
       },
+      activeMemberCount: members.filter((m) => Number(m.units) > 0).length,
     };
 
     return NextResponse.json(enhancedPoolData);
