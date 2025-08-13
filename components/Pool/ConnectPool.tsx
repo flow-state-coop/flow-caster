@@ -151,7 +151,7 @@ export default function ConnectPool({
       console.log("Member added successfully:", data);
 
       // on success
-      refetch();
+      // refetch();
       setIsConfirmingAdd(false);
       setIsAddingMember(false);
       setShareComplete(true);
