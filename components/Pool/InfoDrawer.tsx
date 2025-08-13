@@ -4,9 +4,13 @@ import { X } from "lucide-react";
 
 interface InfoProps {
   handleCloseDrawer: () => void;
+  activeMemberCount?: number;
 }
 
-export default function InfoDrawer({ handleCloseDrawer }: InfoProps) {
+export default function InfoDrawer({
+  handleCloseDrawer,
+  activeMemberCount,
+}: InfoProps) {
   const handleViewProfile = async () => {
     await sdk.actions.viewCast({
       hash: "0xcd9b0113",
@@ -32,8 +36,8 @@ export default function InfoDrawer({ handleCloseDrawer }: InfoProps) {
       </div>
       <div className="mb-6 flex flex-col gap-2 text-primary-800">
         <p>
-          Open a token stream that&apos;s split in real-time to 82 cracked
-          Farcaster devs{" "}
+          Open a token stream that&apos;s split in real-time to{" "}
+          {activeMemberCount ? activeMemberCount : ""} cracked Farcaster devs{" "}
           <span
             onClick={handleViewProfile}
             className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"

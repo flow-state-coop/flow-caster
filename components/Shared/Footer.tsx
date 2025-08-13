@@ -22,6 +22,8 @@ interface PoolActionsProps {
   connectedMember?: PoolData["poolMembers"][0];
   totalFlow: string | number;
   connectedDonor?: PoolData["poolDistributors"][0];
+  noUnits: boolean;
+  activeMemberCount?: number;
 }
 
 type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
@@ -35,6 +37,8 @@ export default function Footer({
   connectedMember,
   totalFlow,
   connectedDonor,
+  noUnits,
+  activeMemberCount,
 }: PoolActionsProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -59,7 +63,9 @@ export default function Footer({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Streaming tips?! Open a real-time stream split to 82 Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Streaming tips?! Open a real-time stream split to ${
+        activeMemberCount ? activeMemberCount : ""
+      } Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL
@@ -168,13 +174,17 @@ export default function Footer({
               connectedDonor={connectedDonor}
               handleCloseDrawer={handleCloseDrawer}
               isOpen={isDrawerOpen}
+              activeMemberCount={activeMemberCount}
             />
           ) : null}
           {drawerType === "claim" && (
             <ClaimSup handleCloseDrawer={handleCloseDrawer} />
           )}
           {drawerType === "info" && (
-            <InfoDrawer handleCloseDrawer={handleCloseDrawer} />
+            <InfoDrawer
+              handleCloseDrawer={handleCloseDrawer}
+              activeMemberCount={activeMemberCount}
+            />
           )}
           {drawerType === "connect" && connectedMember && (
             <ConnectPool
@@ -184,6 +194,8 @@ export default function Footer({
               connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
               connectedMember={connectedMember}
               handleCloseDrawer={handleCloseDrawer}
+              noUnits={noUnits}
+              shouldConnect={connectedMember.isConnected}
             />
           )}
         </div>

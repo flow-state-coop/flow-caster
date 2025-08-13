@@ -84,6 +84,13 @@ export default function RecipientNode({
                   USDCx / mo
                 </span>
               </div>
+
+              {!connected && (
+                <div className="text-[10px] text-black mt-2">Not connected</div>
+              )}
+              {connected && (
+                <div className="text-[10px] text-black mt-2">Connected</div>
+              )}
             </>
           ) : (
             <>
@@ -94,13 +101,6 @@ export default function RecipientNode({
                 Hasn&apos;t opted into funding yet.
               </div>
             </>
-          )}
-
-          {!connected && (
-            <div className="text-[10px] text-black mt-2">Not connected</div>
-          )}
-          {connected && (
-            <div className="text-[10px] text-black mt-2">Connected</div>
           )}
 
           {farcasterUser && (

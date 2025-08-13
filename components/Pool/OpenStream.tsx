@@ -45,6 +45,7 @@ interface OpenStreamProps {
   connectedDonor?: PoolData["poolDistributors"][0];
   handleCloseDrawer: () => void;
   isOpen: boolean;
+  activeMemberCount?: number;
 }
 
 export default function OpenStream({
@@ -54,6 +55,7 @@ export default function OpenStream({
   connectedDonor,
   handleCloseDrawer,
   isOpen,
+  activeMemberCount,
 }: OpenStreamProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -430,7 +432,9 @@ export default function OpenStream({
     }
 
     await sdk.actions.composeCast({
-      text: `Streaming tips?! I'm supporting 82 Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: `Streaming tips?! I'm supporting ${
+        activeMemberCount ? activeMemberCount : ""
+      } Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
       embeds: [targetUrl],
     });
   };
