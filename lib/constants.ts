@@ -45,4 +45,11 @@ export const DEV_POOL_ID = "30";
 export const DEFAULT_POOL_ID = "32";
 export const SUP_PROGRAM_ID = 7743;
 
+// guild guild
+// export const DEV_POOL_ADDRESS = "0x6719cbb70d0faa041f1056542af66066e3cc7a24";
+// export const DEFAULT_CHAIN_ID = "42161";
+// export const DEV_POOL_ID = "3";
+// export const DEFAULT_POOL_ID = "3";
+// export const SUP_PROGRAM_ID = 7743;
+
 export const VIZ_PAUSED = true;
