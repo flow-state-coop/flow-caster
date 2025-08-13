@@ -22,7 +22,7 @@ interface PoolActionsProps {
   connectedMember?: PoolData["poolMembers"][0];
   totalFlow: string | number;
   connectedDonor?: PoolData["poolDistributors"][0];
-  noUnits: boolean;
+  noUnits?: boolean;
   activeMemberCount?: number;
 }
 

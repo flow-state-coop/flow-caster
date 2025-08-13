@@ -31,7 +31,7 @@ export default function ConnectPool({
   connectedAddressNotPoolAddress: boolean;
   connectedMember: PoolData["poolMembers"][0];
   handleCloseDrawer: () => void;
-  noUnits: boolean;
+  noUnits?: boolean;
   shouldConnect?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
