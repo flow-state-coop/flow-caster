@@ -195,7 +195,7 @@ export default function Footer({
               connectedMember={connectedMember}
               handleCloseDrawer={handleCloseDrawer}
               noUnits={noUnits}
-              shouldConnect={connectedMember.isConnected}
+              shouldConnect={!connectedMember.isConnected}
             />
           )}
         </div>
