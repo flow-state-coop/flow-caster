@@ -6,20 +6,10 @@ import {
   FLOW_SPLITTER_POOL_QUERY,
   SUPERFLUID_QUERY,
 } from "@/lib/flowapp/queries";
-import { PoolData } from "@/lib/types";
+import { FlowPoolData, PoolData } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-type FlowPoolData = {
-  token: string;
-  poolAddress: string;
-  name: string;
-  symbol: string;
-  poolAdmins: {
-    address: string;
-  }[];
-};
 
 export async function GET(request: NextRequest) {
   try {

@@ -213,7 +213,18 @@ export default function ConnectPool({
         )}
       </div>
       <div className="mb-6">
-        {isSuccess && <p className="text-black">SUCCESS</p>}
+        {shareComplete && (
+          <p className="text-primary-500 text-xl font-bold">
+            You&apos;re Connected!
+          </p>
+        )}
+      </div>
+      <div className="mb-6">
+        {isSuccess && !shouldConnect && (
+          <p className="text-primary-500 text-xl font-bold">
+            You&apos;re Connected!
+          </p>
+        )}
       </div>
 
       {error && (
@@ -281,10 +292,9 @@ export default function ConnectPool({
                   {shareComplete && (
                     <CircleCheck className="w-4 h-4 fill-primary-500" />
                   )}
-                  {isConfirmingAdd ||
-                    (isAddingMember && (
-                      <LoaderCircle className="w-4 h-4 animate-spin" />
-                    ))}
+                  {(isConfirmingAdd || isAddingMember) && (
+                    <LoaderCircle className="w-4 h-4 animate-spin" />
+                  )}
                   {isConfirmingAdd
                     ? "Sharing..."
                     : isAddingMember

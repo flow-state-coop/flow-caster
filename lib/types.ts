@@ -1,5 +1,15 @@
 import { NeynarUser } from "@/lib/neynar";
 
+export type FlowPoolData = {
+  token: string;
+  poolAddress: string;
+  name: string;
+  symbol: string;
+  poolAdmins: {
+    address: string;
+  }[];
+};
+
 export interface PoolData {
   __typename: string;
   id: string;
