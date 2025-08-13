@@ -45,6 +45,8 @@ export default function LeaderboardList({
     return sorted;
   }, [poolData, devPoolList]);
 
+  console.log("sorted 2", sorted);
+
   const handleViewProfile = async (fid?: string) => {
     if (!fid) return;
     await sdk.actions.viewProfile({
