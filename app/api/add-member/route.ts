@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { networks } from "@/lib/flowapp/networks";
 import {
   FLOW_SPLITTER_POOL_QUERY,
-  SUPERFLUID_QUERY,
+  getSuperFluidQuery,
 } from "@/lib/flowapp/queries";
 import { GraphQLClient } from "graphql-request";
 import { FlowPoolData, PoolData } from "@/lib/types";
-import { DEFAULT_POOL_ID } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const flowSplitterPoolQueryRes = (await flowClient.request(
       FLOW_SPLITTER_POOL_QUERY,
-      { poolId: `0x${Number(DEFAULT_POOL_ID).toString(16)}` }
+      { poolId: `0x${Number(FEATURED_POOL_DATA.DEFAULT_POOL_ID).toString(16)}` }
     )) as { pools: FlowPoolData[] };
 
     const pool = flowSplitterPoolQueryRes?.pools[0];
@@ -52,7 +52,9 @@ export async function POST(request: NextRequest) {
       throw Error("Missing Pool");
     }
 
-    const superfluidQueryRes = (await sfClient.request(SUPERFLUID_QUERY, {
+    const query = getSuperFluidQuery(true);
+
+    const superfluidQueryRes = (await sfClient.request(query, {
       token: pool.token,
       gdaPool: pool.poolAddress,
     })) as { pool: PoolData };

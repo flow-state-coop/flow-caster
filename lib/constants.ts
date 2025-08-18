@@ -1,5 +1,6 @@
 import { base, optimismSepolia } from "wagmi/chains";
 import { Token } from "./flowapp/networks";
+import { AppPoolMeta } from "./types";
 
 export const MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 day
 
@@ -58,3 +59,14 @@ const FEATURED_POOLS = {
 
 export const FEATURED_POOL_DATA = FEATURED_POOLS[TARGET_NETWORK_ID];
 export const VIZ_PAUSED = true;
+
+export const POOL_METADATA: Record<string, AppPoolMeta> = {
+  "8453-32": {
+    hasSupRewards: true,
+    isCracked: true,
+  },
+  "11155420-71": {
+    hasSupRewards: true,
+    isCracked: true,
+  },
+};

@@ -12,6 +12,7 @@ import OpenStream from "../Pool/OpenStream";
 import ConnectPool from "../Pool/ConnectPool";
 import ClaimSup from "../Pool/ClaimSup";
 import BaseButton from "./BaseButton";
+import { usePoolData } from "@/hooks/use-pool-data";
 
 interface FooterProps {
   chainId: string;
@@ -32,6 +33,8 @@ export default function Footer({
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
+
+  const { isCracked } = usePoolData({ chainId, poolId });
 
   const {
     shouldConnect,
@@ -136,12 +139,14 @@ export default function Footer({
             >
               <Share size={20} />
             </div>
-            <button
-              className="p-2 text-black hover:text-gray-800"
-              onClick={() => handleOpenDrawer("info")}
-            >
-              <Info size={20} />
-            </button>
+            {isCracked && (
+              <button
+                className="p-2 text-black hover:text-gray-800"
+                onClick={() => handleOpenDrawer("info")}
+              >
+                <Info size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>

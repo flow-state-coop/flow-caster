@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
+import { FEATURED_POOL_DATA, POOL_METADATA } from "@/lib/constants";
 import { PoolData } from "@/lib/types";
 
 interface UsePoolDataOptions {
@@ -42,11 +42,15 @@ export const usePoolData = ({
     enabled,
   });
 
+  const poolMeta = POOL_METADATA[`${chainId}-${poolId}`];
+
   return {
     data: data,
     poolDistributors: data?.poolDistributors,
     poolMembers: data?.poolMembers,
     activeMemberCount: data?.activeMemberCount,
+    hasSupRewards: poolMeta?.hasSupRewards,
+    isCracked: poolMeta?.isCracked,
     ...rest,
   };
 };

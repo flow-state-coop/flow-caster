@@ -4,9 +4,10 @@ import { fetchUsersByEthAddress, NeynarUser } from "@/lib/neynar";
 import { networks } from "@/lib/flowapp/networks";
 import {
   FLOW_SPLITTER_POOL_QUERY,
-  SUPERFLUID_QUERY,
+  getSuperFluidQuery,
 } from "@/lib/flowapp/queries";
 import { FlowPoolData, PoolData } from "@/lib/types";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -45,7 +46,12 @@ export async function GET(request: NextRequest) {
       throw Error("Missing Pool");
     }
 
-    const superfluidQueryRes = (await sfClient.request(SUPERFLUID_QUERY, {
+    const query = getSuperFluidQuery(
+      FEATURED_POOL_DATA.DEFAULT_POOL_ID === poolId &&
+        FEATURED_POOL_DATA.DEFAULT_CHAIN_ID === chainId
+    );
+
+    const superfluidQueryRes = (await sfClient.request(query, {
       token: pool.token,
       gdaPool: pool.poolAddress,
     })) as { pool: PoolData };
