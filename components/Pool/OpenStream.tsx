@@ -21,8 +21,7 @@ import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import {
   DEV_DONATION_PERCENT,
-  DEV_POOL_ADDRESS,
-  DEV_POOL_ID,
+  FEATURED_POOL_DATA,
   TOKEN_DATA,
   ZERO_ADDRESS,
 } from "@/lib/constants";
@@ -40,6 +39,7 @@ import {
 import { networks } from "@/lib/flowapp/networks";
 import { PoolData } from "@/lib/types";
 import { openExplorerUrl } from "@/lib/helpers";
+import BaseButton from "../Shared/BaseButton";
 
 interface OpenStreamProps {
   chainId: string;
@@ -82,7 +82,7 @@ export default function OpenStream({
   });
   const { data: devPoolData } = usePoolData({
     chainId,
-    poolId: DEV_POOL_ID,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
   const {
@@ -290,7 +290,7 @@ export default function OpenStream({
             args: [
               tokenData.address,
               address,
-              DEV_POOL_ADDRESS as `0x${string}`,
+              FEATURED_POOL_DATA.DEV_POOL_ADDRESS as `0x${string}`,
               devFlowRate,
               "0x",
             ],
@@ -424,23 +424,6 @@ export default function OpenStream({
     return "Open Stream";
   };
 
-  const getButtonClass = () => {
-    const baseClass =
-      "w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors";
-
-    if (
-      isLoading ||
-      isConfirming ||
-      isApprovalConfirming ||
-      isSuccess ||
-      isButtonDisabled
-    ) {
-      return `${baseClass} bg-gray-400 text-gray-700 cursor-not-allowed`;
-    }
-
-    return `${baseClass} bg-accent-800 hover:bg-accent-600`;
-  };
-
   const getDrawerTitle = () => {
     if (isSuccess) return "Success! 🫡";
     if (Number(connectedDonor?.flowRate) > 0) return "Edit Stream";
@@ -495,7 +478,6 @@ export default function OpenStream({
                 </p>
               </div>
 
-              {/* Wrap for USDCx */}
               <div>
                 <label
                   htmlFor="wrapAmount"
@@ -629,19 +611,17 @@ export default function OpenStream({
               )}
 
               {!isConnected && (
-                <button
+                <BaseButton
                   onClick={() => connect({ connector: connectors[0] })}
-                  className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
                 >
                   Connect Wallet
-                </button>
+                </BaseButton>
               )}
 
               {isConnected && (
                 <>
-                  <button
+                  <BaseButton
                     type="submit"
-                    className={getButtonClass()}
                     disabled={
                       isLoading ||
                       isConfirming ||
@@ -651,7 +631,7 @@ export default function OpenStream({
                     }
                   >
                     {getButtonText()}
-                  </button>
+                  </BaseButton>
                   {connectedDonor && (
                     <button
                       type="button"
@@ -685,13 +665,9 @@ export default function OpenStream({
                 Cast about it to help grow the flow.
               </p>
 
-              <button
-                onClick={handleCast}
-                type="button"
-                className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
-              >
+              <BaseButton onClick={handleCast} type="button">
                 Cast
-              </button>
+              </BaseButton>
             </>
           )}
 

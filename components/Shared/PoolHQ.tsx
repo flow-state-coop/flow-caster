@@ -5,10 +5,11 @@ import { useUser } from "@/contexts/user-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { getTotalFlow } from "@/lib/pool";
-import { DEV_POOL_ID } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 import PoolCircle from "@/components/Pool/PoolCircle";
 import Footer from "./Footer";
 import Spinner from "./Spinner";
+import BaseButton from "./BaseButton";
 
 interface PoolHQProps {
   chainId: string;
@@ -30,7 +31,7 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
 
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
-    poolId: DEV_POOL_ID,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
   const { user, signIn } = useUser();
@@ -56,7 +57,7 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
 
   if (!user.data) {
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <button onClick={signIn}>Sign In</button>
+      <BaseButton onClick={signIn}>Sign In</BaseButton>
     </div>;
   }
 

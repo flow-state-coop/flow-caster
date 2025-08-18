@@ -3,7 +3,7 @@ import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
 import fluidLockerFactoryAbi from "@/lib/abi/fluidLockerFactory.json";
 import fluidLockerAbi from "@/lib/abi/fluidLocker.json";
-import { FLUID_LOCKER_CONTRACT, SUP_PROGRAM_ID } from "@/lib/constants";
+import { FLUID_LOCKER_CONTRACT, FEATURED_POOL_DATA } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         address: lockerAddress as `0x${string}`,
         abi: fluidLockerAbi,
         functionName: "getFlowRatePerProgram",
-        args: [SUP_PROGRAM_ID],
+        args: [FEATURED_POOL_DATA.SUP_PROGRAM_ID],
       })) as bigint;
 
       console.log("*****flowRate", flowRate);

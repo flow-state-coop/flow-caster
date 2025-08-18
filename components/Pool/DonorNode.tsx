@@ -27,6 +27,7 @@ interface DonorNodeProps {
   rate?: string;
   startingTimestamp?: string;
   startingAmount?: string;
+  tokenSymbol: string;
 }
 
 export default function DonorNode({
@@ -43,6 +44,7 @@ export default function DonorNode({
   rate,
   startingTimestamp,
   startingAmount,
+  tokenSymbol,
 }: DonorNodeProps) {
   const [showing, setShowing] = useState(false);
 
@@ -115,7 +117,7 @@ export default function DonorNode({
               <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
                 {ratePerMonthFormatted(rate)}
                 <span className="text-xs text-black font-semibold ml-1">
-                  USDCx / mo
+                  {tokenSymbol} / mo
                 </span>
               </div>
 

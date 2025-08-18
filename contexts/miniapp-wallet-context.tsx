@@ -1,14 +1,12 @@
 import { farcasterFrame as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { base, optimismSepolia } from "wagmi/chains";
-import { DEFAULT_CHAIN_ID } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 
 export const config = createConfig({
-  chains: DEFAULT_CHAIN_ID === "8453" ? [base] : [optimismSepolia],
+  chains: [FEATURED_POOL_DATA.VIEM_CHAIN_OBJ],
   transports: {
-    [base.id]: http(),
-    [optimismSepolia.id]: http(),
+    [FEATURED_POOL_DATA.VIEM_CHAIN_OBJ.id]: http(),
   },
   connectors: [miniAppConnector()],
 });

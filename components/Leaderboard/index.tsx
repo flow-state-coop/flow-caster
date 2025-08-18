@@ -7,7 +7,7 @@ import { useUser } from "@/contexts/user-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { getTotalFlow } from "@/lib/pool";
-import { DEV_POOL_ID } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 import LeaderboardList from "./LeaderboardList";
 import Footer from "../Shared/Footer";
 import Spinner from "../Shared/Spinner";
@@ -29,7 +29,7 @@ export default function Leaderboard() {
   });
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
-    poolId: DEV_POOL_ID,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
   const { user } = useUser();
   const { address } = useAccount();

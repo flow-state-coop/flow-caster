@@ -1,3 +1,4 @@
+import { base, optimismSepolia } from "wagmi/chains";
 import { Token } from "./flowapp/networks";
 
 export const MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 day
@@ -34,25 +35,26 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const FLUID_LOCKER_CONTRACT =
   "0xA6694cAB43713287F7735dADc940b555db9d39D9";
 
-// op-sepolia
-// export const DEV_POOL_ADDRESS = "0x592834dfaa81dc050dc5ac46f4fc87d594faeb75";
-// export const DEFAULT_CHAIN_ID: "8453" | "11155420" = "11155420";
-// export const DEV_POOL_ID = "73";
-// export const DEFAULT_POOL_ID = "71";
-// export const SUP_PROGRAM_ID = 7742;
+export const TARGET_NETWORK_ID = "8453";
 
-// base
-export const DEV_POOL_ADDRESS = "0x6719cbb70d0faa041f1056542af66066e3cc7a24";
-export const DEFAULT_CHAIN_ID = "8453";
-export const DEV_POOL_ID = "30";
-export const DEFAULT_POOL_ID = "32";
-export const SUP_PROGRAM_ID = 7743;
+const FEATURED_POOLS = {
+  "8453": {
+    DEV_POOL_ADDRESS: "0x6719cbb70d0faa041f1056542af66066e3cc7a24",
+    DEFAULT_CHAIN_ID: "8453",
+    DEV_POOL_ID: "30",
+    DEFAULT_POOL_ID: "32",
+    SUP_PROGRAM_ID: 7743,
+    VIEM_CHAIN_OBJ: base,
+  },
+  "11155420": {
+    DEV_POOL_ADDRESS: "0x592834dfaa81dc050dc5ac46f4fc87d594faeb75",
+    DEFAULT_CHAIN_ID: "42161",
+    DEV_POOL_ID: "73",
+    DEFAULT_POOL_ID: "71",
+    SUP_PROGRAM_ID: 7742,
+    VIEM_CHAIN_OBJ: optimismSepolia,
+  },
+};
 
-// guild guild
-// export const DEV_POOL_ADDRESS = "0x6719cbb70d0faa041f1056542af66066e3cc7a24";
-// export const DEFAULT_CHAIN_ID = "42161";
-// export const DEV_POOL_ID = "3";
-// export const DEFAULT_POOL_ID = "3";
-// export const SUP_PROGRAM_ID = 7743;
-
+export const FEATURED_POOL_DATA = FEATURED_POOLS[TARGET_NETWORK_ID];
 export const VIZ_PAUSED = true;

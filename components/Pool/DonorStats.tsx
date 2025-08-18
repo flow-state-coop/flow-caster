@@ -11,6 +11,7 @@ interface DonorStatsProps {
   startingAmount?: string;
   startingTimestamp?: string;
   donorAddress?: string;
+  tokenSymbol: string;
 }
 
 export default function DonorStats({
@@ -20,6 +21,7 @@ export default function DonorStats({
   startingAmount,
   startingTimestamp,
   donorAddress,
+  tokenSymbol,
 }: DonorStatsProps) {
   const { data } = useAccountSup({
     userAddress:
@@ -28,7 +30,7 @@ export default function DonorStats({
 
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">
-      <div>{`${ratePerMonthFormatted(rate)} USDCx / mo`}</div>
+      <div>{`${ratePerMonthFormatted(rate)} ${tokenSymbol} / mo`}</div>
 
       {showTotalFlow && (
         <FlowAmount

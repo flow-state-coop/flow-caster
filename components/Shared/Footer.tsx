@@ -11,6 +11,7 @@ import InfoDrawer from "../Pool/InfoDrawer";
 import OpenStream from "../Pool/OpenStream";
 import ConnectPool from "../Pool/ConnectPool";
 import ClaimSup from "../Pool/ClaimSup";
+import BaseButton from "./BaseButton";
 
 interface FooterProps {
   chainId: string;
@@ -81,8 +82,7 @@ export default function Footer({
         <div className="flex items-center justify-between w-full">
           {/* Buttons */}
           <div className="flex gap-3 text-black">
-            <button
-              className="px-4 py-2 rounded-lg bg-accent-800 text-white font-bold"
+            <BaseButton
               onClick={() =>
                 handleOpenDrawer(
                   connectedDonor && Number(connectedDonor.flowRate) > 0
@@ -95,7 +95,7 @@ export default function Footer({
                 ? "Edit"
                 : "Open"}{" "}
               Stream
-            </button>
+            </BaseButton>
           </div>
 
           {/* Links */}

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 import { PoolData } from "@/lib/types";
 
 interface UsePoolDataOptions {
@@ -22,7 +22,10 @@ export const usePoolData = ({
         poolId,
       });
 
-      if (poolId === DEFAULT_POOL_ID && chainId === DEFAULT_CHAIN_ID) {
+      if (
+        poolId === FEATURED_POOL_DATA.DEFAULT_POOL_ID &&
+        chainId === FEATURED_POOL_DATA.DEFAULT_CHAIN_ID
+      ) {
         params.append("isCrackedDevs", "true");
       }
 

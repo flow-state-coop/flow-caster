@@ -7,7 +7,7 @@ import { Crown } from "lucide-react";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
 import { createDonorBuckets } from "@/lib/pool";
-import { DEV_POOL_ID, VIZ_PAUSED } from "@/lib/constants";
+import { FEATURED_POOL_DATA, VIZ_PAUSED } from "@/lib/constants";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import DonorStats from "./DonorStats";
@@ -53,7 +53,7 @@ export default function PoolCircle({
 
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
-    poolId: DEV_POOL_ID,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
   // Transform pool data to component format
@@ -375,6 +375,7 @@ export default function PoolCircle({
                   connectedUserFallback={
                     isUserDonor ? connectedUser : undefined
                   }
+                  tokenSymbol={poolData.token.symbol}
                 />
               )}
 
@@ -395,6 +396,7 @@ export default function PoolCircle({
                   rate={donor?.rate}
                   startingAmount={donor?.startingAmount}
                   startingTimestamp={donor?.startingTimestamp}
+                  tokenSymbol={poolData.token.symbol}
                 />
               )}
 
@@ -413,6 +415,7 @@ export default function PoolCircle({
                     connectedUserFallback={
                       isUserDonor ? connectedUser : undefined
                     }
+                    tokenSymbol={poolData.token.symbol}
                   />
                 </Link>
               )}
@@ -432,6 +435,7 @@ export default function PoolCircle({
             farcasterUser={recipient.farcasterUser}
             totalFlowRate={Number(poolData.flowRate)}
             connected={recipient.connected}
+            tokenSymbol={poolData.token.symbol}
           />
         ))}
         {/* Pool circle particles */}
@@ -488,6 +492,7 @@ export default function PoolCircle({
               startingTimestamp={poolData.updatedAtTimestamp}
               startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}
               donorAddress={donor.accountId}
+              tokenSymbol={poolData.token.symbol}
             />
           );
         })}
