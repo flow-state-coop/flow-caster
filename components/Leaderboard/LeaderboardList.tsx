@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import { useMemo } from "react";
+import { Crown } from "lucide-react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { ratePerMonthFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
-import { Crown } from "lucide-react";
-import { useMemo } from "react";
-import { sdk } from "@farcaster/miniapp-sdk";
 import FlowAmount from "../Pool/FlowAmount";
 
 interface LeaderboardListProps {
@@ -22,10 +22,7 @@ export default function LeaderboardList({
   const sorted = useMemo(() => {
     const devPoleRateList = devPoolList || {};
     const distributors = poolData?.poolDistributors || [];
-    // Sort by flowRate (descending)
-
     const withDevPoolRate = distributors.reduce((acc, d) => {
-      // const donor = {...d, rate}
       const devRate = devPoleRateList[d.account.id];
       if (devRate) {
         acc.push({
@@ -45,7 +42,7 @@ export default function LeaderboardList({
     return sorted;
   }, [poolData, devPoolList]);
 
-  console.log("sorted 2", sorted);
+  console.log("poolData", poolData);
 
   const handleViewProfile = async (fid?: string) => {
     if (!fid) return;

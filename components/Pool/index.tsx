@@ -1,6 +1,7 @@
 "use client";
+
 import { useParams } from "next/navigation";
-import PoolHQ from "./PoolHQ";
+import PoolHQ from "../Shared/PoolHQ";
 
 export default function Pool() {
   const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();

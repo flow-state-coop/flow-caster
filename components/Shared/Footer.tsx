@@ -1,48 +1,44 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Award, Info, Share, House } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { usePoolUser } from "@/contexts/pool-user-context";
+import { ratePerMonthFormatted } from "@/lib/pool";
 import InfoDrawer from "../Pool/InfoDrawer";
 import OpenStream from "../Pool/OpenStream";
-import Link from "next/link";
 import ConnectPool from "../Pool/ConnectPool";
-import { PoolData } from "@/lib/types";
-import { ratePerMonthFormatted } from "@/lib/pool";
 import ClaimSup from "../Pool/ClaimSup";
-import { usePathname } from "next/navigation";
-import Leaderboard from "../Leaderboard";
 
-interface PoolActionsProps {
+interface FooterProps {
   chainId: string;
   poolId: string;
-  shouldConnect?: boolean;
   poolAddress: string;
-  connectedAddressNotPoolAddress: boolean;
-  connectedMember?: PoolData["poolMembers"][0];
   totalFlow: string | number;
-  connectedDonor?: PoolData["poolDistributors"][0];
-  noUnits?: boolean;
   activeMemberCount?: number;
 }
-
 type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
 export default function Footer({
   chainId,
   poolId,
-  shouldConnect,
   poolAddress,
-  connectedAddressNotPoolAddress,
-  connectedMember,
   totalFlow,
-  connectedDonor,
-  noUnits,
   activeMemberCount,
-}: PoolActionsProps) {
+}: FooterProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
+
+  const {
+    shouldConnect,
+    connectedAddressNotPoolAddress,
+    connectedDonor,
+    connectedMember,
+    noUnits,
+  } = usePoolUser();
 
   useEffect(() => {
     if (shouldConnect) {

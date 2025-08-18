@@ -1,8 +1,8 @@
-import Providers from "@/components/providers";
 import type { Metadata } from "next";
 import { Archivo, Archivo_Black } from "next/font/google";
-import "./globals.css";
+import Providers from "@/components/providers";
 import Header from "@/components/Shared/Header";
+import "./globals.css";
 
 const bodyFont = Archivo({ subsets: ["latin"], variable: "--font-body" });
 const headerFont = Archivo_Black({

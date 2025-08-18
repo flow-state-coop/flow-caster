@@ -1,11 +1,11 @@
 import dynamic from "next/dynamic";
-import { env } from "@/lib/env";
 import { Metadata } from "next";
+import { env } from "@/lib/env";
+import Spinner from "@/components/Shared/Spinner";
 
 const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
-  // params: Promise<{ chainid: string; poolId: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -47,7 +47,7 @@ export async function generateMetadata({
 
 const LeaderboardPage = dynamic(() => import("@/components/Leaderboard"), {
   ssr: false,
-  loading: () => <div>Loading...</div>,
+  loading: () => <Spinner />,
 });
 
 export default function Home() {

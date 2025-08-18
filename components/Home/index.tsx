@@ -1,7 +1,7 @@
 "use client";
 
 import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
-import PoolHQ from "../Pool/PoolHQ";
+import PoolHQ from "../Shared/PoolHQ";
 
 export default function Home() {
   return (

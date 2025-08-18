@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GraphQLClient } from "graphql-request";
 import { fetchUsersByEthAddress, NeynarUser } from "@/lib/neynar";
 import { networks } from "@/lib/flowapp/networks";
-import { GraphQLClient } from "graphql-request";
 import {
   FLOW_SPLITTER_POOL_QUERY,
   SUPERFLUID_QUERY,

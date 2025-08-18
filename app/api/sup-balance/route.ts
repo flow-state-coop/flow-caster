@@ -3,7 +3,6 @@ import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
 import fluidLockerFactoryAbi from "@/lib/abi/fluidLockerFactory.json";
 import fluidLockerAbi from "@/lib/abi/fluidLocker.json";
-
 import { FLUID_LOCKER_CONTRACT, SUP_PROGRAM_ID } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";

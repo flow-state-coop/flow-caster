@@ -2,7 +2,7 @@
 import { sdk } from "@farcaster/miniapp-sdk";
 import { X } from "lucide-react";
 
-interface InfoProps {
+interface InfoDrawerProps {
   handleCloseDrawer: () => void;
   activeMemberCount?: number;
 }
@@ -10,7 +10,7 @@ interface InfoProps {
 export default function InfoDrawer({
   handleCloseDrawer,
   activeMemberCount,
-}: InfoProps) {
+}: InfoDrawerProps) {
   const handleViewProfile = async () => {
     await sdk.actions.viewCast({
       hash: "0xcd9b0113",

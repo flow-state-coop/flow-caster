@@ -1,7 +1,6 @@
-import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
-import { NeynarUser } from "@/lib/neynar";
-import { PoolData } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
+import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
+import { PoolData } from "@/lib/types";
 
 interface UsePoolDataOptions {
   chainId: string;

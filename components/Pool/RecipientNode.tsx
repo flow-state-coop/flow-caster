@@ -2,15 +2,15 @@
 "use client";
 import { useRef, useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { ArrowRight } from "lucide-react";
+import Tippy from "@tippyjs/react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
   truncateAddress,
 } from "@/lib/pool";
+import "tippy.js/dist/tippy.css";
 
 interface RecipientNodeProps {
   x: number;

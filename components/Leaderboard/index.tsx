@@ -1,25 +1,19 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { usePoolData } from "@/hooks/use-pool-data";
 import { useParams } from "next/navigation";
-import LeaderboardList from "./LeaderboardList";
-import { getTotalFlow } from "@/lib/pool";
-import Footer from "../Shared/Footer";
-import { PoolData } from "@/lib/types";
-import { useUser } from "@/contexts/user-context";
 import { useAccount } from "wagmi";
+import { useUser } from "@/contexts/user-context";
+import { PoolUserProvider } from "@/contexts/pool-user-context";
+import { usePoolData } from "@/hooks/use-pool-data";
+import { getTotalFlow } from "@/lib/pool";
 import { DEV_POOL_ID } from "@/lib/constants";
+import LeaderboardList from "./LeaderboardList";
+import Footer from "../Shared/Footer";
+import Spinner from "../Shared/Spinner";
 
 export default function Leaderboard() {
   const { chainId, poolId } = useParams<{ chainId: string; poolId: string }>();
-  const [connectedMember, setConnectedMember] = useState<
-    PoolData["poolMembers"][0] | undefined
-  >();
-  const [connectedAddressNotPoolAddress, setConnectedAddressNotPoolAddress] =
-    useState(false);
-  const [connectedDonor, setConnectedDonor] = useState<
-    PoolData["poolDistributors"][0] | undefined
-  >();
   const [devPoolList, setDevPoolList] = useState<
     Record<string, string> | undefined
   >();
@@ -41,33 +35,6 @@ export default function Leaderboard() {
   const { address } = useAccount();
 
   useEffect(() => {
-    if (!user.data || !poolMembers) return;
-    const member = poolMembers.find(
-      (m) =>
-        m.account.id === user.data?.verified_addresses.primary.eth_address ||
-        m.account.id === user.data?.verified_addresses.eth_addresses[0]
-    );
-
-    setConnectedMember(member);
-    if (
-      member &&
-      member.account.id.toLowerCase() !== address?.toLocaleLowerCase()
-    ) {
-      setConnectedAddressNotPoolAddress(true);
-    }
-  }, [poolMembers, address, user]);
-
-  useEffect(() => {
-    if (!address || !poolDistributors) return;
-
-    const donor = poolDistributors.find((d) => {
-      return d.account.id.toLowerCase() === address.toLowerCase();
-    });
-
-    setConnectedDonor(donor);
-  }, [poolDistributors, address]);
-
-  useEffect(() => {
     if (!devPoolistributors) return;
 
     const rateList = devPoolistributors.reduce((acc, d) => {
@@ -78,10 +45,10 @@ export default function Leaderboard() {
     setDevPoolList(rateList);
   }, [devPoolistributors]);
 
-  if (isLoading || !poolData) {
+  if (isLoading || !poolData || !poolDistributors) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg">Loading pool data...</p>
+        <Spinner />
       </div>
     );
   }
@@ -89,8 +56,8 @@ export default function Leaderboard() {
   if (error) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <p className="text-lg text-red-500">
-          Failed to load pool data: {error.message}
+        <p className="text-lg text-accent-800">
+          Failed to load pool. {error.message}
         </p>
       </div>
     );
@@ -98,16 +65,20 @@ export default function Leaderboard() {
 
   return (
     <main className="relative">
-      <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
-      <Footer
-        chainId={chainId}
-        poolId={poolId}
-        poolAddress={poolData.id}
-        connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
-        connectedMember={connectedMember}
-        totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
-        connectedDonor={connectedDonor}
-      />
+      <PoolUserProvider
+        poolDistributors={poolDistributors}
+        poolMembers={poolMembers}
+        user={user?.data}
+        connectedAddress={address}
+      >
+        <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
+        <Footer
+          chainId={chainId}
+          poolId={poolId}
+          poolAddress={poolData.id}
+          totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+        />
+      </PoolUserProvider>
     </main>
   );
 }

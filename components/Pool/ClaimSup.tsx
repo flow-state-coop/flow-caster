@@ -1,10 +1,9 @@
 "use client";
 
-import { useSupPoints } from "@/hooks/use-sup-points";
 import { useAccount } from "wagmi";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { X } from "lucide-react";
-
+import { sdk } from "@farcaster/miniapp-sdk";
+import { useAccountSup } from "@/hooks/use-account-sup";
 import { ratePerMonthFormatted } from "@/lib/pool";
 
 interface ClaimSupProps {
@@ -13,7 +12,7 @@ interface ClaimSupProps {
 
 export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
   const { address } = useAccount();
-  const { data } = useSupPoints({
+  const { data } = useAccountSup({
     userAddress: address,
   });
 

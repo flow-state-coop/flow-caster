@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { ArrowRight } from "lucide-react";
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import {
   formatPoolCount,
   ratePerMonthFormatted,
   truncateAddress,
 } from "@/lib/pool";
-import { ArrowRight } from "lucide-react";
 import FlowAmount from "./FlowAmount";
+import "tippy.js/dist/tippy.css";
 
 interface DonorNodeProps {
   x: number;

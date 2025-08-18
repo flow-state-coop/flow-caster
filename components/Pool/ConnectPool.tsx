@@ -1,7 +1,6 @@
 "use client";
 
-import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
-import { networks } from "@/lib/flowapp/networks";
+import { useCallback, useEffect, useState } from "react";
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -9,11 +8,23 @@ import {
   useAccount,
   useConnect,
 } from "wagmi";
-import { useCallback, useEffect, useState } from "react";
 import sdk from "@farcaster/miniapp-sdk";
-import { usePoolData } from "@/hooks/use-pool-data";
-import { PoolData } from "@/lib/types";
 import { ArrowRight, CircleCheck, LoaderCircle, X } from "lucide-react";
+import { usePoolData } from "@/hooks/use-pool-data";
+import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
+import { networks } from "@/lib/flowapp/networks";
+import { PoolData } from "@/lib/types";
+
+interface ConnectPoolProps {
+  poolAddress: string;
+  chainId: string;
+  poolId: string;
+  connectedAddressNotPoolAddress: boolean;
+  connectedMember: PoolData["poolMembers"][0];
+  handleCloseDrawer: () => void;
+  noUnits?: boolean;
+  shouldConnect?: boolean;
+}
 
 export default function ConnectPool({
   poolAddress,
@@ -24,16 +35,7 @@ export default function ConnectPool({
   handleCloseDrawer,
   noUnits,
   shouldConnect,
-}: {
-  poolAddress: string;
-  chainId: string;
-  poolId: string;
-  connectedAddressNotPoolAddress: boolean;
-  connectedMember: PoolData["poolMembers"][0];
-  handleCloseDrawer: () => void;
-  noUnits?: boolean;
-  shouldConnect?: boolean;
-}) {
+}: ConnectPoolProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);

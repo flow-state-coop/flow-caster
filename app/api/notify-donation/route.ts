@@ -1,14 +1,5 @@
 import { sendFrameNotificationToAllUsers } from "@/lib/notification-client";
 import { NextResponse } from "next/server";
-import { resourceLimits } from "worker_threads";
-
-type LaunchWorkflowPayload = {
-  poolid: string;
-  chainid: string;
-  poolname: string;
-  username: string;
-  flowrate: string;
-};
 
 export async function POST(request: Request) {
   try {
