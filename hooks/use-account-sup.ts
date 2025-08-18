@@ -5,11 +5,11 @@ interface SupPointsData {
   lockerAddress: string;
 }
 
-interface UseSupPointsOptions {
+interface useAccountSupOptions {
   userAddress?: string;
 }
 
-export const useSupPoints = ({ userAddress }: UseSupPointsOptions) => {
+export const useAccountSup = ({ userAddress }: useAccountSupOptions) => {
   return useQuery<SupPointsData | null>({
     queryKey: ["sup-points", userAddress],
     queryFn: async () => {

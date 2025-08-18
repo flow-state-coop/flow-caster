@@ -1,8 +1,8 @@
 "use client";
 
-import FlowAmount from "./FlowAmount";
+import { useAccountSup } from "@/hooks/use-account-sup";
 import { ratePerMonthFormatted } from "@/lib/pool";
-import { useSupPoints } from "@/hooks/use-sup-points";
+import FlowAmount from "./FlowAmount";
 
 interface DonorStatsProps {
   rate: string;
@@ -11,6 +11,7 @@ interface DonorStatsProps {
   startingAmount?: string;
   startingTimestamp?: string;
   donorAddress?: string;
+  tokenSymbol: string;
 }
 
 export default function DonorStats({
@@ -20,15 +21,16 @@ export default function DonorStats({
   startingAmount,
   startingTimestamp,
   donorAddress,
+  tokenSymbol,
 }: DonorStatsProps) {
-  const { data } = useSupPoints({
+  const { data } = useAccountSup({
     userAddress:
       donorAddress && donorAddress.startsWith("0x") ? donorAddress : undefined,
   });
 
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">
-      <div>{`${ratePerMonthFormatted(rate)} USDCx / mo`}</div>
+      <div>{`${ratePerMonthFormatted(rate)} ${tokenSymbol} / mo`}</div>
 
       {showTotalFlow && (
         <FlowAmount

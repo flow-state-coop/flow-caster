@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import { useMemo } from "react";
+import { Crown } from "lucide-react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { ratePerMonthFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
-import { Crown } from "lucide-react";
-import { useMemo } from "react";
-import { sdk } from "@farcaster/miniapp-sdk";
 import FlowAmount from "../Pool/FlowAmount";
 
 interface LeaderboardListProps {
@@ -22,10 +22,7 @@ export default function LeaderboardList({
   const sorted = useMemo(() => {
     const devPoleRateList = devPoolList || {};
     const distributors = poolData?.poolDistributors || [];
-    // Sort by flowRate (descending)
-
     const withDevPoolRate = distributors.reduce((acc, d) => {
-      // const donor = {...d, rate}
       const devRate = devPoleRateList[d.account.id];
       if (devRate) {
         acc.push({
@@ -45,14 +42,14 @@ export default function LeaderboardList({
     return sorted;
   }, [poolData, devPoolList]);
 
-  console.log("sorted 2", sorted);
-
   const handleViewProfile = async (fid?: string) => {
     if (!fid) return;
     await sdk.actions.viewProfile({
       fid: Number(fid),
     });
   };
+
+  if (!poolData) return;
 
   return (
     <div className="w-full max-w-md mx-auto bg-white">
@@ -64,7 +61,7 @@ export default function LeaderboardList({
       </p>
       <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
         <div className="col-span-2">&nbsp;</div>
-        <div className="text-right">USDCx/mo</div>
+        <div className="text-right">{poolData.token.symbol}/mo</div>
         <div className="text-right">Total</div>
       </div>
       <div className="divide-y divide-primary-200 text-black bg-brand-light rounded-lg py-3 mb-24">

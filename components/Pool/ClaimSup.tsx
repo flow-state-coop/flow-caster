@@ -1,11 +1,11 @@
 "use client";
 
-import { useSupPoints } from "@/hooks/use-sup-points";
 import { useAccount } from "wagmi";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { X } from "lucide-react";
-
+import { sdk } from "@farcaster/miniapp-sdk";
+import { useAccountSup } from "@/hooks/use-account-sup";
 import { ratePerMonthFormatted } from "@/lib/pool";
+import BaseButton from "../Shared/BaseButton";
 
 interface ClaimSupProps {
   handleCloseDrawer: () => void;
@@ -13,7 +13,7 @@ interface ClaimSupProps {
 
 export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
   const { address } = useAccount();
-  const { data } = useSupPoints({
+  const { data } = useAccountSup({
     userAddress: address,
   });
 
@@ -49,12 +49,12 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
           </div>
         </div>
       )}
-      <button
-        className="w-full px-4 py-3 rounded-lg bg-brand-sfGreen text-black font-bold"
+      <BaseButton
+        className="bg-brand-sfGreen hover:bg-brand-sfGreen/80"
         onClick={onClaimSup}
       >
         Claim SUP
-      </button>
+      </BaseButton>
     </>
   );
 }

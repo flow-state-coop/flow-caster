@@ -1,7 +1,6 @@
-import { DEFAULT_CHAIN_ID, DEFAULT_POOL_ID } from "@/lib/constants";
-import { NeynarUser } from "@/lib/neynar";
-import { PoolData } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
+import { FEATURED_POOL_DATA, POOL_METADATA } from "@/lib/constants";
+import { PoolData } from "@/lib/types";
 
 interface UsePoolDataOptions {
   chainId: string;
@@ -23,7 +22,10 @@ export const usePoolData = ({
         poolId,
       });
 
-      if (poolId === DEFAULT_POOL_ID && chainId === DEFAULT_CHAIN_ID) {
+      if (
+        poolId === FEATURED_POOL_DATA.DEFAULT_POOL_ID &&
+        chainId === FEATURED_POOL_DATA.DEFAULT_CHAIN_ID
+      ) {
         params.append("isCrackedDevs", "true");
       }
 
@@ -40,11 +42,15 @@ export const usePoolData = ({
     enabled,
   });
 
+  const poolMeta = POOL_METADATA[`${chainId}-${poolId}`];
+
   return {
     data: data,
     poolDistributors: data?.poolDistributors,
     poolMembers: data?.poolMembers,
     activeMemberCount: data?.activeMemberCount,
+    hasSupRewards: poolMeta?.hasSupRewards,
+    isCracked: poolMeta?.isCracked,
     ...rest,
   };
 };

@@ -1,48 +1,48 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Award, Info, Share, House } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { usePoolUser } from "@/contexts/pool-user-context";
+import { ratePerMonthFormatted } from "@/lib/pool";
 import InfoDrawer from "../Pool/InfoDrawer";
 import OpenStream from "../Pool/OpenStream";
-import Link from "next/link";
 import ConnectPool from "../Pool/ConnectPool";
-import { PoolData } from "@/lib/types";
-import { ratePerMonthFormatted } from "@/lib/pool";
 import ClaimSup from "../Pool/ClaimSup";
-import { usePathname } from "next/navigation";
-import Leaderboard from "../Leaderboard";
+import BaseButton from "./BaseButton";
+import { usePoolData } from "@/hooks/use-pool-data";
 
-interface PoolActionsProps {
+interface FooterProps {
   chainId: string;
   poolId: string;
-  shouldConnect?: boolean;
   poolAddress: string;
-  connectedAddressNotPoolAddress: boolean;
-  connectedMember?: PoolData["poolMembers"][0];
   totalFlow: string | number;
-  connectedDonor?: PoolData["poolDistributors"][0];
-  noUnits?: boolean;
   activeMemberCount?: number;
 }
-
 type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
 export default function Footer({
   chainId,
   poolId,
-  shouldConnect,
   poolAddress,
-  connectedAddressNotPoolAddress,
-  connectedMember,
   totalFlow,
-  connectedDonor,
-  noUnits,
   activeMemberCount,
-}: PoolActionsProps) {
+}: FooterProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
+
+  const { isCracked } = usePoolData({ chainId, poolId });
+
+  const {
+    shouldConnect,
+    connectedAddressNotPoolAddress,
+    connectedDonor,
+    connectedMember,
+    noUnits,
+  } = usePoolUser();
 
   useEffect(() => {
     if (shouldConnect) {
@@ -85,8 +85,7 @@ export default function Footer({
         <div className="flex items-center justify-between w-full">
           {/* Buttons */}
           <div className="flex gap-3 text-black">
-            <button
-              className="px-4 py-2 rounded-lg bg-accent-800 text-white font-bold"
+            <BaseButton
               onClick={() =>
                 handleOpenDrawer(
                   connectedDonor && Number(connectedDonor.flowRate) > 0
@@ -99,7 +98,7 @@ export default function Footer({
                 ? "Edit"
                 : "Open"}{" "}
               Stream
-            </button>
+            </BaseButton>
           </div>
 
           {/* Links */}
@@ -140,12 +139,14 @@ export default function Footer({
             >
               <Share size={20} />
             </div>
-            <button
-              className="p-2 text-black hover:text-gray-800"
-              onClick={() => handleOpenDrawer("info")}
-            >
-              <Info size={20} />
-            </button>
+            {isCracked && (
+              <button
+                className="p-2 text-black hover:text-gray-800"
+                onClick={() => handleOpenDrawer("info")}
+              >
+                <Info size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>

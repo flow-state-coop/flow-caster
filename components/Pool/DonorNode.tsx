@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { ArrowRight } from "lucide-react";
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import {
   formatPoolCount,
   ratePerMonthFormatted,
   truncateAddress,
 } from "@/lib/pool";
-import { ArrowRight } from "lucide-react";
 import FlowAmount from "./FlowAmount";
+import "tippy.js/dist/tippy.css";
 
 interface DonorNodeProps {
   x: number;
@@ -27,6 +27,7 @@ interface DonorNodeProps {
   rate?: string;
   startingTimestamp?: string;
   startingAmount?: string;
+  tokenSymbol: string;
 }
 
 export default function DonorNode({
@@ -43,6 +44,7 @@ export default function DonorNode({
   rate,
   startingTimestamp,
   startingAmount,
+  tokenSymbol,
 }: DonorNodeProps) {
   const [showing, setShowing] = useState(false);
 
@@ -115,7 +117,7 @@ export default function DonorNode({
               <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
                 {ratePerMonthFormatted(rate)}
                 <span className="text-xs text-black font-semibold ml-1">
-                  USDCx / mo
+                  {tokenSymbol} / mo
                 </span>
               </div>
 

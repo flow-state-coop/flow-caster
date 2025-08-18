@@ -1,7 +1,7 @@
 "use client";
 
-import useFlowingAmount from "@/hooks/use-flowing-amount";
 import { formatEther } from "viem";
+import useFlowingAmount from "@/hooks/use-flowing-amount";
 
 interface FlowAmountProps {
   startingAmount: bigint;

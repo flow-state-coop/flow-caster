@@ -2,15 +2,15 @@
 "use client";
 import { useRef, useState } from "react";
 import { NeynarUser } from "@/lib/neynar";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { ArrowRight } from "lucide-react";
+import Tippy from "@tippyjs/react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
   truncateAddress,
 } from "@/lib/pool";
+import "tippy.js/dist/tippy.css";
 
 interface RecipientNodeProps {
   x: number;
@@ -22,6 +22,7 @@ interface RecipientNodeProps {
   totalFlowRate: number;
   farcasterUser?: NeynarUser | null | undefined;
   connected: boolean;
+  tokenSymbol: string;
 }
 
 export default function RecipientNode({
@@ -34,6 +35,7 @@ export default function RecipientNode({
   totalFlowRate,
   farcasterUser,
   connected,
+  tokenSymbol,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
@@ -81,7 +83,7 @@ export default function RecipientNode({
               <div className="font-bold text-xl text-accent-800 leading-tight">
                 {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
                 <span className="text-xs text-black font-semibold">
-                  USDCx / mo
+                  {tokenSymbol} / mo
                 </span>
               </div>
 

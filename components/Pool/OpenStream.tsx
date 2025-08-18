@@ -1,9 +1,8 @@
 "use client";
 
-import { usePoolData } from "@/hooks/use-pool-data";
-import { DEV_POOL_ADDRESS, DEV_POOL_ID, TOKEN_DATA } from "@/lib/constants";
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
+import { encodeFunctionData, formatUnits, parseEther, parseUnits } from "viem";
 import sdk from "@farcaster/miniapp-sdk";
 import {
   useAccount,
@@ -14,29 +13,33 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
-
+import { superTokenAbi } from "@sfpro/sdk/abi";
+import erc20Abi from "@/lib/abi/erc20.json";
+import hostAbi from "@/lib/abi/sfHost.json";
+import gdaAbi from "@/lib/abi/gdaV1.json";
+import { useUser } from "@/contexts/user-context";
+import { usePoolData } from "@/hooks/use-pool-data";
+import {
+  DEV_DONATION_PERCENT,
+  FEATURED_POOL_DATA,
+  TOKEN_DATA,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
 import {
   Operation,
   OPERATION_TYPE,
   prepareOperation,
 } from "@sfpro/sdk/constant";
-
-import { superTokenAbi } from "@sfpro/sdk/abi";
-import erc20Abi from "@/lib/abi/erc20.json";
-import hostAbi from "@/lib/abi/sfHost.json";
-import gdaAbi from "@/lib/abi/gdaV1.json";
-
 import {
   calculateFlowratePerSecond,
   ratePerMonthFormattedNoLocale,
   TIME_UNIT,
   truncateString,
 } from "@/lib/pool";
-import { encodeFunctionData, formatUnits, parseEther, parseUnits } from "viem";
 import { networks } from "@/lib/flowapp/networks";
-import { ArrowRight } from "lucide-react";
-import { useUser } from "@/contexts/user-context";
 import { PoolData } from "@/lib/types";
+import { openExplorerUrl } from "@/lib/helpers";
+import BaseButton from "../Shared/BaseButton";
 
 interface OpenStreamProps {
   chainId: string;
@@ -70,6 +73,8 @@ export default function OpenStream({
   const [currentDevDonor, setCurrentDevDonor] = useState(false);
 
   const { address, isConnected, chainId: connectedChainId } = useAccount();
+  const { connect, connectors } = useConnect();
+  const { user } = useUser();
   const { switchChain } = useSwitchChain();
   const { refetch } = usePoolData({
     chainId,
@@ -77,11 +82,8 @@ export default function OpenStream({
   });
   const { data: devPoolData } = usePoolData({
     chainId,
-    poolId: DEV_POOL_ID,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
-
-  const { connect, connectors } = useConnect();
-  const { user } = useUser();
 
   const {
     writeContract: approve,
@@ -104,13 +106,12 @@ export default function OpenStream({
     });
 
   const tokenData = TOKEN_DATA[chainId];
-  const devDonationPercent = 5;
 
   // Fetch SuperToken balance
   const { data: superTokenBalance } = useReadSuperToken({
     address: tokenData.address,
     functionName: "balanceOf",
-    args: [address || "0x0000000000000000000000000000000000000000"],
+    args: [address || ZERO_ADDRESS],
   });
 
   // Fetch underlying token balance
@@ -118,7 +119,7 @@ export default function OpenStream({
     address: tokenData.underlyingAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "balanceOf",
-    args: [address || "0x0000000000000000000000000000000000000000"],
+    args: [address || ZERO_ADDRESS],
   }) as { data: bigint | undefined };
 
   // Fetch underlying token allowance for SuperToken contract
@@ -126,16 +127,12 @@ export default function OpenStream({
     address: tokenData.underlyingAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "allowance",
-    args: [
-      address || "0x0000000000000000000000000000000000000000",
-      tokenData.address,
-    ],
+    args: [address || ZERO_ADDRESS, tokenData.address],
   }) as { data: bigint | undefined };
 
   const userBalance = superTokenBalance
     ? Number(formatUnits(superTokenBalance, 18))
     : 0;
-
   const usdcBalance = underlyingBalance
     ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals))
     : 0;
@@ -158,25 +155,16 @@ export default function OpenStream({
   useEffect(() => {
     if (!connectedDonor || !address || !devPoolData || !isOpen) return;
 
-    console.log("setting defaults");
-    console.log("connectedDonor", connectedDonor);
-    console.log("address", address);
-    console.log("devPoolData", devPoolData);
-
     const donor = devPoolData.poolDistributors.find((d) => {
       return d.account.id.toLowerCase() === address.toLowerCase();
     });
-
     setCurrentDevDonor(!!donor);
     setDonateToDevs(!!donor);
 
     const totalFlowRate = donor
       ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
       : connectedDonor.flowRate;
-
     const rate = ratePerMonthFormattedNoLocale(totalFlowRate);
-
-    console.log("setting rate", rate);
     setCurrentMonthlyRate(rate);
     setMonthlyDonation(rate);
   }, [connectedDonor, devPoolData, address, isOpen]);
@@ -224,7 +212,6 @@ export default function OpenStream({
           onSuccess: () => {
             console.log("Approval transaction sent successfully");
             // The approval will be handled by the useWaitForTransactionReceipt hook
-            // setIsConfirming(false);
           },
           onError: (error) => {
             console.error("Approval failed:", error);
@@ -240,7 +227,7 @@ export default function OpenStream({
     }
   };
 
-  // Function to handle the main transaction after approval
+  // Step 2: Handle main transaction after approval
   const proceedWithMainTransaction = async (cancel?: boolean) => {
     setIsSuccess(false);
     setIsLoading(false);
@@ -253,13 +240,8 @@ export default function OpenStream({
       return;
     }
 
-    console.log("setting up batch for wrapAmountValue", wrapAmount);
-    console.log("and monthlyDonation", monthlyDonation);
-
     let operations: Operation[] = [];
-
     const _wrapAmount = cancel ? "0" : wrapAmount;
-
     const wrapAmountValue = parseEther(_wrapAmount);
 
     if (wrapAmountValue > 0) {
@@ -282,28 +264,20 @@ export default function OpenStream({
       cancel || monthlyDonation === "" ? "0" : monthlyDonation;
     let poolMonthlyDonation = parseFloat(_monthlyDonation);
 
-    console.log("poolMonthlyDonation", poolMonthlyDonation);
-    console.log("currentDevDonor", currentDevDonor);
-
     const zeroOutDevDonation =
       (poolMonthlyDonation == 0 && currentDevDonor) ||
       (currentDevDonor && !donateToDevs);
 
-    console.log("zeroOutDevDonation", zeroOutDevDonation);
-
     if (donateToDevs || zeroOutDevDonation) {
-      console.log("adding dev donation");
       const devMonthlyDonation = zeroOutDevDonation
         ? 0
-        : parseFloat(_monthlyDonation) * (devDonationPercent / 100);
+        : parseFloat(_monthlyDonation) * (DEV_DONATION_PERCENT / 100);
       poolMonthlyDonation = parseFloat(_monthlyDonation) - devMonthlyDonation;
 
       const devFlowRate = calculateFlowratePerSecond({
         amountWei: parseEther(devMonthlyDonation.toString()),
         timeUnit: TIME_UNIT["month"],
       });
-
-      console.log("devFlowRate", devFlowRate);
 
       operations = [
         ...operations,
@@ -316,7 +290,7 @@ export default function OpenStream({
             args: [
               tokenData.address,
               address,
-              DEV_POOL_ADDRESS as `0x${string}`,
+              FEATURED_POOL_DATA.DEV_POOL_ADDRESS as `0x${string}`,
               devFlowRate,
               "0x",
             ],
@@ -329,8 +303,6 @@ export default function OpenStream({
       amountWei: parseEther(poolMonthlyDonation.toString()),
       timeUnit: TIME_UNIT["month"],
     });
-
-    console.log("adding main donation poolFlowRate", poolFlowRate);
 
     operations = [
       ...operations,
@@ -360,7 +332,6 @@ export default function OpenStream({
       },
       {
         onSuccess: () => {
-          // setIsConfirming(false);
           console.log("batch transaction sent successfully");
           // The approval will be handled by the useWaitForTransactionReceipt hook
         },
@@ -389,11 +360,6 @@ export default function OpenStream({
   // Monitor batch transaction completion
   useEffect(() => {
     if (isBatchSuccess && isBatchConfirming === false) {
-      console.log(
-        "Batch transaction confirmed, monthlyDonation",
-        monthlyDonation
-      );
-
       if (Number(monthlyDonation) > 99) {
         const options = {
           method: "POST",
@@ -408,10 +374,7 @@ export default function OpenStream({
         fetch(`/api/notify-donation`, options);
       }
 
-      console.log("Delaying");
       setTimeout(() => {
-        console.log("Delayed for 4 seconds.");
-
         setIsConfirming(false);
         setIsSuccess(true);
         refetch();
@@ -419,10 +382,6 @@ export default function OpenStream({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBatchSuccess, isBatchConfirming]);
-
-  const openExplorerUrl = (hash: string) => {
-    sdk.actions.openUrl(`https://basescan.org/tx/${hash}`);
-  };
 
   const handleCast = async () => {
     let targetUrl = `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?flowRate=${monthlyDonationAmount}`;
@@ -463,23 +422,6 @@ export default function OpenStream({
       return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}.`;
     if (connectedDonor) return "Edit Stream";
     return "Open Stream";
-  };
-
-  const getButtonClass = () => {
-    const baseClass =
-      "w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors";
-
-    if (
-      isLoading ||
-      isConfirming ||
-      isApprovalConfirming ||
-      isSuccess ||
-      isButtonDisabled
-    ) {
-      return `${baseClass} bg-gray-400 text-gray-700 cursor-not-allowed`;
-    }
-
-    return `${baseClass} bg-accent-800 hover:bg-accent-600`;
   };
 
   const getDrawerTitle = () => {
@@ -536,7 +478,6 @@ export default function OpenStream({
                 </p>
               </div>
 
-              {/* Wrap for USDCx */}
               <div>
                 <label
                   htmlFor="wrapAmount"
@@ -670,19 +611,17 @@ export default function OpenStream({
               )}
 
               {!isConnected && (
-                <button
+                <BaseButton
                   onClick={() => connect({ connector: connectors[0] })}
-                  className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
                 >
                   Connect Wallet
-                </button>
+                </BaseButton>
               )}
 
               {isConnected && (
                 <>
-                  <button
+                  <BaseButton
                     type="submit"
-                    className={getButtonClass()}
                     disabled={
                       isLoading ||
                       isConfirming ||
@@ -692,7 +631,7 @@ export default function OpenStream({
                     }
                   >
                     {getButtonText()}
-                  </button>
+                  </BaseButton>
                   {connectedDonor && (
                     <button
                       type="button"
@@ -726,13 +665,9 @@ export default function OpenStream({
                 Cast about it to help grow the flow.
               </p>
 
-              <button
-                onClick={handleCast}
-                type="button"
-                className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
-              >
+              <BaseButton onClick={handleCast} type="button">
                 Cast
-              </button>
+              </BaseButton>
             </>
           )}
 

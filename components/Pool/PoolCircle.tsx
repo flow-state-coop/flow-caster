@@ -1,22 +1,19 @@
 "use client";
 import { useMemo, useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import * as d3 from "d3";
-import RecipientNode from "./RecipientNode";
-import DonorNode from "./DonorNode";
-import FlowLine from "./Flowline";
 import gsap from "gsap";
+import { Crown } from "lucide-react";
+import { usePoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
 import { createDonorBuckets } from "@/lib/pool";
-import { Crown } from "lucide-react";
-import { PoolData } from "@/lib/types";
+import { FEATURED_POOL_DATA, VIZ_PAUSED } from "@/lib/constants";
+import RecipientNode from "./RecipientNode";
+import DonorNode from "./DonorNode";
 import DonorStats from "./DonorStats";
-import { VIZ_PAUSED } from "@/lib/constants";
-import Link from "next/link";
+import FlowLine from "./Flowline";
 
 interface PoolCircleProps {
-  poolData: PoolData;
-  poolDistributors: PoolData["poolDistributors"];
-  devPoolistributors: PoolData["poolDistributors"];
   connectedUser: NeynarUser | null | undefined;
   connectedAddress?: `0x${string}`;
   chainId: string;
@@ -32,9 +29,6 @@ interface PoolDonor {
 }
 
 export default function PoolCircle({
-  poolData,
-  devPoolistributors,
-  poolDistributors,
   connectedUser,
   connectedAddress,
   chainId,
@@ -48,10 +42,24 @@ export default function PoolCircle({
   const [donors, setDonors] = useState<PoolDonor[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
 
+  const {
+    poolDistributors,
+    poolMembers,
+    data: poolData,
+  } = usePoolData({
+    chainId: chainId,
+    poolId: poolId,
+  });
+
+  const { poolDistributors: devPoolistributors } = usePoolData({
+    chainId,
+    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+  });
+
   // Transform pool data to component format
   const recipients = useMemo(() => {
-    if (!poolData) return [];
-    const formattedRecipients = poolData.poolMembers.map((member) => ({
+    if (!poolMembers) return [];
+    const formattedRecipients = poolMembers.map((member) => ({
       accountId: member.account.id,
       units: parseInt(member.units),
       startingAmount: member.poolTotalAmountDistributedUntilUpdatedAt,
@@ -60,13 +68,11 @@ export default function PoolCircle({
       connected: member.isConnected,
     }));
 
-    console.log("**** formattedRecipients", formattedRecipients);
-
     return formattedRecipients;
-  }, [poolData]);
+  }, [poolMembers]);
 
   useEffect(() => {
-    if (!poolData || !poolDistributors) return;
+    if (!devPoolistributors || !poolDistributors) return;
 
     const formattedDonors = createDonorBuckets(
       poolDistributors,
@@ -74,11 +80,11 @@ export default function PoolCircle({
       connectedAddress
     );
 
-    console.log("**** formattedDonors", formattedDonors);
     setDonors(formattedDonors);
-  }, [poolData, poolDistributors, devPoolistributors, connectedAddress]);
+  }, [poolDistributors, devPoolistributors, connectedAddress]);
 
   useEffect(() => {
+    if (!poolData) return;
     // Calculate sizes first
     const poolArea = Math.PI * radius * radius;
     const availableArea = poolArea * 0.95; // Use 80% of pool area for recipients
@@ -369,6 +375,7 @@ export default function PoolCircle({
                   connectedUserFallback={
                     isUserDonor ? connectedUser : undefined
                   }
+                  tokenSymbol={poolData.token.symbol}
                 />
               )}
 
@@ -389,6 +396,7 @@ export default function PoolCircle({
                   rate={donor?.rate}
                   startingAmount={donor?.startingAmount}
                   startingTimestamp={donor?.startingTimestamp}
+                  tokenSymbol={poolData.token.symbol}
                 />
               )}
 
@@ -407,6 +415,7 @@ export default function PoolCircle({
                     connectedUserFallback={
                       isUserDonor ? connectedUser : undefined
                     }
+                    tokenSymbol={poolData.token.symbol}
                   />
                 </Link>
               )}
@@ -426,6 +435,7 @@ export default function PoolCircle({
             farcasterUser={recipient.farcasterUser}
             totalFlowRate={Number(poolData.flowRate)}
             connected={recipient.connected}
+            tokenSymbol={poolData.token.symbol}
           />
         ))}
         {/* Pool circle particles */}
@@ -482,6 +492,7 @@ export default function PoolCircle({
               startingTimestamp={poolData.updatedAtTimestamp}
               startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}
               donorAddress={donor.accountId}
+              tokenSymbol={poolData.token.symbol}
             />
           );
         })}

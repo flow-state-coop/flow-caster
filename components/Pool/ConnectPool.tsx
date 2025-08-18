@@ -1,7 +1,6 @@
 "use client";
 
-import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
-import { networks } from "@/lib/flowapp/networks";
+import { useCallback, useEffect, useState } from "react";
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -9,11 +8,24 @@ import {
   useAccount,
   useConnect,
 } from "wagmi";
-import { useCallback, useEffect, useState } from "react";
 import sdk from "@farcaster/miniapp-sdk";
-import { usePoolData } from "@/hooks/use-pool-data";
-import { PoolData } from "@/lib/types";
 import { ArrowRight, CircleCheck, LoaderCircle, X } from "lucide-react";
+import { usePoolData } from "@/hooks/use-pool-data";
+import { gdaForwarderAbi } from "@/lib/abi/gdaForwarder";
+import { networks } from "@/lib/flowapp/networks";
+import { PoolData } from "@/lib/types";
+import BaseButton from "../Shared/BaseButton";
+
+interface ConnectPoolProps {
+  poolAddress: string;
+  chainId: string;
+  poolId: string;
+  connectedAddressNotPoolAddress: boolean;
+  connectedMember: PoolData["poolMembers"][0];
+  handleCloseDrawer: () => void;
+  noUnits?: boolean;
+  shouldConnect?: boolean;
+}
 
 export default function ConnectPool({
   poolAddress,
@@ -24,16 +36,7 @@ export default function ConnectPool({
   handleCloseDrawer,
   noUnits,
   shouldConnect,
-}: {
-  poolAddress: string;
-  chainId: string;
-  poolId: string;
-  connectedAddressNotPoolAddress: boolean;
-  connectedMember: PoolData["poolMembers"][0];
-  handleCloseDrawer: () => void;
-  noUnits?: boolean;
-  shouldConnect?: boolean;
-}) {
+}: ConnectPoolProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +47,7 @@ export default function ConnectPool({
   const [isAddingMember, setIsAddingMember] = useState(false);
   const { address, isConnected, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
-  const { refetch } = usePoolData({
+  const { data: poolData, refetch } = usePoolData({
     chainId,
     poolId,
   });
@@ -174,17 +177,6 @@ export default function ConnectPool({
     return "Connect to Pool";
   };
 
-  const getButtonClass = () => {
-    const baseClass =
-      "w-1/2 px-4 py-3 rounded-lg text-white text-bold text-sm font-bold transition-colors";
-
-    if (isLoading || isConfirming || isSuccess) {
-      return `${baseClass} bg-gray-400 text-white cursor-not-allowed`;
-    }
-
-    return `${baseClass} bg-accent-800 text-white hover:bg-accent-600`;
-  };
-
   return (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -241,7 +233,8 @@ export default function ConnectPool({
 
       {isSuccess && (
         <div className="mb-4 p-3 text-lg font-bold text-primary-500 bg-primary-100 border border-primary-500 rounded break-words">
-          Successfully connected to pool! USDCx is streaming to your wallet.
+          Successfully connected to pool! {poolData?.token.symbol} is streaming
+          to your wallet.
         </div>
       )}
 
@@ -267,24 +260,17 @@ export default function ConnectPool({
       )}
 
       {!isConnected && (
-        <button
-          onClick={() => connect({ connector: connectors[0] })}
-          className="w-full px-4 py-3 rounded-lg text-white font-medium text-xl transition-colors bg-accent-800 hover:bg-accent-600"
-        >
+        <BaseButton onClick={() => connect({ connector: connectors[0] })}>
           Connect Wallet
-        </button>
+        </BaseButton>
       )}
 
       {noUnits ? (
         <>
           {isConnected && !connectedAddressNotPoolAddress && (
             <div className="flex flex-row gap-5">
-              <button
-                className={`w-1/2 px-4 py-3 rounded-lg text-white font-bold text-sm transition-colors bg-accent-800 text-white hover:bg-accent-600 ${
-                  shareComplete || isConfirmingAdd || isAddingMember
-                    ? "bg-gray-400 text-white cursor-not-allowed transition-none hover:bg-gray-400"
-                    : ""
-                }`}
+              <BaseButton
+                className="w-1/2"
                 onClick={handleShare}
                 disabled={shareComplete || isConfirmingAdd || isAddingMember}
               >
@@ -301,19 +287,15 @@ export default function ConnectPool({
                     ? "Adding Member..."
                     : "Share"}
                 </div>
-              </button>
+              </BaseButton>
               {shouldConnect && (
-                <button
-                  className={`w-1/2 px-4 py-3 rounded-lg text-white font-bold text-sm transition-colors bg-accent-800 text-white hover:bg-accent-600 ${
-                    !shareComplete
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : ""
-                  }`}
+                <BaseButton
+                  className="w-1/2"
                   onClick={onConnectPool}
                   disabled={isLoading || isConfirming || isSuccess}
                 >
                   {getButtonText()}
-                </button>
+                </BaseButton>
               )}
             </div>
           )}
@@ -321,13 +303,12 @@ export default function ConnectPool({
       ) : (
         <>
           {isConnected && !connectedAddressNotPoolAddress && (
-            <button
-              className={getButtonClass()}
+            <BaseButton
               onClick={onConnectPool}
               disabled={isLoading || isConfirming || isSuccess}
             >
               {getButtonText()}
-            </button>
+            </BaseButton>
           )}
         </>
       )}

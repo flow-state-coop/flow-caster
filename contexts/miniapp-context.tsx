@@ -1,7 +1,5 @@
 "use client";
-import { AddMiniAppResult } from "@farcaster/miniapp-core/dist/actions/AddMiniApp";
-import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
-import { sdk } from "@farcaster/miniapp-sdk";
+
 import {
   createContext,
   useCallback,
@@ -10,6 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { AddMiniAppResult } from "@farcaster/miniapp-core/dist/actions/AddMiniApp";
+import { MiniAppContext } from "@farcaster/miniapp-core/dist/context";
+import { sdk } from "@farcaster/miniapp-sdk";
 import MiniAppWalletProvider from "./miniapp-wallet-context";
 
 interface MiniAppContextType {

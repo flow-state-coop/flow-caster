@@ -1,8 +1,3 @@
-import { useApiMutation } from "@/hooks/use-api-mutation";
-import { useApiQuery } from "@/hooks/use-api-query";
-import { NeynarUser } from "@/lib/neynar";
-import sdk from "@farcaster/miniapp-sdk";
-import { QueryObserverResult } from "@tanstack/react-query";
 import {
   createContext,
   ReactNode,
@@ -12,7 +7,12 @@ import {
   useMemo,
   useState,
 } from "react";
+import { QueryObserverResult } from "@tanstack/react-query";
+import sdk from "@farcaster/miniapp-sdk";
 import { useMiniApp } from "./miniapp-context";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { useApiQuery } from "@/hooks/use-api-query";
+import { NeynarUser } from "@/lib/neynar";
 
 const UserProviderContext = createContext<
   | {

@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
-import { env } from "@/lib/env";
 import { Metadata } from "next";
+import { env } from "@/lib/env";
+import Spinner from "@/components/Shared/Spinner";
 
 const appUrl = env.NEXT_PUBLIC_URL;
 
@@ -46,7 +47,7 @@ export async function generateMetadata({
 
 const HomePage = dynamic(() => import("@/components/Home"), {
   ssr: false,
-  loading: () => <div>Loading...</div>,
+  loading: () => <Spinner />,
 });
 
 export default function Home() {

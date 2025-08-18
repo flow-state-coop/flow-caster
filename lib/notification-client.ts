@@ -1,12 +1,12 @@
 import {
-  getAllUserNotificationDetails,
-  getUserNotificationDetails,
-} from "@/lib/notifications";
-import {
   MiniAppNotificationDetails,
   type SendNotificationRequest,
   sendNotificationResponseSchema,
 } from "@farcaster/miniapp-sdk";
+import {
+  getAllUserNotificationDetails,
+  getUserNotificationDetails,
+} from "@/lib/notifications";
 import { env } from "./env";
 
 const appUrl = env.NEXT_PUBLIC_URL || "";
