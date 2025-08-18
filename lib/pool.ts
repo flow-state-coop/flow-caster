@@ -1,4 +1,3 @@
-import { NeynarUser } from "./neynar";
 import { formatEther } from "viem";
 import { PoolData } from "./types";
 
