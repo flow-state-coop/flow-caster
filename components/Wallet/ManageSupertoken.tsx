@@ -17,6 +17,7 @@ import erc20Abi from "@/lib/abi/erc20.json";
 import { superTokenAbi } from "@sfpro/sdk/abi";
 import { openExplorerUrl } from "@/lib/helpers";
 import BaseButton from "../Shared/BaseButton";
+import { truncateString } from "@/lib/pool";
 
 interface ManageSupertokenProps {
   address: `0x${string}`;
