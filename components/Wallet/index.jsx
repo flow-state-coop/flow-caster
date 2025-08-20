@@ -56,25 +56,27 @@ export default function Wallet() {
           <h2 className="text-2xl text-primary-500 font-bold mb-5">
             Manage Super Token Balance
           </h2>
-          <div className="min-h-72">
-            <ManageSupertoken address={address} />
-          </div>
-          <div className="bg-primary-100 border border-primary-400 px-4 py-3 rounded-lg mt-8">
-            <button
-              onClick={() => openUrl("https://app.superfluid.org/")}
-              className="flex flew-row items-center gap-1 text-sm text-primary-500 hover:text-primary-300"
-            >
-              Access the Superfluid App for more features{" "}
-              <ArrowRight className="w-4 h-4" />
-            </button>
+          <div className="flex flex-col h-[calc(100vh-175px)] justify-between">
+            <div className="min-h-72 px-4 py-3 bg-primary-100 border border-primary-500 rounded-lg">
+              <ManageSupertoken address={address} />
+            </div>
+            <div className="bg-primary-100 border border-primary-400 px-4 py-3 rounded-lg">
+              <button
+                onClick={() => openUrl("https://app.superfluid.org/")}
+                className="flex flew-row items-center gap-1 text-sm text-primary-500 hover:text-primary-300"
+              >
+                Access the Superfluid App for more features{" "}
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-            <button
-              onClick={() => openUrl("https://app.superboring.xyz/en")}
-              className="flex flew-row items-center gap-1 mt-2 text-sm text-primary-500 hover:text-primary-300"
-            >
-              Consider opening a streaming DCA with your USDC{" "}
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              <button
+                onClick={() => openUrl("https://app.superboring.xyz/en")}
+                className="flex flew-row items-center gap-1 mt-2 text-sm text-primary-500 hover:text-primary-300"
+              >
+                Consider opening a streaming DCA with your USDC{" "}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 

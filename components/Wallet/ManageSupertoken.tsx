@@ -233,28 +233,29 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     if (isSuccess) return "Success!";
     if (isAmountEmpty) return `Enter ${isWrapping ? "wrap" : "unwrap"} amount`;
     if (isInsufficientBalance) {
-      const balance = isWrapping
-        ? userUnderlyingBalance
-        : userSuperTokenBalance;
       const symbol = isWrapping ? tokenData.underlyingSymbol : tokenData.symbol;
-      return `${symbol} balance too low (${balance.toFixed(2)})`;
+      return `${symbol} balance too low`;
     }
     return isWrapping ? "Wrap Tokens" : "Unwrap Tokens";
   };
 
-  const getCurrentBalance = () => {
+  const getCurrentBalance = (toggle?: boolean) => {
+    if (toggle)
+      return isWrapping ? userSuperTokenBalance : userUnderlyingBalance;
     return isWrapping ? userUnderlyingBalance : userSuperTokenBalance;
   };
 
-  const getBalanceSymbol = () => {
+  const getBalanceSymbol = (toggle?: boolean) => {
+    if (toggle)
+      return isWrapping ? tokenData.symbol : tokenData.underlyingSymbol;
     return isWrapping ? tokenData.underlyingSymbol : tokenData.symbol;
   };
 
   return (
     <div className="text-black max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Toggle between wrap/unwrap */}
-        <div className="flex bg-primary-100 rounded-lg p-1">
+        <div className="flex bg-primary-200 rounded-lg p-1">
           <button
             type="button"
             onClick={() => {
@@ -297,6 +298,21 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
           </button>
         </div>
 
+        <div className="flex flex-row justify-between flex-wrap text-xs text-primary-800">
+          <p className="mt-2 font-bold">
+            {tokenData.underlyingSymbol} balance:{" "}
+            {userUnderlyingBalance?.toLocaleString("en-US", {
+              maximumFractionDigits: 4,
+            })}
+          </p>
+          <p className="mt-2 font-bold">
+            {tokenData.symbol} balance:{" "}
+            {userSuperTokenBalance.toLocaleString("en-US", {
+              maximumFractionDigits: 4,
+            })}
+          </p>
+        </div>
+
         {/* Amount input */}
         <div>
           <label
@@ -321,12 +337,6 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
               </span>
             </div>
           </div>
-          <p className="mt-2 text-xs text-primary-700">
-            {getBalanceSymbol()} balance:{" "}
-            {getCurrentBalance().toLocaleString("en-US", {
-              maximumFractionDigits: 2,
-            })}
-          </p>
         </div>
 
         {/* Approval notice for wrapping */}
