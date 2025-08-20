@@ -124,14 +124,14 @@ export default function Footer({
               <Award size={20} />
             </Link>
 
-            <Link
+            {/* <Link
               href={`/wallet`}
               className={`p-2 text-black hover:text-gray-800 ${
                 pathname.includes("wallet") && "border-b border-black"
               }`}
             >
               <LucideWallet size={20} />
-            </Link>
+            </Link> */}
             <button
               className="p-2 text-black hover:text-gray-800"
               onClick={() => handleOpenDrawer("claim")}
