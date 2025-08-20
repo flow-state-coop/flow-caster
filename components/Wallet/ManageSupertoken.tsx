@@ -374,10 +374,9 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
         {error && (
           <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-            {error}
+            {truncateString(error, 50)}
           </div>
         )}
-
         <div>
           {/* Transaction hashes */}
           {approvalHash && (
