@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Award, Info, Share, House } from "lucide-react";
+import { Award, Info, Share, House, LucideWallet } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { usePoolUser } from "@/contexts/pool-user-context";
 import { ratePerMonthFormatted } from "@/lib/pool";
@@ -76,7 +76,8 @@ export default function Footer({
     });
   };
 
-  const isLeaderboard = pathname.includes("leaderboard");
+  const isHome =
+    !pathname.includes("wallet") && !pathname.includes("leaderboard");
 
   return (
     <>
@@ -85,41 +86,52 @@ export default function Footer({
         <div className="flex items-center justify-between w-full">
           {/* Buttons */}
           <div className="flex gap-3 text-black">
-            <BaseButton
-              onClick={() =>
-                handleOpenDrawer(
-                  connectedDonor && Number(connectedDonor.flowRate) > 0
-                    ? "edit"
-                    : "stream"
-                )
-              }
-            >
-              {connectedDonor && Number(connectedDonor.flowRate) > 0
-                ? "Edit"
-                : "Open"}{" "}
-              Stream
-            </BaseButton>
+            {!pathname.includes("wallet") && (
+              <BaseButton
+                onClick={() =>
+                  handleOpenDrawer(
+                    connectedDonor && Number(connectedDonor.flowRate) > 0
+                      ? "edit"
+                      : "stream"
+                  )
+                }
+              >
+                {connectedDonor && Number(connectedDonor.flowRate) > 0
+                  ? "Edit"
+                  : "Open"}{" "}
+                Stream
+              </BaseButton>
+            )}
           </div>
 
           {/* Links */}
           <div className="flex items-center">
-            {!isLeaderboard && (
-              <Link
-                href={`/pool/${chainId}/${poolId}/leaderboard`}
-                className="p-2 text-black hover:text-gray-800"
-              >
-                <Award size={20} />
-              </Link>
-            )}
+            <Link
+              href={`/pool/${chainId}/${poolId}`}
+              className={`p-2 text-black hover:text-gray-800 ${
+                isHome && "border-b border-black"
+              }`}
+            >
+              <House size={20} />
+            </Link>
 
-            {isLeaderboard && (
-              <Link
-                href={`/pool/${chainId}/${poolId}`}
-                className="p-2 text-black hover:text-gray-800"
-              >
-                <House size={20} />
-              </Link>
-            )}
+            <Link
+              href={`/pool/${chainId}/${poolId}/leaderboard`}
+              className={`p-2 text-black hover:text-gray-800 ${
+                pathname.includes("leaderboard") && "border-b border-black"
+              }`}
+            >
+              <Award size={20} />
+            </Link>
+
+            <Link
+              href={`/wallet`}
+              className={`p-2 text-black hover:text-gray-800 ${
+                pathname.includes("wallet") && "border-b border-black"
+              }`}
+            >
+              <LucideWallet size={20} />
+            </Link>
             <button
               className="p-2 text-black hover:text-gray-800"
               onClick={() => handleOpenDrawer("claim")}

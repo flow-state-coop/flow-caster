@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     if (!network || !chainId || !poolId) {
       throw Error("Missing ChainId, PoolId or Network");
     }
+
     const flowUrl = network.flowSplitterSubgraph;
     const sfUrl = network.superfluidSubgraph;
     const flowClient = new GraphQLClient(flowUrl);
