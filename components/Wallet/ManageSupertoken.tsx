@@ -7,6 +7,9 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
+  useAccount,
+  useConnect,
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
 import { FEATURED_POOL_DATA, TOKEN_DATA, ZERO_ADDRESS } from "@/lib/constants";
@@ -14,6 +17,7 @@ import erc20Abi from "@/lib/abi/erc20.json";
 import { superTokenAbi } from "@sfpro/sdk/abi";
 import { openExplorerUrl } from "@/lib/helpers";
 import BaseButton from "../Shared/BaseButton";
+import { truncateString } from "@/lib/pool";
 
 interface ManageSupertokenProps {
   address: `0x${string}`;
@@ -26,6 +30,9 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isWrapping, setIsWrapping] = useState(true); // true = wrap, false = unwrap
   const [amount, setAmount] = useState<string>("");
+  const { switchChain } = useSwitchChain();
+  const { isConnected, chainId: connectedChainId } = useAccount();
+  const { connect, connectors } = useConnect();
 
   const {
     writeContract: approve,
@@ -93,6 +100,13 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
     if (!address) {
       setError("Please connect your wallet");
+      return;
+    }
+
+    if (connectedChainId !== Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID)) {
+      await switchChain({
+        chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
+      });
       return;
     }
 
@@ -361,10 +375,9 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
         {error && (
           <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-            {error}
+            {truncateString(error, 50)}
           </div>
         )}
-
         <div>
           {/* Transaction hashes */}
           {approvalHash && (
@@ -387,19 +400,30 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
           )}
         </div>
 
-        <BaseButton
-          type="submit"
-          disabled={
-            isLoading ||
-            isConfirming ||
-            isApprovalConfirming ||
-            isTxConfirming ||
-            isSuccess ||
-            isButtonDisabled
-          }
-        >
-          {getButtonText()}
-        </BaseButton>
+        {!isConnected && (
+          <BaseButton
+            type="button"
+            onClick={() => connect({ connector: connectors[0] })}
+          >
+            Connect Wallet
+          </BaseButton>
+        )}
+
+        {isConnected && (
+          <BaseButton
+            type="submit"
+            disabled={
+              isLoading ||
+              isConfirming ||
+              isApprovalConfirming ||
+              isTxConfirming ||
+              isSuccess ||
+              isButtonDisabled
+            }
+          >
+            {getButtonText()}
+          </BaseButton>
+        )}
       </form>
 
       {isSuccess && (
