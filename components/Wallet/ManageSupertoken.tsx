@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ArrowRight, X } from "lucide-react";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, parseEther, parseUnits } from "viem";
 import {
   useReadContract,
   useWriteContract,
@@ -122,7 +122,8 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
     if (isWrapping) {
       // Handle wrapping (upgrading)
-      const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals);
+      // const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals);
+      const wrapAmount = parseEther(amount);
       const currentAllowance = Number(underlyingAllowance) || 0;
 
       // Check if approval is needed
@@ -225,6 +226,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
         setIsSuccess(true);
         setAmount("");
         refetchSuperTokenBal();
+        resetForm();
       }, 2000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,12 +253,6 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       return `${symbol} balance too low`;
     }
     return isWrapping ? "Wrap Tokens" : "Unwrap Tokens";
-  };
-
-  const getCurrentBalance = (toggle?: boolean) => {
-    if (toggle)
-      return isWrapping ? userSuperTokenBalance : userUnderlyingBalance;
-    return isWrapping ? userUnderlyingBalance : userSuperTokenBalance;
   };
 
   const getBalanceSymbol = (toggle?: boolean) => {
