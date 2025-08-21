@@ -218,8 +218,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   useEffect(() => {
     if (isApprovalSuccess && isApprovalConfirming === false) {
       console.log("Approval transaction confirmed, proceeding with upgrade");
-      setIsConfirming(false);
-      proceedWithUpgrade();
+      setTimeout(() => {
+        setIsConfirming(false);
+        proceedWithUpgrade();
+      }, 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isApprovalSuccess, isApprovalConfirming]);
