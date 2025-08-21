@@ -85,7 +85,7 @@ export default function Footer({
       <div className="fixed bottom-0 left-0 right-0 bg-primary-500 px-4 py-3 z-50">
         <div className="flex items-center justify-between w-full">
           {/* Buttons */}
-          <div className="flex gap-3 text-black">
+          <div className="flex text-black">
             {!pathname.includes("wallet") && (
               <BaseButton
                 onClick={() =>
@@ -124,14 +124,14 @@ export default function Footer({
               <Award size={20} />
             </Link>
 
-            {/* <Link
+            <Link
               href={`/wallet`}
               className={`p-2 text-black hover:text-gray-800 ${
                 pathname.includes("wallet") && "border-b border-black"
               }`}
             >
               <LucideWallet size={20} />
-            </Link> */}
+            </Link>
             <button
               className="p-2 text-black hover:text-gray-800"
               onClick={() => handleOpenDrawer("claim")}
