@@ -26,7 +26,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-accent-800">
-          You&apos;re getting paid!
+          2.6M SUP is up for grabs!
         </h2>
         <button
           onClick={handleCloseDrawer}
@@ -37,7 +37,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
       </div>
       <div className="mb-6">
         <p className="text-primary-500 text-sm">
-          Open donation streams to earn SUP.
+          The more you stream, the more SUP you earn (min. $1).
         </p>
       </div>
 
@@ -53,7 +53,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
         className="bg-brand-sfGreen hover:bg-brand-sfGreen/80"
         onClick={onClaimSup}
       >
-        Claim SUP
+        Claim SUP XP Daily
       </BaseButton>
     </>
   );
