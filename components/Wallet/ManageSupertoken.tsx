@@ -65,12 +65,13 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     });
 
   // Fetch underlying token balance
-  const { data: underlyingBalance } = useReadContract({
-    address: tokenData.underlyingAddress as `0x${string}`,
-    abi: erc20Abi,
-    functionName: "balanceOf",
-    args: [address || ZERO_ADDRESS],
-  }) as { data: bigint | undefined };
+  const { data: underlyingBalance, refetch: refetchUnderlyingBalance } =
+    useReadContract({
+      address: tokenData.underlyingAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [address || ZERO_ADDRESS],
+    }) as { data: bigint | undefined; refetch: () => void };
 
   // Fetch underlying token allowance for SuperToken contract
   const { data: underlyingAllowance } = useReadContract({
@@ -159,8 +160,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   };
 
   const proceedWithUpgrade = () => {
+    setIsSuccess(false);
+    setIsLoading(false);
     setIsConfirming(true);
-    const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals);
+    const wrapAmount = parseEther(amount);
 
     executeTx(
       {
@@ -184,7 +187,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   };
 
   const proceedWithDowngrade = () => {
+    setIsSuccess(false);
+    setIsLoading(false);
     setIsConfirming(true);
+
     const unwrapAmount = parseUnits(amount, 18); // SuperTokens use 18 decimals
 
     executeTx(
@@ -224,22 +230,25 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       setTimeout(() => {
         setIsConfirming(false);
         setIsSuccess(true);
-        setAmount("");
+        // setAmount("");
+        // resetForm();
         refetchSuperTokenBal();
-        resetForm();
-      }, 2000);
+        refetchUnderlyingBalance();
+      }, 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTxSuccess, isTxConfirming]);
 
   const resetForm = () => {
+    setIsSuccess(false);
     setIsLoading(false);
     setIsConfirming(false);
     setError(null);
-    setIsSuccess(false);
     setAmount("");
     resetApproval();
     resetTx();
+    refetchSuperTokenBal();
+    refetchUnderlyingBalance();
   };
 
   const getButtonText = () => {
@@ -423,13 +432,12 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       </form>
 
       {isSuccess && (
-        <div className="mt-5">
-          <div className="flex flex-col gap-1">
-            <p className="text-accent-500 text-xl font-bold w-full text-center">
-              {isWrapping
-                ? `Successfully wrapped ${amount} ${tokenData.underlyingSymbol} to ${tokenData.symbol}!`
-                : `Successfully unwrapped ${amount} ${tokenData.symbol} to ${tokenData.underlyingSymbol}!`}
+        <div className="mt-5 bg-accent-200 px3 py-4 rounded-lg border border-accent-800">
+          <div className="flex flex-row justify-betweeen items-center px-4">
+            <p className="text-accent-800 text-xl font-bold w-full">
+              {isWrapping ? `Successfully wrapped` : `Successfully unwrapped`}
             </p>
+            <X className="w-5 h-5 stroke-accent-800" onClick={resetForm} />
           </div>
         </div>
       )}
