@@ -91,6 +91,8 @@ export default function OpenStream({
     poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
+  const isConnectedVerified = isConnected && status === "connected";
+
   console.log("isConnected", isConnected);
   console.log("address", address);
   console.log("connectedChainId", connectedChainId);
@@ -635,7 +637,7 @@ export default function OpenStream({
                 </div>
               )}
 
-              {isConnected && Number(chainId) !== connectedChainId && (
+              {isConnectedVerified && Number(chainId) !== connectedChainId && (
                 <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
                   Connected to the wrong chain
                 </div>
@@ -659,13 +661,13 @@ export default function OpenStream({
                 </div>
               )}
 
-              {!isConnected && (
+              {!isConnectedVerified && (
                 <BaseButton onClick={handleConnect} type="button">
                   Connect Wallet
                 </BaseButton>
               )}
 
-              {isConnected && (
+              {isConnectedVerified && (
                 <>
                   <BaseButton
                     type="submit"
