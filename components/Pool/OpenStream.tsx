@@ -73,12 +73,7 @@ export default function OpenStream({
   >();
   const [currentDevDonor, setCurrentDevDonor] = useState(false);
 
-  const {
-    address,
-    isConnected,
-    chainId: connectedChainId,
-    status,
-  } = useAccount();
+  const { address, chainId: connectedChainId, status } = useAccount();
   const { connect, connectors } = useConnect();
   const { user } = useUser();
   const { switchChain } = useSwitchChain();
@@ -91,10 +86,8 @@ export default function OpenStream({
     poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
-  console.log("address", address);
-  console.log("connectedChainId", connectedChainId);
-  console.log("chainId", chainId);
   console.log("status", status);
+  const isConnected = status === "connected";
 
   const {
     writeContract: approve,
@@ -204,9 +197,6 @@ export default function OpenStream({
     setIsLoading(true);
     setError(null);
 
-    console.log("connectors[0] in handleSubmit", connectors[0]);
-    console.log("*****.getChainId()", connectors[0].getChainId());
-
     if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
       setError("Wallet connector not ready. Please refresh and try again.");
       setIsLoading(false);
@@ -214,13 +204,6 @@ export default function OpenStream({
     }
 
     if (Number(chainId) !== connectedChainId) {
-      console.log("*** SWITCH CHAIN");
-      console.log("chainId", chainId);
-      console.log("connectedChainId", connectedChainId);
-
-      // await switchChain({ chainId: Number(chainId) });
-      console.log("WRONG CHAIN");
-
       try {
         await switchChain({ chainId: Number(chainId) });
       } catch (error) {
@@ -229,10 +212,6 @@ export default function OpenStream({
         setIsLoading(false);
         return;
       }
-    }
-
-    if (status === "reconnecting" || status === "connecting") {
-      await connect({ connector: connectors[0] });
     }
 
     const wrapAmountValue = parseEther(wrapAmount);
