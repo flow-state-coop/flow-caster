@@ -13,6 +13,7 @@ import ConnectPool from "../Pool/ConnectPool";
 import ClaimSup from "../Pool/ClaimSup";
 import BaseButton from "./BaseButton";
 import { usePoolData } from "@/hooks/use-pool-data";
+import { useMiniApp } from "@/contexts/miniapp-context";
 
 interface FooterProps {
   chainId: string;
@@ -35,6 +36,10 @@ export default function Footer({
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
 
   const { isCracked } = usePoolData({ chainId, poolId });
+
+  const { isMiniAppReady } = useMiniApp();
+
+  console.log("isMiniAppReady", isMiniAppReady);
 
   const {
     shouldConnect,
@@ -88,6 +93,7 @@ export default function Footer({
           <div className="flex text-black">
             {!pathname.includes("wallet") && (
               <BaseButton
+                disabled={!isMiniAppReady}
                 onClick={() =>
                   handleOpenDrawer(
                     connectedDonor && Number(connectedDonor.flowRate) > 0
