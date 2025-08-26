@@ -13,6 +13,7 @@ import { useMiniApp } from "./miniapp-context";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { NeynarUser } from "@/lib/neynar";
+import { useAccount, useConnect } from "wagmi";
 
 const UserProviderContext = createContext<
   | {
@@ -50,6 +51,8 @@ export const UserProvider = ({
   const [error, setError] = useState<Error | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { status } = useAccount();
+  const { connect, connectors } = useConnect();
 
   const {
     data: user,
@@ -122,6 +125,13 @@ export const UserProvider = ({
       handleSignIn();
     }
   }, [context, handleSignIn, isSignedIn, isLoading, autoSignIn, userError]);
+
+  useEffect(() => {
+    if (status !== "connected") {
+      console.log("******* auto connect status", status);
+      connect({ connector: connectors[0] });
+    }
+  }, [status, connect, connectors]);
 
   const value = useMemo(() => {
     return {
