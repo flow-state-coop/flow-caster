@@ -262,7 +262,10 @@ export default function ConnectPool({
       )}
 
       {!isConnected && (
-        <BaseButton onClick={() => connect({ connector: connectors[0] })}>
+        <BaseButton
+          onClick={() => connect({ connector: connectors[0] })}
+          type="button"
+        >
           Connect Wallet
         </BaseButton>
       )}
@@ -275,6 +278,7 @@ export default function ConnectPool({
                 className="w-1/2"
                 onClick={handleShare}
                 disabled={shareComplete || isConfirmingAdd || isAddingMember}
+                type="button"
               >
                 <div className="flex flex-row gap-2 items-center justify-center">
                   {shareComplete && (
