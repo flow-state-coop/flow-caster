@@ -85,6 +85,11 @@ export default function OpenStream({
     poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
+  console.log("isConnected", isConnected);
+  console.log("address", address);
+  console.log("connectedChainId", connectedChainId);
+  console.log("chainId", chainId);
+
   const {
     writeContract: approve,
     data: approvalHash,
