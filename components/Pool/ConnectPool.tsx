@@ -274,7 +274,7 @@ export default function ConnectPool({
         </div>
       )}
 
-      {awaitingConnection && (
+      {!isConnected && (
         <BaseButton
           onClick={() => connect({ connector: connectors[0] })}
           type="button"
