@@ -31,8 +31,11 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   const [isWrapping, setIsWrapping] = useState(true); // true = wrap, false = unwrap
   const [amount, setAmount] = useState<string>("");
   const { switchChain } = useSwitchChain();
-  const { isConnected, chainId: connectedChainId } = useAccount();
+  const { chainId: connectedChainId } = useAccount();
   const { connect, connectors } = useConnect();
+
+  console.log("status", status);
+  const isConnected = status === "connected";
 
   const {
     writeContract: approve,
@@ -104,13 +107,23 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       return;
     }
 
-    if (connectedChainId !== Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID)) {
-      console.log("*** SWITCH CHAIN");
-      console.log("chainId", FEATURED_POOL_DATA.DEFAULT_CHAIN_ID);
-      console.log("connectedChainId", connectedChainId);
-      await switchChain({
-        chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
-      });
+    if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
+      setError("Wallet connector not ready. Please refresh and try again.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID) !== connectedChainId) {
+      try {
+        await switchChain({
+          chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
+        });
+      } catch (error) {
+        console.error("Chain switching failed:", error);
+        setError("Failed to switch chain. Please try again.");
+        setIsLoading(false);
+        return;
+      }
     }
 
     setIsLoading(true);

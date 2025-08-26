@@ -34,12 +34,8 @@ export default function Footer({
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
-
   const { isCracked } = usePoolData({ chainId, poolId });
-
   const { isMiniAppReady } = useMiniApp();
-
-  console.log("isMiniAppReady", isMiniAppReady);
 
   const {
     shouldConnect,

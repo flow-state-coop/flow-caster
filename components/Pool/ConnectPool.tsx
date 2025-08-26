@@ -45,13 +45,16 @@ export default function ConnectPool({
   const [shareComplete, setShareComplete] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
   const [isAddingMember, setIsAddingMember] = useState(false);
-  const { address, isConnected, chainId: connectedChainId } = useAccount();
+  const { address, status, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const { data: poolData, refetch } = usePoolData({
     chainId,
     poolId,
   });
   const { connect, connectors } = useConnect();
+
+  console.log("status", status);
+  const isConnected = status === "connected";
 
   const { writeContract, data: hash } = useWriteContract();
 
@@ -68,11 +71,21 @@ export default function ConnectPool({
       return;
     }
 
+    if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
+      setError("Wallet connector not ready. Please refresh and try again.");
+      setIsLoading(false);
+      return;
+    }
+
     if (Number(chainId) !== connectedChainId) {
-      console.log("*** SWITCH CHAIN");
-      console.log("chainId", connectedChainId);
-      console.log("connectedChainId", connectedChainId);
-      await switchChain({ chainId: Number(chainId) });
+      try {
+        await switchChain({ chainId: Number(chainId) });
+      } catch (error) {
+        console.error("Chain switching failed:", error);
+        setError("Failed to switch chain. Please try again.");
+        setIsLoading(false);
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -261,7 +274,7 @@ export default function ConnectPool({
         </div>
       )}
 
-      {!isConnected && (
+      {awaitingConnection && (
         <BaseButton
           onClick={() => connect({ connector: connectors[0] })}
           type="button"
