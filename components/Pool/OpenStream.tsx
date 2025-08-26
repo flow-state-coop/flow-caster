@@ -91,7 +91,7 @@ export default function OpenStream({
     poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
-  const isConnectedVerified = isConnected && status === "connected";
+  // const isConnected = isConnected && status === "connected";
 
   console.log("isConnected", isConnected);
   console.log("address", address);
@@ -234,6 +234,10 @@ export default function OpenStream({
         setIsLoading(false);
         return;
       }
+    }
+
+    if (status === "reconnecting") {
+      connect({ connector: connectors[0] });
     }
 
     const wrapAmountValue = parseEther(wrapAmount);
@@ -637,12 +641,6 @@ export default function OpenStream({
                 </div>
               )}
 
-              {isConnectedVerified && Number(chainId) !== connectedChainId && (
-                <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
-                  Connected to the wrong chain
-                </div>
-              )}
-
               {approvalHash && (
                 <div
                   onClick={() => openExplorerUrl(approvalHash)}
@@ -661,13 +659,13 @@ export default function OpenStream({
                 </div>
               )}
 
-              {!isConnectedVerified && (
+              {!isConnected && (
                 <BaseButton onClick={handleConnect} type="button">
                   Connect Wallet
                 </BaseButton>
               )}
 
-              {isConnectedVerified && (
+              {isConnected && (
                 <>
                   <BaseButton
                     type="submit"
