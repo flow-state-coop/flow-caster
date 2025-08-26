@@ -101,6 +101,8 @@ export default function OpenStream({
   console.log("config", config);
   console.log("status", status);
 
+  const notConnectedStatus = status != "connected";
+
   const {
     writeContract: approve,
     data: approvalHash,
@@ -237,7 +239,7 @@ export default function OpenStream({
     }
 
     if (status === "reconnecting") {
-      connect({ connector: connectors[0] });
+      await connect({ connector: connectors[0] });
     }
 
     const wrapAmountValue = parseEther(wrapAmount);
@@ -674,7 +676,8 @@ export default function OpenStream({
                       isConfirming ||
                       isApprovalConfirming ||
                       isSuccess ||
-                      isButtonDisabled
+                      isButtonDisabled ||
+                      notConnectedStatus
                     }
                   >
                     {getButtonText()}
