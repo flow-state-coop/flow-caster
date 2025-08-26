@@ -196,6 +196,13 @@ export default function OpenStream({
     setIsLoading(true);
     setError(null);
 
+    console.log("connectors[0]", connectors[0]);
+    if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
+      setError("Wallet connector not ready. Please refresh and try again.");
+      setIsLoading(false);
+      return;
+    }
+
     if (Number(chainId) !== connectedChainId) {
       console.log("*** SWITCH CHAIN");
       console.log("chainId", chainId);
@@ -203,6 +210,15 @@ export default function OpenStream({
 
       // await switchChain({ chainId: Number(chainId) });
       console.log("WRONG CHAIN");
+
+      try {
+        await switchChain({ chainId: Number(chainId) });
+      } catch (error) {
+        console.error("Chain switching failed:", error);
+        setError("Failed to switch chain. Please try again.");
+        setIsLoading(false);
+        return;
+      }
     }
 
     const wrapAmountValue = parseEther(wrapAmount);
