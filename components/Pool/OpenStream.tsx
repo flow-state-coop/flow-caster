@@ -196,7 +196,8 @@ export default function OpenStream({
       console.log("chainId", chainId);
       console.log("connectedChainId", connectedChainId);
 
-      await switchChain({ chainId: Number(chainId) });
+      // await switchChain({ chainId: Number(chainId) });
+      console.log("WRONG CHAIN");
     }
 
     const wrapAmountValue = parseEther(wrapAmount);
@@ -597,6 +598,12 @@ export default function OpenStream({
               {error && (
                 <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
                   {truncateString(error, 50)}
+                </div>
+              )}
+
+              {isConnected && Number(chainId) !== connectedChainId && (
+                <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
+                  Connected to the wrong chain
                 </div>
               )}
 
