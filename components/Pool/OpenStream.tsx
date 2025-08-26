@@ -198,6 +198,8 @@ export default function OpenStream({
     setError(null);
 
     console.log("connectors[0]", connectors[0]);
+    console.log("connectors[0].getChainId()", connectors[0].getChainId());
+
     if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
       setError("Wallet connector not ready. Please refresh and try again.");
       setIsLoading(false);
