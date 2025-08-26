@@ -187,8 +187,11 @@ export default function OpenStream({
     setError(null);
 
     if (Number(chainId) !== connectedChainId) {
+      console.log("*** SWITCH CHAIN");
+      console.log("chainId", chainId);
+      console.log("connectedChainId", connectedChainId);
+
       await switchChain({ chainId: Number(chainId) });
-      return;
     }
 
     const wrapAmountValue = parseEther(wrapAmount);

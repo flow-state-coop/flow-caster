@@ -69,8 +69,10 @@ export default function ConnectPool({
     }
 
     if (Number(chainId) !== connectedChainId) {
+      console.log("*** SWITCH CHAIN");
+      console.log("chainId", connectedChainId);
+      console.log("connectedChainId", connectedChainId);
       await switchChain({ chainId: Number(chainId) });
-      return;
     }
 
     setIsLoading(true);
