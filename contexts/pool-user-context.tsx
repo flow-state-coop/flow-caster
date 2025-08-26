@@ -59,10 +59,6 @@ export const PoolUserProvider = ({
       (m) => m.account.id === user.verified_addresses.primary.eth_address
     );
 
-    console.log("poolMembers", poolMembers);
-    console.log("member", member);
-    console.log("address", connectedAddress);
-
     setConnectedMember(member);
     if (
       member &&
