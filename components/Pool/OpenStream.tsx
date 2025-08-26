@@ -73,7 +73,12 @@ export default function OpenStream({
   >();
   const [currentDevDonor, setCurrentDevDonor] = useState(false);
 
-  const { address, isConnected, chainId: connectedChainId } = useAccount();
+  const {
+    address,
+    isConnected,
+    chainId: connectedChainId,
+    status,
+  } = useAccount();
   const { connect, connectors } = useConnect();
   const { user } = useUser();
   const { switchChain } = useSwitchChain();
@@ -92,6 +97,7 @@ export default function OpenStream({
   console.log("chainId", chainId);
   console.log("connectors[0]", connectors[0]);
   console.log("config", config);
+  console.log("status", status);
 
   const {
     writeContract: approve,
