@@ -52,6 +52,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
       <BaseButton
         className="bg-brand-sfGreen hover:bg-brand-sfGreen/80"
         onClick={onClaimSup}
+        type="button"
       >
         Claim SUP XP Daily
       </BaseButton>

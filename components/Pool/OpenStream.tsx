@@ -180,6 +180,11 @@ export default function OpenStream({
     proceedWithMainTransaction(true);
   };
 
+  const handleConnect = () => {
+    connect({ connector: connectors[0] });
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -626,9 +631,7 @@ export default function OpenStream({
               )}
 
               {!isConnected && (
-                <BaseButton
-                  onClick={() => connect({ connector: connectors[0] })}
-                >
+                <BaseButton onClick={handleConnect} type="button">
                   Connect Wallet
                 </BaseButton>
               )}
