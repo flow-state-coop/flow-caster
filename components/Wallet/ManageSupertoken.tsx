@@ -105,10 +105,12 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     }
 
     if (connectedChainId !== Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID)) {
+      console.log("*** SWITCH CHAIN");
+      console.log("chainId", FEATURED_POOL_DATA.DEFAULT_CHAIN_ID);
+      console.log("connectedChainId", connectedChainId);
       await switchChain({
         chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
       });
-      return;
     }
 
     setIsLoading(true);
