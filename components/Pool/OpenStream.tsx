@@ -40,6 +40,7 @@ import { networks } from "@/lib/flowapp/networks";
 import { PoolData } from "@/lib/types";
 import { openExplorerUrl } from "@/lib/helpers";
 import BaseButton from "../Shared/BaseButton";
+import { config } from "@/contexts/miniapp-wallet-context";
 
 interface OpenStreamProps {
   chainId: string;
@@ -90,6 +91,7 @@ export default function OpenStream({
   console.log("connectedChainId", connectedChainId);
   console.log("chainId", chainId);
   console.log("connectors[0]", connectors[0]);
+  console.log("config", config);
 
   const {
     writeContract: approve,
@@ -105,7 +107,9 @@ export default function OpenStream({
     writeContract: batchCall,
     data: batchHash,
     reset: resetBatch,
-  } = useWriteContract();
+  } = useWriteContract({
+    config: config,
+  });
   const { isLoading: isBatchConfirming, isSuccess: isBatchSuccess } =
     useWaitForTransactionReceipt({
       hash: batchHash,
@@ -197,8 +201,8 @@ export default function OpenStream({
     setIsLoading(true);
     setError(null);
 
-    console.log("connectors[0]", connectors[0]);
-    console.log("connectors[0].getChainId()", connectors[0].getChainId());
+    console.log("connectors[0] in handleSubmit", connectors[0]);
+    console.log("*****.getChainId()", connectors[0].getChainId());
 
     if (!connectors[0] || typeof connectors[0].getChainId !== "function") {
       setError("Wallet connector not ready. Please refresh and try again.");
