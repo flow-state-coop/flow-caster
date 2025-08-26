@@ -89,6 +89,7 @@ export default function OpenStream({
   console.log("address", address);
   console.log("connectedChainId", connectedChainId);
   console.log("chainId", chainId);
+  console.log("connectors[0]", connectors[0]);
 
   const {
     writeContract: approve,
