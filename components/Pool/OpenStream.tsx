@@ -91,17 +91,10 @@ export default function OpenStream({
     poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
   });
 
-  // const isConnected = isConnected && status === "connected";
-
-  console.log("isConnected", isConnected);
   console.log("address", address);
   console.log("connectedChainId", connectedChainId);
   console.log("chainId", chainId);
-  console.log("connectors[0]", connectors[0]);
-  console.log("config", config);
   console.log("status", status);
-
-  const notConnectedStatus = status != "connected";
 
   const {
     writeContract: approve,
@@ -238,7 +231,7 @@ export default function OpenStream({
       }
     }
 
-    if (status === "reconnecting") {
+    if (status === "reconnecting" || status === "connecting") {
       await connect({ connector: connectors[0] });
     }
 
@@ -676,8 +669,7 @@ export default function OpenStream({
                       isConfirming ||
                       isApprovalConfirming ||
                       isSuccess ||
-                      isButtonDisabled ||
-                      notConnectedStatus
+                      isButtonDisabled
                     }
                   >
                     {getButtonText()}
