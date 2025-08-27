@@ -31,7 +31,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   const [isWrapping, setIsWrapping] = useState(true); // true = wrap, false = unwrap
   const [amount, setAmount] = useState<string>("");
   const { switchChain } = useSwitchChain();
-  const { chainId: connectedChainId } = useAccount();
+  const { chainId: connectedChainId, status } = useAccount();
   const { connect, connectors } = useConnect();
 
   console.log("status", status);
