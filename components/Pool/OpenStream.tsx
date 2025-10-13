@@ -604,7 +604,7 @@ export default function OpenStream({
                     htmlFor="donateToDevs"
                     className="ml-2 block text-sm font-medium text-primary-800"
                   >
-                    Donate 5% to flowcaster devs & earn x2 SUP XP
+                    Donate 5% to the Flow Caster devs
                   </label>
                 </div>
               </div>

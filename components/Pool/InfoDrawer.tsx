@@ -49,15 +49,6 @@ export default function InfoDrawer({
           Your stream delivers instant & consistent income so these builders can
           focus on building.
         </p>
-        <p>
-          Donors are eligible for{" "}
-          <span
-            onClick={onClaimSup}
-            className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
-          >
-            SUP Rewards.
-          </span>
-        </p>
       </div>
     </>
   );

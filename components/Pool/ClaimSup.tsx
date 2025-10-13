@@ -26,7 +26,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-accent-800">
-          2.6M SUP is up for grabs!
+          More SUP soon!
         </h2>
         <button
           onClick={handleCloseDrawer}
@@ -37,7 +37,7 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
       </div>
       <div className="mb-6">
         <p className="text-primary-500 text-sm">
-          The more you stream, the more SUP you earn (min. $1).
+          The next season of SUP rewards on Flow Caster is coming.
         </p>
       </div>
 
