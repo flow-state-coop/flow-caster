@@ -7,7 +7,8 @@ import { Crown } from "lucide-react";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
 import { createDonorBuckets } from "@/lib/pool";
-import { FEATURED_POOL_DATA, VIZ_PAUSED } from "@/lib/constants";
+import { usePool } from "@/contexts/pool-context";
+import { VIZ_PAUSED } from "@/lib/constants";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import DonorStats from "./DonorStats";
@@ -41,6 +42,8 @@ export default function PoolCircle({
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
   const [donors, setDonors] = useState<PoolDonor[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
 
   const {
     poolDistributors,
@@ -51,9 +54,9 @@ export default function PoolCircle({
     poolId: poolId,
   });
 
-  const { poolDistributors: devPoolistributors } = usePoolData({
+  const { poolDistributors: devPoolDistributors } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
 
   // Transform pool data to component format
@@ -72,16 +75,16 @@ export default function PoolCircle({
   }, [poolMembers]);
 
   useEffect(() => {
-    if (!devPoolistributors || !poolDistributors) return;
+    if (!devPoolDistributors || !poolDistributors) return;
 
     const formattedDonors = createDonorBuckets(
       poolDistributors,
-      devPoolistributors,
+      devPoolDistributors,
       connectedAddress
     );
 
     setDonors(formattedDonors);
-  }, [poolDistributors, devPoolistributors, connectedAddress]);
+  }, [poolDistributors, devPoolDistributors, connectedAddress]);
 
   useEffect(() => {
     if (!poolData) return;
@@ -292,9 +295,9 @@ export default function PoolCircle({
             fill="none"
           />
         </defs>
-        <text className="text-black font-bold text-3xl">
+        <text className="text-black font-bold text-2xl">
           <textPath href="#pool-text-path" startOffset="0%" textAnchor="start">
-            {poolData.poolMeta.name}
+            {currentPoolData.CONTENT.POOL_TITLE}
           </textPath>
         </text>
 

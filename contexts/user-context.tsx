@@ -129,7 +129,8 @@ export const UserProvider = ({
   useEffect(() => {
     if (status !== "connected") {
       console.log("******* auto connect status", status);
-      connect({ connector: connectors[0] });
+      // TODO: TEST ME
+      // connect({ connector: connectors[0] });
     }
   }, [status, connect, connectors]);
 

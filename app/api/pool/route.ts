@@ -47,10 +47,7 @@ export async function GET(request: NextRequest) {
       throw Error("Missing Pool");
     }
 
-    const query = getSuperFluidQuery(
-      FEATURED_POOL_DATA.DEFAULT_POOL_ID === poolId &&
-        FEATURED_POOL_DATA.DEFAULT_CHAIN_ID === chainId
-    );
+    const query = getSuperFluidQuery(FEATURED_POOL_DATA.FILTER_ZERO_UNITS);
 
     const superfluidQueryRes = (await sfClient.request(query, {
       token: pool.token,

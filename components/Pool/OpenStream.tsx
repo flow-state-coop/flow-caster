@@ -19,9 +19,9 @@ import hostAbi from "@/lib/abi/sfHost.json";
 import gdaAbi from "@/lib/abi/gdaV1.json";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
+import { usePool } from "@/contexts/pool-context";
 import {
   DEV_DONATION_PERCENT,
-  FEATURED_POOL_DATA,
   TOKEN_DATA,
   ZERO_ADDRESS,
 } from "@/lib/constants";
@@ -77,13 +77,16 @@ export default function OpenStream({
   const { connect, connectors } = useConnect();
   const { user } = useUser();
   const { switchChain } = useSwitchChain();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+  
   const { refetch } = usePoolData({
     chainId,
     poolId,
   });
   const { data: devPoolData } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
 
   console.log("status", status);
@@ -140,7 +143,7 @@ export default function OpenStream({
     ? Number(formatUnits(superTokenBalance, 18))
     : 0;
   const usdcBalance = underlyingBalance
-    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals))
+    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals || 18))
     : 0;
 
   // Validation logic
@@ -228,7 +231,7 @@ export default function OpenStream({
           functionName: "approve",
           args: [
             tokenData.address,
-            parseUnits(wrapAmount, tokenData.underlyingDecimals),
+            parseUnits(wrapAmount, tokenData.underlyingDecimals || 18),
           ],
         },
         {
@@ -313,7 +316,7 @@ export default function OpenStream({
             args: [
               tokenData.address,
               address,
-              FEATURED_POOL_DATA.DEV_POOL_ADDRESS as `0x${string}`,
+              currentPoolData.DEV_POOL_ADDRESS as `0x${string}`,
               devFlowRate,
               "0x",
             ],
@@ -570,7 +573,7 @@ export default function OpenStream({
                   const currentAllowance = Number(underlyingAllowance) || 0;
                   const wrapAmountValue = parseUnits(
                     wrapAmount,
-                    tokenData.underlyingDecimals
+                    tokenData.underlyingDecimals || 18
                   );
 
                   if (

@@ -2,10 +2,10 @@
 
 import { useAccount } from "wagmi";
 import { useUser } from "@/contexts/user-context";
+import { usePool } from "@/contexts/pool-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { getTotalFlow } from "@/lib/pool";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
 import PoolCircle from "@/components/Pool/PoolCircle";
 import Footer from "./Footer";
 import Spinner from "./Spinner";
@@ -17,6 +17,9 @@ interface PoolHQProps {
 }
 
 export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+
   const {
     data: poolData,
     poolDistributors,
@@ -31,11 +34,13 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
 
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
 
   const { user, signIn } = useUser();
   const { address } = useAccount();
+
+  console.log("poolData", poolData);
 
   if (error) {
     return (

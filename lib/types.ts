@@ -53,8 +53,3 @@ export interface PoolData {
   };
   activeMemberCount: number;
 }
-
-export type AppPoolMeta = {
-  hasSupRewards: boolean;
-  isCracked: boolean;
-};

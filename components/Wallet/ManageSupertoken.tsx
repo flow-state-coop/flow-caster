@@ -12,7 +12,8 @@ import {
   useConnect,
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
-import { FEATURED_POOL_DATA, TOKEN_DATA, ZERO_ADDRESS } from "@/lib/constants";
+import { usePool } from "@/contexts/pool-context";
+import { TOKEN_DATA, ZERO_ADDRESS } from "@/lib/constants";
 import erc20Abi from "@/lib/abi/erc20.json";
 import { superTokenAbi } from "@sfpro/sdk/abi";
 import { openExplorerUrl } from "@/lib/helpers";
@@ -33,6 +34,8 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   const { switchChain } = useSwitchChain();
   const { chainId: connectedChainId, status } = useAccount();
   const { connect, connectors } = useConnect();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
 
   console.log("status", status);
   const isConnected = status === "connected";
@@ -57,7 +60,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       hash: txHash,
     });
 
-  const tokenData = TOKEN_DATA[FEATURED_POOL_DATA.DEFAULT_CHAIN_ID];
+  const tokenData = TOKEN_DATA[currentPoolData.DEFAULT_CHAIN_ID];
 
   // Fetch SuperToken balance
   const { data: superTokenBalance, refetch: refetchSuperTokenBal } =
@@ -88,7 +91,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     ? Number(formatUnits(superTokenBalance, 18))
     : 0;
   const userUnderlyingBalance = underlyingBalance
-    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals))
+    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals || 18))
     : 0;
 
   // Validation logic
@@ -113,10 +116,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       return;
     }
 
-    if (Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID) !== connectedChainId) {
+    if (Number(currentPoolData.DEFAULT_CHAIN_ID) !== connectedChainId) {
       try {
         await switchChain({
-          chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
+          chainId: Number(currentPoolData.DEFAULT_CHAIN_ID),
         });
       } catch (error) {
         console.error("Chain switching failed:", error);
@@ -380,7 +383,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
           amountValue > 0 &&
           (() => {
             const currentAllowance = Number(underlyingAllowance) || 0;
-            const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals);
+            const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals || 18);
 
             if (currentAllowance < wrapAmount) {
               return (
