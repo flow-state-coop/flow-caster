@@ -28,6 +28,7 @@ interface DonorNodeProps {
   startingTimestamp?: string;
   startingAmount?: string;
   tokenSymbol: string;
+  iconOverride?: string;
 }
 
 export default function DonorNode({
@@ -45,6 +46,7 @@ export default function DonorNode({
   startingTimestamp,
   startingAmount,
   tokenSymbol,
+  iconOverride,
 }: DonorNodeProps) {
   const [showing, setShowing] = useState(false);
 
@@ -107,7 +109,6 @@ export default function DonorNode({
 
           {!farcasterUser && accountId && (
             <div>
-              {accountId}
               <b>Account:</b> {truncateAddress(accountId)}
             </div>
           )}
@@ -177,6 +178,7 @@ export default function DonorNode({
         {!isGroupDonors && (
           <image
             href={
+              iconOverride ||
               farcasterUser?.pfp_url ||
               connectedUserFallback?.pfp_url ||
               iconPath

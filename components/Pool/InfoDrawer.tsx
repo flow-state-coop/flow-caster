@@ -5,24 +5,14 @@ import { X } from "lucide-react";
 interface InfoDrawerProps {
   handleCloseDrawer: () => void;
   activeMemberCount?: number;
+  poolKey: string;
 }
 
 export default function InfoDrawer({
   handleCloseDrawer,
   activeMemberCount,
+  poolKey,
 }: InfoDrawerProps) {
-  const handleViewProfile = async () => {
-    await sdk.actions.viewCast({
-      hash: "0xcd9b0113",
-    });
-  };
-
-  const onClaimSup = async () => {
-    await sdk.actions.openMiniApp({
-      url: "https://farcaster.xyz/miniapps/qva4-LdCMptX/sup",
-    });
-  };
-
   return (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -35,21 +25,62 @@ export default function InfoDrawer({
         </button>
       </div>
       <div className="mb-6 flex flex-col gap-2 text-primary-800">
-        <p>
-          Open a token stream that&apos;s split in real-time to{" "}
-          {activeMemberCount ? activeMemberCount : ""} cracked Farcaster devs{" "}
-          <span
-            onClick={handleViewProfile}
-            className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
-          >
-            (h/t @Curie curation).
-          </span>
-        </p>
-        <p>
-          Your stream delivers instant & consistent income so these builders can
-          focus on building.
-        </p>
+        {poolKey === "8453-32" && (
+          <CrackedInfo
+            activeMemberCount={activeMemberCount}
+            handleCloseDrawer={handleCloseDrawer}
+            poolKey={poolKey}
+          />
+        )}
+        {poolKey === "11155420-96" && <ArbInfo />}
       </div>
+    </>
+  );
+}
+
+function CrackedInfo({ activeMemberCount }: InfoDrawerProps) {
+  const handleViewProfile = async () => {
+    await sdk.actions.viewCast({
+      hash: "0xcd9b0113",
+    });
+  };
+  return (
+    <>
+      <p>
+        Open a token stream that&apos;s split in real-time to{" "}
+        {activeMemberCount ? activeMemberCount : ""} cracked Farcaster devs{" "}
+        <span
+          onClick={handleViewProfile}
+          className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
+        >
+          (h/t @Curie curation).
+        </span>
+      </p>
+      <p>
+        Your stream delivers instant & consistent income so these builders can
+        focus on building.
+      </p>
+    </>
+  );
+}
+
+function ArbInfo() {
+  return (
+    <>
+      <p>
+        Flow Caster uses daily and transacting users to dynamically score
+        Arbitrum’s top mini apps and assign them proportional weights in a
+        streaming pool.
+      </p>
+      <p>
+        Rather than getting paid once a week, Arbitrum builders get paid every
+        second.
+      </p>
+      <p>
+        Builder rewards are supported by the Arbitrum Foundation (60k USND over
+        6 months), Superfluid DAO (2M SUP in incentives), & community members
+        like you.
+      </p>
     </>
   );
 }

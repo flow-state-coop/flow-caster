@@ -69,6 +69,7 @@ export default function PoolCircle({
       udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
       connected: member.isConnected,
+      arbCampaign: member.arbCampaign,
     }));
 
     return formattedRecipients;
@@ -400,6 +401,13 @@ export default function PoolCircle({
                   startingAmount={donor?.startingAmount}
                   startingTimestamp={donor?.startingTimestamp}
                   tokenSymbol={poolData.token.symbol}
+                  iconOverride={
+                    currentPoolData.SPONSOR_ADDRESS !== undefined &&
+                    currentPoolData.SPONSOR_ADDRESS.toLowerCase() ===
+                      donor?.accountId?.toLowerCase()
+                      ? currentPoolData.SPONSOR_ICON
+                      : undefined
+                  }
                 />
               )}
 
@@ -439,6 +447,8 @@ export default function PoolCircle({
             totalFlowRate={Number(poolData.flowRate)}
             connected={recipient.connected}
             tokenSymbol={poolData.token.symbol}
+            isArb={currentPoolData.IS_ARB}
+            arbApps={recipient.arbCampaign}
           />
         ))}
         {/* Pool circle particles */}
@@ -490,7 +500,9 @@ export default function PoolCircle({
             <DonorStats
               key={`${donor.accountId}-${donor.rate}-${i}`}
               rate={donor.rate}
-              showSup={i < 2}
+              hasSupRewards={currentPoolData.SUP_REWARDS!! && i < 2}
+              isMiddle={i === 1}
+              sponsorAddress={currentPoolData.SPONSOR_ADDRESS}
               showTotalFlow={i > 1}
               startingTimestamp={poolData.updatedAtTimestamp}
               startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}

@@ -1,5 +1,5 @@
 import { base, Chain, optimismSepolia } from "wagmi/chains";
-import { Token } from "./flowapp/networks";
+import { networks } from "./flowapp/networks";
 
 export const MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 day
 
@@ -41,8 +41,10 @@ type POOL_CONFIG = {
   };
   FILTER_ZERO_UNITS: boolean;
   IS_CRACKED?: boolean;
+  IS_ARB?: boolean;
   SUP_REWARDS?: boolean;
   SPONSOR_ADDRESS?: string;
+  SPONSOR_ICON?: string;
 };
 
 export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
@@ -62,11 +64,11 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     IS_CRACKED: true,
     SUP_REWARDS: false,
   },
-  // sep cracked devs
+  // sep arb devs
   "11155420-96": {
     DEFAULT_CHAIN_ID: "11155420",
-    DEV_POOL_ADDRESS: "0x592834dfaa81dc050dc5ac46f4fc87d594faeb75",
-    DEV_POOL_ID: "73",
+    DEV_POOL_ADDRESS: "0xb5cb850de58ff3fb199b72bbb235b46dd314c0fd",
+    DEV_POOL_ID: "97",
     DEFAULT_POOL_ID: "96",
     SUP_PROGRAM_ID: 7742,
     VIEM_CHAIN_OBJ: optimismSepolia,
@@ -79,6 +81,8 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     FILTER_ZERO_UNITS: false,
     SUP_REWARDS: true,
     SPONSOR_ADDRESS: "0xed6a062fbe2993be323af118f79e9b213c81f4f2",
+    SPONSOR_ICON: "/images/arb-logo.svg",
+    IS_ARB: true,
   },
 };
 
@@ -89,7 +93,9 @@ export const TARGET_CHAIN_OBJS = Object.keys(FEATURED_POOLS).map(
 export const FEATURED_POOL_DATA =
   FEATURED_POOLS[`${FEATURED_NETWORK_ID}-${FEATURED_POOL_ID}`];
 
-console.log("FEATURED_POOL_DATA", FEATURED_POOL_DATA);
+export const FEATURED_POOL_NETWORK = networks.find(
+  (network) => network.id === Number(FEATURED_NETWORK_ID)
+);
 
 export const VIZ_PAUSED = true;
 

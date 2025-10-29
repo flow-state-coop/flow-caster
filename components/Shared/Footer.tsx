@@ -15,6 +15,8 @@ import BaseButton from "./BaseButton";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { useMiniApp } from "@/contexts/miniapp-context";
 import { usePool } from "@/contexts/pool-context";
+import ConnectPoolCracked from "../Pool/ConnectPoolCracked";
+import OpenStreamSimple from "../Pool/OpenStreamSimple";
 
 interface FooterProps {
   chainId: string;
@@ -187,15 +189,31 @@ export default function Footer({
         <div className="p-6">
           {/* Drawer Content */}
           {drawerType === "stream" || drawerType === "edit" ? (
-            <OpenStream
-              chainId={chainId}
-              poolId={poolId}
-              poolAddress={poolAddress}
-              connectedDonor={connectedDonor}
-              handleCloseDrawer={handleCloseDrawer}
-              isOpen={isDrawerOpen}
-              activeMemberCount={activeMemberCount}
-            />
+            <>
+              {currentPoolData.IS_ARB && (
+                <OpenStreamSimple
+                  chainId={chainId}
+                  poolId={poolId}
+                  poolAddress={poolAddress}
+                  connectedDonor={connectedDonor}
+                  handleCloseDrawer={handleCloseDrawer}
+                  isOpen={isDrawerOpen}
+                  activeMemberCount={activeMemberCount}
+                />
+              )}
+
+              {!currentPoolData.IS_ARB && (
+                <OpenStream
+                  chainId={chainId}
+                  poolId={poolId}
+                  poolAddress={poolAddress}
+                  connectedDonor={connectedDonor}
+                  handleCloseDrawer={handleCloseDrawer}
+                  isOpen={isDrawerOpen}
+                  activeMemberCount={activeMemberCount}
+                />
+              )}
+            </>
           ) : null}
           {drawerType === "claim" && (
             <ClaimSup handleCloseDrawer={handleCloseDrawer} />
@@ -204,20 +222,37 @@ export default function Footer({
             <InfoDrawer
               handleCloseDrawer={handleCloseDrawer}
               activeMemberCount={activeMemberCount}
+              poolKey={`${chainId}-${poolId}`}
             />
           )}
-          {drawerType === "connect" && connectedMember && (
-            <ConnectPool
-              poolAddress={poolAddress}
-              poolId={poolId}
-              chainId={chainId}
-              connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
-              connectedMember={connectedMember}
-              handleCloseDrawer={handleCloseDrawer}
-              noUnits={noUnits}
-              shouldConnect={!connectedMember.isConnected}
-            />
-          )}
+          {drawerType === "connect" &&
+            connectedMember &&
+            currentPoolData.IS_CRACKED && (
+              <ConnectPoolCracked
+                poolAddress={poolAddress}
+                poolId={poolId}
+                chainId={chainId}
+                connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+                connectedMember={connectedMember}
+                handleCloseDrawer={handleCloseDrawer}
+                noUnits={noUnits}
+                shouldConnect={!connectedMember.isConnected}
+              />
+            )}
+
+          {drawerType === "connect" &&
+            connectedMember &&
+            !currentPoolData.IS_CRACKED && (
+              <ConnectPool
+                poolAddress={poolAddress}
+                poolId={poolId}
+                chainId={chainId}
+                connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+                connectedMember={connectedMember}
+                handleCloseDrawer={handleCloseDrawer}
+                shouldConnect={!connectedMember.isConnected}
+              />
+            )}
         </div>
       </div>
     </>

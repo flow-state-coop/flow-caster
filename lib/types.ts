@@ -1,4 +1,5 @@
 import { NeynarUser } from "@/lib/neynar";
+import { ArbCampaignData } from "@/lib/arb-campaign";
 
 export type FlowPoolData = {
   token: string;
@@ -30,6 +31,7 @@ export interface PoolData {
     poolTotalAmountDistributedUntilUpdatedAt: string;
     updatedAtTimestamp: string;
     farcasterUser: NeynarUser | null | undefined;
+    arbCampaign?: ArbCampaignData[];
   }>;
   poolDistributors: Array<{
     __typename: string;

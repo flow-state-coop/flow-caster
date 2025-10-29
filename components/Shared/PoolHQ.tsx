@@ -40,7 +40,7 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
   const { user, signIn } = useUser();
   const { address } = useAccount();
 
-  console.log("poolData", poolData);
+  // console.log("poolData", poolData);
 
   if (error) {
     return (

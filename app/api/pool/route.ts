@@ -7,7 +7,8 @@ import {
   getSuperFluidQuery,
 } from "@/lib/flowapp/queries";
 import { FlowPoolData, PoolData } from "@/lib/types";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
+import { FEATURED_POOL_DATA, FEATURED_POOLS } from "@/lib/constants";
+import { getArbCampaignDataForAddress } from "@/lib/arb-campaign";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -96,15 +97,35 @@ export async function GET(request: NextRequest) {
           return !splitterAdmins.includes(member.account.id.toLowerCase());
         })
       : farcasterDevsData.poolMembers;
+
+    // Check if this pool should have arbCampaign data
+    const poolKey = `${chainId}-${poolId}`;
+    const poolConfig = FEATURED_POOLS[poolKey];
+    const isArbPool = poolConfig?.IS_ARB === true;
+
     const enhancedPoolData = {
       ...farcasterDevsData,
-      poolMembers: members.map((member) => ({
-        ...member,
-        farcasterUser:
-          (farcasterUsers[member.account.id.toLowerCase()] &&
-            farcasterUsers[member.account.id.toLowerCase()][0]) ||
-          null,
-      })),
+      poolMembers: members.map((member) => {
+        const enhancedMember = {
+          ...member,
+          farcasterUser:
+            (farcasterUsers[member.account.id.toLowerCase()] &&
+              farcasterUsers[member.account.id.toLowerCase()][0]) ||
+            null,
+        };
+
+        // Add arbCampaign data if this is an ARB pool
+        if (isArbPool) {
+          const arbCampaignData = getArbCampaignDataForAddress(
+            member.account.id
+          );
+          if (arbCampaignData.length > 0) {
+            enhancedMember.arbCampaign = arbCampaignData;
+          }
+        }
+
+        return enhancedMember;
+      }),
       poolDistributors: farcasterDevsData.poolDistributors.map(
         (distributor) => ({
           ...distributor,

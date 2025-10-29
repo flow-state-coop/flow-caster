@@ -75,7 +75,12 @@ export default function Leaderboard() {
         connectedAddress={address}
       >
         <div className="mt-3">
-          <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
+          <LeaderboardList
+            poolData={poolData}
+            devPoolList={devPoolList}
+            sponsorAddress={currentPoolData.SPONSOR_ADDRESS}
+            iconOverride={currentPoolData.SPONSOR_ICON}
+          />
         </div>
         <Footer
           chainId={chainId}
