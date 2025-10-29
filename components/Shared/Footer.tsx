@@ -14,6 +14,7 @@ import ClaimSup from "../Pool/ClaimSup";
 import BaseButton from "./BaseButton";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { useMiniApp } from "@/contexts/miniapp-context";
+import { usePool } from "@/contexts/pool-context";
 
 interface FooterProps {
   chainId: string;
@@ -35,6 +36,8 @@ export default function Footer({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
   const { isMiniAppReady } = useMiniApp();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
 
   const {
     shouldConnect,
@@ -125,26 +128,31 @@ export default function Footer({
               <Award size={20} />
             </Link>
 
-            <Link
-              href={`/wallet`}
-              className={`p-2 text-black hover:text-gray-800 ${
-                pathname.includes("wallet") && "border-b border-black"
-              }`}
-            >
-              <LucideWallet size={20} />
-            </Link>
-            <button
-              className="p-2 text-black hover:text-gray-800"
-              onClick={() => handleOpenDrawer("claim")}
-            >
-              <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
-                <img
-                  src="/images/sup.svg"
-                  alt="Farcaster"
-                  className="w-5 h-5"
-                />
-              </div>
-            </button>
+            {currentPoolData.IS_CRACKED && (
+              <Link
+                href={`/wallet`}
+                className={`p-2 text-black hover:text-gray-800 ${
+                  pathname.includes("wallet") && "border-b border-black"
+                }`}
+              >
+                <LucideWallet size={20} />
+              </Link>
+            )}
+
+            {currentPoolData.SUP_REWARDS && (
+              <button
+                className="p-2 text-black hover:text-gray-800"
+                onClick={() => handleOpenDrawer("claim")}
+              >
+                <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
+                  <img
+                    src="/images/sup.svg"
+                    alt="Farcaster"
+                    className="w-5 h-5"
+                  />
+                </div>
+              </button>
+            )}
 
             <div
               className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"

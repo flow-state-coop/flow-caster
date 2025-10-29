@@ -19,7 +19,7 @@ export default function Leaderboard() {
   >();
   const { getCurrentPoolData } = usePool();
   const currentPoolData = getCurrentPoolData();
-  
+
   const {
     data: poolData,
     poolDistributors,
@@ -74,7 +74,9 @@ export default function Leaderboard() {
         user={user?.data}
         connectedAddress={address}
       >
-        <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
+        <div className="mt-3">
+          <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
+        </div>
         <Footer
           chainId={chainId}
           poolId={poolId}

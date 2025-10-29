@@ -42,6 +42,7 @@ type POOL_CONFIG = {
   FILTER_ZERO_UNITS: boolean;
   IS_CRACKED?: boolean;
   SUP_REWARDS?: boolean;
+  SPONSOR_ADDRESS?: string;
 };
 
 export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
@@ -77,6 +78,7 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     },
     FILTER_ZERO_UNITS: false,
     SUP_REWARDS: true,
+    SPONSOR_ADDRESS: "0xed6a062fbe2993be323af118f79e9b213c81f4f2",
   },
 };
 
