@@ -46,6 +46,14 @@ export interface PoolData {
     __typename: string;
     id: string;
     symbol: string;
+    name: string;
+    decimals: number;
+    isSuperToken: boolean;
+    underlyingAddress: string;
+    underlyingToken: {
+      symbol: string;
+      decimals: number;
+    };
   };
   poolMeta: {
     name: string;

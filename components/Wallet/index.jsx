@@ -15,7 +15,7 @@ import ManageSupertoken from "./ManageSupertoken";
 export default function Wallet() {
   const { getCurrentPoolData } = usePool();
   const poolData = getCurrentPoolData();
-  
+
   const {
     data: poolDataResult,
     poolDistributors,
@@ -29,7 +29,13 @@ export default function Wallet() {
   const { user } = useUser();
   const { address } = useAccount();
 
-  if (isLoading || !poolDataResult || !poolDistributors || !poolMembers || !user) {
+  if (
+    isLoading ||
+    !poolDataResult ||
+    !poolDistributors ||
+    !poolMembers ||
+    !user
+  ) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <Spinner />
@@ -61,7 +67,11 @@ export default function Wallet() {
           </h2>
           <div className="flex flex-col h-[calc(100vh-175px)] justify-between">
             <div className="min-h-72 px-4 py-3 bg-primary-100 border border-primary-500 rounded-lg">
-              <ManageSupertoken address={address} />
+              <ManageSupertoken
+                address={address}
+                chainId={poolData.DEFAULT_CHAIN_ID}
+                poolId={poolData.DEFAULT_POOL_ID}
+              />
             </div>
             <div className="bg-primary-100 border border-primary-400 px-4 py-3 rounded-lg">
               <button

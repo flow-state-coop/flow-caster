@@ -99,8 +99,8 @@ export default function PoolCircle({
       const nodeRadius = Math.max(
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
-          baseRadius * 3, // Max 300% of base size
-          baseRadius * unitRatio * 4 // Scale by units with multiplier
+          baseRadius * 3.5, // Max 350% of base size
+          baseRadius * unitRatio * 10 // Scale by units with multiplier
         )
       );
 

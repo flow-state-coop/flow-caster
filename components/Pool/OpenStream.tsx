@@ -20,11 +20,7 @@ import gdaAbi from "@/lib/abi/gdaV1.json";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { usePool } from "@/contexts/pool-context";
-import {
-  DEV_DONATION_PERCENT,
-  TOKEN_DATA,
-  ZERO_ADDRESS,
-} from "@/lib/constants";
+import { DEV_DONATION_PERCENT, ZERO_ADDRESS } from "@/lib/constants";
 import {
   Operation,
   OPERATION_TYPE,
@@ -79,8 +75,8 @@ export default function OpenStream({
   const { switchChain } = useSwitchChain();
   const { getCurrentPoolData } = usePool();
   const currentPoolData = getCurrentPoolData();
-  
-  const { refetch } = usePoolData({
+
+  const { refetch, data: poolData } = usePoolData({
     chainId,
     poolId,
   });
@@ -114,18 +110,20 @@ export default function OpenStream({
       hash: batchHash,
     });
 
-  const tokenData = TOKEN_DATA[chainId];
+  // const tokenData = TOKEN_DATA[chainId];
 
   // Fetch SuperToken balance
   const { data: superTokenBalance } = useReadSuperToken({
-    address: tokenData.address,
+    address: poolData?.token.id as `0x${string}`,
+    // address: tokenData.address,s
     functionName: "balanceOf",
     args: [address || ZERO_ADDRESS],
   });
 
   // Fetch underlying token balance
   const { data: underlyingBalance } = useReadContract({
-    address: tokenData.underlyingAddress as `0x${string}`,
+    // address: tokenData.underlyingAddress as `0x${string}`,
+    address: poolData?.token.underlyingAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "balanceOf",
     args: [address || ZERO_ADDRESS],
@@ -133,17 +131,23 @@ export default function OpenStream({
 
   // Fetch underlying token allowance for SuperToken contract
   const { data: underlyingAllowance } = useReadContract({
-    address: tokenData.underlyingAddress as `0x${string}`,
+    // address: tokenData.underlyingAddress as `0x${string}`,
+    address: poolData?.token.underlyingAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "allowance",
-    args: [address || ZERO_ADDRESS, tokenData.address],
+    args: [address || ZERO_ADDRESS, poolData?.token.id],
   }) as { data: bigint | undefined };
 
   const userBalance = superTokenBalance
     ? Number(formatUnits(superTokenBalance, 18))
     : 0;
   const usdcBalance = underlyingBalance
-    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals || 18))
+    ? Number(
+        formatUnits(
+          underlyingBalance,
+          poolData?.token.underlyingToken.decimals || 18
+        )
+      )
     : 0;
 
   // Validation logic
@@ -226,12 +230,16 @@ export default function OpenStream({
       setIsConfirming(true);
       approve(
         {
-          address: tokenData.underlyingAddress as `0x${string}`,
+          // address: tokenData.underlyingAddress as `0x${string}`,
+          address: poolData?.token.underlyingAddress as `0x${string}`,
           abi: erc20Abi,
           functionName: "approve",
           args: [
-            tokenData.address,
-            parseUnits(wrapAmount, tokenData.underlyingDecimals || 18),
+            poolData?.token.id,
+            parseUnits(
+              wrapAmount,
+              poolData?.token.underlyingToken.decimals || 18
+            ),
           ],
         },
         {
@@ -275,7 +283,7 @@ export default function OpenStream({
       operations = [
         prepareOperation({
           operationType: OPERATION_TYPE.SUPERTOKEN_UPGRADE,
-          target: tokenData.address,
+          target: poolData?.token.id as `0x${string}`,
           data: encodeFunctionData({
             abi: superTokenAbi,
             functionName: "upgrade",
@@ -314,7 +322,7 @@ export default function OpenStream({
             abi: gdaAbi,
             functionName: "distributeFlow",
             args: [
-              tokenData.address,
+              poolData?.token.id as `0x${string}`,
               address,
               currentPoolData.DEV_POOL_ADDRESS as `0x${string}`,
               devFlowRate,
@@ -339,7 +347,7 @@ export default function OpenStream({
           abi: gdaAbi,
           functionName: "distributeFlow",
           args: [
-            tokenData.address,
+            poolData?.token.id as `0x${string}`,
             address,
             poolAddress as `0x${string}`,
             poolFlowRate,
@@ -443,9 +451,9 @@ export default function OpenStream({
     if (isSuccess) return "Success!";
     if (isMonthlyDonationEmpty) return "Add streaming amount";
     if (isWrapAmountExceedsBalance)
-      return `${tokenData.underlyingSymbol} balance too low`;
+      return `${poolData?.token.underlyingToken.symbol} balance too low`;
     if (isInsufficientBalance)
-      return `${tokenData.symbol} balance too low. Wrap ${tokenData.underlyingSymbol}.`;
+      return `${poolData?.token.symbol} balance too low. Wrap ${poolData?.token.underlyingToken.symbol}.`;
     if (connectedDonor) return "Edit Stream";
     return "Open Stream";
   };
@@ -492,12 +500,12 @@ export default function OpenStream({
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="text-gray-500 text-sm font-medium">
-                      {tokenData.symbol}
+                      {poolData?.token.symbol}
                     </span>
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-primary-700">
-                  Streaming token ({tokenData.symbol}) balance:{" "}
+                  Streaming token ({poolData?.token.symbol}) balance:{" "}
                   {userBalance.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                   })}
@@ -509,8 +517,8 @@ export default function OpenStream({
                   htmlFor="wrapAmount"
                   className="block text-sm font-medium text-primary-800 mb-2"
                 >
-                  How much {tokenData.underlyingSymbol} should we wrap to fund
-                  your stream?
+                  How much {poolData?.token.underlyingToken.symbol} should we
+                  wrap to fund your stream?
                 </label>
                 <div className="relative">
                   <input
@@ -524,20 +532,20 @@ export default function OpenStream({
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="text-gray-500 text-sm font-medium">
-                      {tokenData.underlyingSymbol}{" "}
+                      {poolData?.token.underlyingToken.symbol}{" "}
                     </span>
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-primary-700">
-                  {tokenData.underlyingSymbol} balance:{" "}
+                  {poolData?.token.underlyingToken.symbol} balance:{" "}
                   {usdcBalance.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                   })}
                 </p>
                 <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
                   <p className="text-primary-800 font-bold">
-                    Your stream will last until your {tokenData.symbol} balance
-                    is depleted. You can wrap/unwrap more any time.{" "}
+                    Your stream will last until your {poolData?.token.symbol}{" "}
+                    balance is depleted. You can wrap/unwrap more any time.{" "}
                   </p>
                   <p className="mt-2 text-primary-800 font-normal">
                     {(() => {
@@ -573,7 +581,7 @@ export default function OpenStream({
                   const currentAllowance = Number(underlyingAllowance) || 0;
                   const wrapAmountValue = parseUnits(
                     wrapAmount,
-                    tokenData.underlyingDecimals || 18
+                    poolData?.token.underlyingToken.decimals || 18
                   );
 
                   if (
@@ -584,7 +592,7 @@ export default function OpenStream({
                       <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
                         <p className="text-xs text-accent-800">
                           There will be an approval request allowing wrapping of{" "}
-                          {tokenData.underlyingSymbol}
+                          {poolData?.token.underlyingToken.symbol}
                         </p>
                       </div>
                     );
