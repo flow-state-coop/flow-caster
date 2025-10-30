@@ -17,7 +17,11 @@ import hostAbi from "@/lib/abi/sfHost.json";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { usePool } from "@/contexts/pool-context";
-import { DEV_DONATION_PERCENT, ZERO_ADDRESS } from "@/lib/constants";
+import {
+  DEV_DONATION_PERCENT,
+  NERITE_TOKEN_ID,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
 import {
   Operation,
   OPERATION_TYPE,
@@ -352,6 +356,12 @@ export default function OpenStreamSimple({
     return "Open Stream";
   };
 
+  const handleViewToken = async () => {
+    await sdk.actions.viewToken({
+      token: NERITE_TOKEN_ID,
+    });
+  };
+
   return (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -367,6 +377,17 @@ export default function OpenStreamSimple({
       </div>
 
       <div className="max-w-md mx-auto">
+        <div className="mb-6 pb-6 w-full border-b border-primary-800">
+          <p className="mt-2 mb-4 text-2xl text-primary-800 font-bold text-center">
+            {userBalance.toLocaleString("en-US", {
+              maximumFractionDigits: 2,
+            })}{" "}
+            {poolData?.token.symbol}
+          </p>
+          <BaseButton onClick={handleViewToken} type="button">
+            Buy {poolData?.token.symbol}
+          </BaseButton>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isSuccess && (
             <>

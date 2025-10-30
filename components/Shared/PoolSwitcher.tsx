@@ -1,14 +1,12 @@
 "use client";
 
-import { switchChain } from "@wagmi/core";
 import { usePool } from "../../contexts/pool-context";
 import { FEATURED_POOLS } from "../../lib/constants";
-import { config } from "@/contexts/miniapp-wallet-context";
 import { ChangeEvent } from "react";
 import { useRouter, usePathname, useParams } from "next/navigation";
 
 export default function PoolSwitcher() {
-  const { selectedPool, setSelectedPool } = usePool();
+  const { selectedPool, setPool } = usePool();
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ chainId?: string; poolId?: string }>();
@@ -25,10 +23,7 @@ export default function PoolSwitcher() {
   const handlePoolChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     const poolData =
       FEATURED_POOLS[e.target.value as keyof typeof FEATURED_POOLS];
-    setSelectedPool(`${poolData.DEFAULT_CHAIN_ID}-${poolData.DEFAULT_POOL_ID}`);
-    await switchChain(config, {
-      chainId: Number(poolData.DEFAULT_CHAIN_ID),
-    });
+    setPool(`${poolData.DEFAULT_CHAIN_ID}-${poolData.DEFAULT_POOL_ID}`);
 
     // If we're on a pool route, navigate to the new pool route
     if (pathname?.startsWith("/pool/") && params?.chainId && params?.poolId) {

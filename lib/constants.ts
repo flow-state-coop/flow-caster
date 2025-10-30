@@ -86,6 +86,8 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
   },
 };
 
+export const NERITE_TOKEN_ID = `eip155:42161/erc20:0x4ecf61a6c2fab8a047ceb3b3b263b401763e9d49`;
+
 export const TARGET_CHAIN_OBJS = Object.keys(FEATURED_POOLS).map(
   (k) => FEATURED_POOLS[k].VIEM_CHAIN_OBJ
 );
