@@ -7,16 +7,28 @@ const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { chainid: string; poolid: string };
 };
 
 export async function generateMetadata({
   searchParams,
+  params,
 }: Props): Promise<Metadata> {
   const search = await searchParams;
-  let imageUrl = `${appUrl}/api/share`;
+  const { chainid, poolid } = await params;
+
+  let imageUrl = `${appUrl}/api/share?poolKey=${chainid}-${poolid}`;
 
   if (search.totalFlow || search.totalFlow === "0") {
-    imageUrl += `?totalFlow=${search.totalFlow}`;
+    imageUrl += `&totalFlow=${search.totalFlow}`;
+  }
+
+  if (search.tokenSymbol) {
+    imageUrl += `&tokenSymbol=${search.tokenSymbol}`;
+  }
+
+  if (search.poolKey) {
+    imageUrl += `&poolKey=${search.poolKey}`;
   }
 
   const finalUrl = new URL(imageUrl);

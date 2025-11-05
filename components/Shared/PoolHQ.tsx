@@ -85,6 +85,7 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
         poolAddress={poolData.id}
         totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
         activeMemberCount={activeMemberCount}
+        poolTokenSymbol={poolData.token.symbol}
       />
     </PoolUserProvider>
   );

@@ -35,7 +35,7 @@ import {
 } from "@/lib/pool";
 import { networks } from "@/lib/flowapp/networks";
 import { PoolData } from "@/lib/types";
-import { openExplorerUrl } from "@/lib/helpers";
+import { openExplorerUrl, shareContent } from "@/lib/helpers";
 import BaseButton from "../Shared/BaseButton";
 import { config } from "@/contexts/miniapp-wallet-context";
 
@@ -321,9 +321,7 @@ export default function OpenStreamSimple({
     }
 
     await sdk.actions.composeCast({
-      text: `Streaming tips?! I'm supporting ${
-        activeMemberCount ? activeMemberCount : ""
-      } Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: shareContent(`${chainId}-${poolId}`),
       embeds: [targetUrl],
     });
   };

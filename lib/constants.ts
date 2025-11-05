@@ -100,17 +100,3 @@ export const FEATURED_POOL_NETWORK = networks.find(
 );
 
 export const VIZ_PAUSED = true;
-
-export const POOL_CONTENT: Record<
-  string,
-  {
-    INFO_DRAWER: string;
-  }
-> = {
-  "8453-32": {
-    INFO_DRAWER: "yolo",
-  },
-  "11155420-96": {
-    INFO_DRAWER: "yolo",
-  },
-};

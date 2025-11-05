@@ -17,6 +17,7 @@ import { useMiniApp } from "@/contexts/miniapp-context";
 import { usePool } from "@/contexts/pool-context";
 import ConnectPoolCracked from "../Pool/ConnectPoolCracked";
 import OpenStreamSimple from "../Pool/OpenStreamSimple";
+import { shareContent } from "@/lib/helpers";
 
 interface FooterProps {
   chainId: string;
@@ -24,6 +25,7 @@ interface FooterProps {
   poolAddress: string;
   totalFlow: string | number;
   activeMemberCount?: number;
+  poolTokenSymbol: string;
 }
 type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
@@ -33,6 +35,7 @@ export default function Footer({
   poolAddress,
   totalFlow,
   activeMemberCount,
+  poolTokenSymbol,
 }: FooterProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -68,15 +71,13 @@ export default function Footer({
 
   const handleCast = async () => {
     await sdk.actions.composeCast({
-      text: `Streaming tips?! Open a real-time stream split to ${
-        activeMemberCount ? activeMemberCount : ""
-      } Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
+      text: shareContent(`${chainId}-${poolId}`),
       embeds: [
         `${
           process.env.NEXT_PUBLIC_URL
         }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
           totalFlow
-        )}`,
+        )}&tokenSymbol=${poolTokenSymbol}`,
       ],
     });
   };

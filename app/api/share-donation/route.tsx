@@ -58,11 +58,25 @@ const archivoBlackBuffer = readFileSync(
 const logoBuffer = readFileSync(path.join(process.cwd(), "static", "icon.png"));
 const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
-const devsBuffer = readFileSync(path.join(process.cwd(), "static", "devs.png"));
-const devsBase64 = `data:image/png;base64,${devsBuffer.toString("base64")}`;
+const arbLogoBuffer = readFileSync(
+  path.join(process.cwd(), "static", "arb-logo.png")
+);
+const arbLogoBase64 = `data:image/png;base64,${arbLogoBuffer.toString(
+  "base64"
+)}`;
 
-// const flowlineBuffer = readFileSync(path.join(process.cwd(), "static", "og-flowline.svg"));
-// const devsBase64 = `data:image/png;base64,${devsBuffer.toString("base64")}`;
+const crackedDevsBuffer = readFileSync(
+  path.join(process.cwd(), "static", "cracked-devs.png")
+);
+const crackedDevsBase64 = `data:image/png;base64,${crackedDevsBuffer.toString(
+  "base64"
+)}`;
+const defaultDevsBuffer = readFileSync(
+  path.join(process.cwd(), "static", "default-devs.png")
+);
+const defaultDevsBase64 = `data:image/png;base64,${defaultDevsBuffer.toString(
+  "base64"
+)}`;
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,6 +95,13 @@ export async function GET(request: NextRequest) {
     }
     const flowRate = searchParams.get("flowRate");
 
+    const poolKey = searchParams.get("poolKey");
+    const tokenSymbol = searchParams.get("tokenSymbol");
+    const isArb = poolKey === "11155420-96";
+
+    const poolImg =
+      poolKey === "8453-32" ? crackedDevsBase64 : defaultDevsBase64;
+
     let user;
 
     const options = {
@@ -98,6 +119,19 @@ export async function GET(request: NextRequest) {
 
       user = users.users[0];
     }
+
+    let donorName = user.username;
+    let donorPfp = user.pfp_url;
+    // if (isArb) {
+    if (isArb && !user) {
+      donorPfp = arbLogoBase64;
+      donorName = "Arbitrum Foundation";
+    }
+
+    const lineOne = isArb ? "Stream $USND" : "Stream Tokens";
+    const LineTwo = isArb
+      ? "Support Arbitrum Mini Apps"
+      : "Support Farcaster Cracked Devs";
 
     return new ImageResponse(
       (
@@ -124,13 +158,15 @@ export async function GET(request: NextRequest) {
               tw="flex flex-col w-full"
               style={{ display: "flex", gap: "10px" }}
             >
-              <div style={STYLES.sectionText}>Stream Tokens</div>
+              <div style={STYLES.sectionText}>{lineOne}</div>
               <div style={{ ...STYLES.sectionText, color: "#D95D39" }}>
-                Support Farcaster Cracked Devs
+                {LineTwo}
               </div>
-              <div style={{ ...STYLES.sectionText, color: "#75eb00" }}>
-                Earn SUP
-              </div>
+              {isArb && (
+                <div style={{ ...STYLES.sectionText, color: "#75eb00" }}>
+                  Earn SUP
+                </div>
+              )}
               <div
                 style={{
                   display: "flex",
@@ -145,7 +181,7 @@ export async function GET(request: NextRequest) {
                 >
                   <img
                     style={STYLES.pfpImg}
-                    src={user.pfp_url}
+                    src={donorPfp}
                     height={100}
                     width={100}
                     alt="pfp"
@@ -247,16 +283,16 @@ export async function GET(request: NextRequest) {
                     color: "#679A8B",
                   }}
                 >
-                  {user.username}
+                  {donorName}
                 </p>
                 {flowRate && (
                   <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
-                    is streaming {flowRate} USDCx / mo
+                    is streaming {flowRate} {tokenSymbol || "tokens"} / mo
                   </p>
                 )}
                 {!flowRate && (
                   <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
-                    is streaming USDCx
+                    is streaming {tokenSymbol || "tokens"}
                   </p>
                 )}
               </div>
@@ -268,7 +304,7 @@ export async function GET(request: NextRequest) {
               alignItems: "center",
             }}
           >
-            <img src={devsBase64} height={350} width={350} alt="circle" />
+            <img src={poolImg} height={350} width={350} alt="circle" />
           </div>
         </div>
       ),

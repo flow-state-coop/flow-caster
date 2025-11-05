@@ -7,21 +7,32 @@ const appUrl = env.NEXT_PUBLIC_URL;
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { chainid: string; poolid: string };
 };
 
 export async function generateMetadata({
   searchParams,
+  params,
 }: Props): Promise<Metadata> {
   const search = await searchParams;
-  let imageUrl = `${appUrl}/api/share-donation?`;
+  const { chainid, poolid } = await params;
+  let imageUrl = `${appUrl}/api/share-donation?poolKey=${chainid}-${poolid}`;
 
   if (search.fid && search.flowRate) {
-    imageUrl += `fid=${search.fid}&flowRate=${search.flowRate}`;
+    imageUrl += `&fid=${search.fid}&flowRate=${search.flowRate}`;
+  }
+
+  if (search.tokenSymbol) {
+    imageUrl += `&tokenSymbol=${search.tokenSymbol}`;
+  }
+
+  if (search.poolKey) {
+    imageUrl += `&poolKey=${search.poolKey}`;
   }
 
   const frame = {
     version: "next",
-    imageUrl: imageUrl,
+    imageUrl: encodeURI(imageUrl),
     button: {
       title: "Launch flowcaster",
       action: {
