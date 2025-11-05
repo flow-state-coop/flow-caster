@@ -70,15 +70,15 @@ export default function Footer({
   };
 
   const handleCast = async () => {
+    const targetUrl = `${
+      process.env.NEXT_PUBLIC_URL
+    }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+      totalFlow
+    )}&tokenSymbol=${poolTokenSymbol}`;
+    console.log("targetUrl", targetUrl);
     await sdk.actions.composeCast({
       text: shareContent(`${chainId}-${poolId}`),
-      embeds: [
-        `${
-          process.env.NEXT_PUBLIC_URL
-        }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
-          totalFlow
-        )}&tokenSymbol=${poolTokenSymbol}`,
-      ],
+      embeds: [targetUrl],
     });
   };
 

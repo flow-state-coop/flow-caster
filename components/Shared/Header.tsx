@@ -4,10 +4,14 @@
 import Image from "next/image";
 import PoolSwitcher from "./PoolSwitcher";
 import { usePool } from "@/contexts/pool-context";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { getCurrentPoolData } = usePool();
   const currentPoolData = getCurrentPoolData();
+  const pathname = usePathname();
+
+  const hideSwitcher = pathname.includes("wallet");
 
   return (
     <div>
@@ -20,7 +24,7 @@ export default function Header() {
         </div>
       </div>
       <div className="mt-2">
-        <PoolSwitcher />
+        {!hideSwitcher && <PoolSwitcher />}
         <div className="text-black text-xs w-full mt-1 flex gap-1">
           {currentPoolData.CONTENT.LOGO && (
             <img
