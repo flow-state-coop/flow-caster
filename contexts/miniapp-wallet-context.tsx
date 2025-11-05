@@ -2,10 +2,7 @@ import { farcasterFrame as miniAppConnector } from "@farcaster/miniapp-wagmi-con
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, injected, WagmiProvider } from "wagmi";
 import { Chain } from "wagmi/chains";
-import {
-  TARGET_CHAIN_OBJS,
-  FEATURED_POOLS,
-} from "@/lib/constants";
+import { TARGET_CHAIN_OBJS, FEATURED_POOLS } from "@/lib/constants";
 
 export const config = createConfig({
   chains: TARGET_CHAIN_OBJS as [Chain, ...Chain[]],
@@ -15,8 +12,8 @@ export const config = createConfig({
       return acc;
     }, {} as Record<number, any>),
   },
-  // connectors: [miniAppConnector()],
-  connectors: [injected()],
+  connectors: [miniAppConnector()],
+  // connectors: [injected()],
 });
 
 const queryClient = new QueryClient();
