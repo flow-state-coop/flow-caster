@@ -379,17 +379,19 @@ export default function OpenStreamSimple({
       </div>
 
       <div className="max-w-md mx-auto">
-        <div className="mb-6 pb-6 w-full border-b border-primary-800">
-          <p className="mt-2 mb-4 text-2xl text-primary-800 font-bold text-center">
-            {userBalance.toLocaleString("en-US", {
-              maximumFractionDigits: 2,
-            })}{" "}
-            {poolData?.token.symbol}
-          </p>
-          <BaseButton onClick={handleViewToken} type="button">
-            Buy {poolData?.token.symbol}
-          </BaseButton>
-        </div>
+        {!isSuccess && (
+          <div className="mb-6 pb-6 w-full border-b border-primary-800">
+            <p className="mt-2 mb-4 text-2xl text-primary-800 font-bold text-center">
+              {userBalance.toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+              })}{" "}
+              {poolData?.token.symbol}
+            </p>
+            <BaseButton onClick={handleViewToken} type="button">
+              Buy {poolData?.token.symbol}
+            </BaseButton>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isSuccess && (
             <>

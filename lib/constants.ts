@@ -75,7 +75,7 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     VIEM_CHAIN_OBJ: optimismSepolia,
     CONTENT: {
       NAME: "Arbitrum Mini App Rewards",
-      DESCRIPTION: "Continuous rewards for Arbitrum's top mini app",
+      DESCRIPTION: "Continuous rewards for Arbitrum's top mini apps",
       POOL_TITLE: "Sponsored by the Arbitrum Foundation",
       LOGO: "/images/arb-logo.svg",
     },

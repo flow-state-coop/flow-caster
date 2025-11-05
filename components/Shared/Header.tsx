@@ -15,14 +15,6 @@ export default function Header() {
 
   return (
     <div>
-      <div className="flex flex-row items-center justify-between w-full mb-1">
-        <div className="flex flex-row items-center gap-1">
-          <Image src="/images/icon.png" width={30} height={30} alt="logo" />
-          <h1 className="text-xl font-header text-black tracking-tight">
-            flowcaster
-          </h1>
-        </div>
-      </div>
       <div className="mt-2">
         {!hideSwitcher && <PoolSwitcher />}
         <div className="text-black text-xs w-full mt-1 flex gap-1">
