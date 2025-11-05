@@ -27,10 +27,6 @@ export async function generateMetadata({
     imageUrl += `&tokenSymbol=${search.tokenSymbol}`;
   }
 
-  if (search.poolKey) {
-    imageUrl += `&poolKey=${search.poolKey}`;
-  }
-
   const finalUrl = new URL(imageUrl);
 
   console.log("finalUrl", finalUrl.toString());

@@ -87,6 +87,7 @@ export default function Leaderboard() {
           poolId={poolId}
           poolAddress={poolData.id}
           totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+          poolTokenSymbol={poolData.token.symbol}
         />
       </PoolUserProvider>
     </main>

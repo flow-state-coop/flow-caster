@@ -25,6 +25,7 @@ export const FLUID_LOCKER_CONTRACT =
 // export const FEATURED_POOL_ID = "32";
 export const FEATURED_NETWORK_ID = "11155420";
 export const FEATURED_POOL_ID = "96";
+export const FEATURED_TOKEN_SYMBOL = "$USND";
 
 type POOL_CONFIG = {
   DEFAULT_CHAIN_ID: string;

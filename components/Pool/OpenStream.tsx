@@ -424,6 +424,10 @@ export default function OpenStream({
       targetUrl += `&fid=${user.data.fid}`;
     }
 
+    if (poolData?.token.symbol) {
+      targetUrl += `&tokenSymbol=${poolData.token.symbol}`;
+    }
+
     await sdk.actions.composeCast({
       text: shareContent(`${chainId}-${poolId}`),
       embeds: [targetUrl],
