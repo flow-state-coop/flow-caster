@@ -494,7 +494,7 @@ export default function PoolCircle({
           );
         })}
       </svg>
-      {/* <div className="flex flex-row justify-between w-full mt-2">
+      <div className="flex flex-row justify-between w-full mt-2">
         {donors.map((donor, i) => {
           return (
             <DonorStats
@@ -511,7 +511,7 @@ export default function PoolCircle({
             />
           );
         })}
-      </div> */}
+      </div>
     </div>
   );
 }
