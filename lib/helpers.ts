@@ -17,10 +17,10 @@ export const shareContent = (poolKey: string): string => {
     return `Arbitrum’s top mini app builders now earn by the second 💸🌊. 
     
 @arbitrum, @flowstate, & @superfluid are teaming up for S2 of Flow Caster:
-- 🤝Dynamic scoring based on daily & transacting users
-- 🐳60k $USND sponsor funding
-- 📈2M $SUP incentives
-- 🤑??? crowdsourced funding 
+- 🤝 Dynamic scoring based on daily & transacting users
+- 🐳 60k $USND sponsor funding
+- 📈 3M+ $SUP incentives
+- 🤑 ??? crowdsourced funding 
 `;
   }
   return "Instant + Consistent Funding. Real-time token stream on @flowstatecoop";

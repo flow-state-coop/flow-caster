@@ -381,11 +381,14 @@ export default function OpenStreamSimple({
       <div className="max-w-md mx-auto">
         {!isSuccess && (
           <div className="mb-6 pb-6 w-full border-b border-primary-800">
-            <p className="mt-2 mb-4 text-2xl text-primary-800 font-bold text-center">
+            <p className="mt-2 text-2xl text-primary-800 font-bold text-center">
               {userBalance.toLocaleString("en-US", {
                 maximumFractionDigits: 2,
               })}{" "}
               {poolData?.token.symbol}
+            </p>
+            <p className="mt-2 mb-4 text-sm text-primary-800 text-center">
+              Nerite is a natively streamable stablecoin.
             </p>
             <BaseButton onClick={handleViewToken} type="button">
               Buy {poolData?.token.symbol}
@@ -476,7 +479,7 @@ export default function OpenStreamSimple({
                     htmlFor="donateToDevs"
                     className="ml-2 block text-sm font-medium text-primary-800"
                   >
-                    Donate 5% to the Flow Caster devs
+                    Donate 5% to the Flow Caster devs for x2 SUP XP
                   </label>
                 </div>
               </div>

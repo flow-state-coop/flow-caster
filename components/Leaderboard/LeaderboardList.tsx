@@ -5,7 +5,6 @@ import { sdk } from "@farcaster/miniapp-sdk";
 import { ratePerMonthFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
 import FlowAmount from "../Pool/FlowAmount";
-import { usePool } from "@/contexts/pool-context";
 
 interface LeaderboardListProps {
   poolData?: PoolData;
