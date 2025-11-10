@@ -27,7 +27,7 @@ interface FooterProps {
   activeMemberCount?: number;
   poolTokenSymbol: string;
 }
-type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
+export type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
 export default function Footer({
   chainId,
@@ -222,6 +222,7 @@ export default function Footer({
           {drawerType === "info" && (
             <InfoDrawer
               handleCloseDrawer={handleCloseDrawer}
+              handleOpenDrawer={handleOpenDrawer}
               activeMemberCount={activeMemberCount}
               poolKey={`${chainId}-${poolId}`}
             />

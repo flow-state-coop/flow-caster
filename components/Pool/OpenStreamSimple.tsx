@@ -364,6 +364,12 @@ export default function OpenStreamSimple({
     });
   };
 
+  const onClaimSup = async () => {
+    await sdk.actions.openMiniApp({
+      url: "https://farcaster.xyz/miniapps/1NTJKdUZCsPI/superfluid-claim-app",
+    });
+  };
+
   return (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -538,10 +544,19 @@ export default function OpenStreamSimple({
           {isSuccess && Number(monthlyDonation) > 0 && (
             <>
               <div className="flex flex-col gap-1">
-                <p className="text-primary-500 text-sm">
-                  You&apos;ve joined the galaxy of Cracked Dev supporters!
-                </p>
+                <p className="text-primary-500 text-sm">Success! 🫡</p>
               </div>
+
+              <p className="text-primary-500 text-sm">
+                You&apos;re now supporting top buidlers by the second! Make sure
+                to claim your{" "}
+                <span
+                  className="hover:cursor-pointer text-primary-700 hover:text-primary-500 underline"
+                  onClick={onClaimSup}
+                >
+                  SUP XP Daily
+                </span>
+              </p>
 
               <p className="text-primary-500 text-sm">
                 Cast about it to help grow the flow.

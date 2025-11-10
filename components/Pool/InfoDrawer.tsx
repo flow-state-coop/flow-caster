@@ -1,15 +1,18 @@
 "use client";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { X } from "lucide-react";
+import { DrawerTypes } from "../Shared/Footer";
 
 interface InfoDrawerProps {
   handleCloseDrawer: () => void;
+  handleOpenDrawer: (types: DrawerTypes) => void;
   activeMemberCount?: number;
   poolKey: string;
 }
 
 export default function InfoDrawer({
   handleCloseDrawer,
+  handleOpenDrawer,
   activeMemberCount,
   poolKey,
 }: InfoDrawerProps) {
@@ -29,10 +32,18 @@ export default function InfoDrawer({
           <CrackedInfo
             activeMemberCount={activeMemberCount}
             handleCloseDrawer={handleCloseDrawer}
+            handleOpenDrawer={handleOpenDrawer}
             poolKey={poolKey}
           />
         )}
-        {poolKey === "11155420-96" && <ArbInfo />}
+        {poolKey === "11155420-96" && (
+          <ArbInfo
+            activeMemberCount={activeMemberCount}
+            handleCloseDrawer={handleCloseDrawer}
+            handleOpenDrawer={handleOpenDrawer}
+            poolKey={poolKey}
+          />
+        )}
       </div>
     </>
   );
@@ -64,22 +75,36 @@ function CrackedInfo({ activeMemberCount }: InfoDrawerProps) {
   );
 }
 
-function ArbInfo() {
+function ArbInfo({ handleOpenDrawer }: InfoDrawerProps) {
+  const onClaimSup = async () => {
+    await sdk.actions.openMiniApp({
+      url: "https://farcaster.xyz/miniapps/1NTJKdUZCsPI/superfluid-claim-app",
+    });
+  };
+
   return (
     <>
       <p>
-        Flow Caster uses daily and transacting users to dynamically score
-        Arbitrum’s top mini apps and assign them proportional weights in a
-        streaming pool.
+        Flow Caster scores Arbitrum’s top mini apps and assigns shares in a
+        dynamic streaming funding pool.
       </p>
+      <p>Builders get paid every second instead of weekly.</p>
       <p>
-        Rather than getting paid once a week, Arbitrum builders get paid every
-        second.
-      </p>
-      <p>
-        Builder rewards are supported by the Arbitrum Foundation (60k USND over
-        6 months), Superfluid DAO (2M SUP in incentives), & community members
-        like you.
+        The campaign is supported by the Arbitrum Foundation (60k USND over 6
+        months), Superfluid DAO{" "}
+        <span
+          onClick={onClaimSup}
+          className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
+        >
+          (3M+ SUP in incentives)
+        </span>
+        , &{" "}
+        <span
+          onClick={() => handleOpenDrawer("stream")}
+          className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
+        >
+          community donors like you.
+        </span>
       </p>
     </>
   );

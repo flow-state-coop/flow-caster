@@ -81,7 +81,7 @@ export default function LeaderboardList({
               }`}
               onClick={() => handleViewProfile(!!isSponsor, user?.fid)}
             >
-              <div className="w-5 text-right mr-2 font-bold">
+              <div className="w-5 text-center mr-2 font-bold">
                 {isTop && (
                   <Crown fill="gold" className="w-6 h-6 text-yellow-400" />
                 )}

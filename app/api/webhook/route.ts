@@ -86,7 +86,7 @@ export async function POST(request: Request) {
         await sendFrameNotification({
           fid,
           title: `Welcome to flowcaster`,
-          body: `Open a stream to support the Cracked Devs. Claim $SUP when you've crossed $1 streamed.`,
+          body: `3M+ Superfluid SUP tokens are up for grabs. Stream USND ($1 minimum) to earn!.`,
         });
       } else {
         await deleteUserNotificationDetails(fid);

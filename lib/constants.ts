@@ -71,7 +71,7 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     DEV_POOL_ADDRESS: "0xb5cb850de58ff3fb199b72bbb235b46dd314c0fd",
     DEV_POOL_ID: "97",
     DEFAULT_POOL_ID: "96",
-    SUP_PROGRAM_ID: 7742,
+    SUP_PROGRAM_ID: 7761,
     VIEM_CHAIN_OBJ: optimismSepolia,
     CONTENT: {
       NAME: "Arbitrum Mini App Rewards",
