@@ -359,9 +359,13 @@ export default function OpenStreamSimple({
   };
 
   const handleViewToken = async () => {
-    await sdk.actions.viewToken({
-      token: NERITE_TOKEN_ID,
+    await sdk.actions.swapToken({
+      buyToken: NERITE_TOKEN_ID,
     });
+
+    //   await sdk.actions.viewToken({
+    //   token: NERITE_TOKEN_ID,
+    // });
   };
 
   const onClaimSup = async () => {
