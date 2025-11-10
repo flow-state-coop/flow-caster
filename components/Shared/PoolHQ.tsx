@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { useUser } from "@/contexts/user-context";
 import { usePool } from "@/contexts/pool-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
@@ -10,6 +10,7 @@ import PoolCircle from "@/components/Pool/PoolCircle";
 import Footer from "./Footer";
 import Spinner from "./Spinner";
 import BaseButton from "./BaseButton";
+import { useEffect } from "react";
 
 interface PoolHQProps {
   chainId: string;
@@ -38,7 +39,25 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
   });
 
   const { user, signIn } = useUser();
-  const { address } = useAccount();
+  const { address, chainId: connectedChainId } = useAccount();
+  const { switchChain } = useSwitchChain();
+
+  useEffect(() => {
+    const connectToChain = async () => {
+      try {
+        await switchChain({ chainId: Number(chainId) });
+      } catch (error) {
+        console.error("Chain switching failed:", error);
+        return;
+      }
+    };
+    console.log("poolhq chainId", chainId);
+    console.log("poolhq connectedChainId", connectedChainId);
+
+    if (Number(chainId) !== connectedChainId) {
+      connectToChain();
+    }
+  }, [chainId, connectedChainId, switchChain]);
 
   // console.log("poolData", poolData);
 
