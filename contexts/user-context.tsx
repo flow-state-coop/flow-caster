@@ -130,7 +130,7 @@ export const UserProvider = ({
     if (status !== "connected") {
       console.log("******* auto connect status", status);
       // TODO: TEST ME
-      // connect({ connector: connectors[0] });
+      connect({ connector: connectors[0] });
     }
   }, [status, connect, connectors]);
 
