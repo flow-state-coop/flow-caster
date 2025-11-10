@@ -4,6 +4,7 @@ import { usePool } from "../../contexts/pool-context";
 import { FEATURED_POOLS } from "../../lib/constants";
 import { ChangeEvent } from "react";
 import { useRouter, usePathname, useParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 export default function PoolSwitcher() {
   const { selectedPool, setPool } = usePool();
@@ -36,12 +37,12 @@ export default function PoolSwitcher() {
   };
 
   return (
-    <div className="w-48">
+    <div className="relative w-72">
       <select
         id="pool-select"
         value={selectedPool}
         onChange={(e) => handlePoolChange(e)}
-        className="bg-white border border-black focus:outline-none focus:ring-0 text-black text-xs rounded block w-full py-1 px-1 hover:cursor-pointer"
+        className="appearance-none bg-white border border-black shadow-none focus:outline-none focus:ring-0 text-black font-bold text-lg rounded-full block w-full py-2 pr-10 pl-2 hover:cursor-pointer"
       >
         {poolOptions.map((option) => (
           <option key={option.key} value={option.value}>
@@ -49,6 +50,7 @@ export default function PoolSwitcher() {
           </option>
         ))}
       </select>
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black" />
     </div>
   );
 }

@@ -15,19 +15,7 @@ export default function Header() {
 
   return (
     <div>
-      <div className="mt-2">
-        {!hideSwitcher && <PoolSwitcher />}
-        <div className="text-black text-xs w-full mt-1 flex gap-1">
-          {currentPoolData.CONTENT.LOGO && (
-            <img
-              src={currentPoolData.CONTENT.LOGO}
-              alt="logo"
-              className="w-4 h-4 rounded-full"
-            />
-          )}
-          {currentPoolData.CONTENT.DESCRIPTION}
-        </div>
-      </div>
+      <div className="mt-2">{!hideSwitcher && <PoolSwitcher />}</div>
     </div>
   );
 }

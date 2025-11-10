@@ -31,3 +31,10 @@ body {
   color: black;
   opacity: 0.95;
 }
+
+select {
+  appearance: none; /* Standard */
+  -webkit-appearance: none; /* Safari/Chrome */
+  -moz-appearance: none; /* Firefox */
+  background: none; /* Removes default background */
+}
