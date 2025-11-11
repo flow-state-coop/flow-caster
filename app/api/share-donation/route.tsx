@@ -41,8 +41,6 @@ const STYLES = {
     width: "100px",
     height: "100px",
     borderRadius: "50%",
-    border: "3px",
-    borderColor: "#679A8B",
   },
 };
 
@@ -58,10 +56,10 @@ const archivoBlackBuffer = readFileSync(
 const logoBuffer = readFileSync(path.join(process.cwd(), "static", "icon.png"));
 const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
-const arbLogoBuffer = readFileSync(
-  path.join(process.cwd(), "static", "arb-logo.png")
+const communityLogoBuffer = readFileSync(
+  path.join(process.cwd(), "static", "community-logo.png")
 );
-const arbLogoBase64 = `data:image/png;base64,${arbLogoBuffer.toString(
+const communityLogoBase64 = `data:image/png;base64,${communityLogoBuffer.toString(
   "base64"
 )}`;
 
@@ -72,7 +70,7 @@ const crackedDevsBase64 = `data:image/png;base64,${crackedDevsBuffer.toString(
   "base64"
 )}`;
 const defaultDevsBuffer = readFileSync(
-  path.join(process.cwd(), "static", "default-devs.png")
+  path.join(process.cwd(), "static", "arb-devs.png")
 );
 const defaultDevsBase64 = `data:image/png;base64,${defaultDevsBuffer.toString(
   "base64"
@@ -124,7 +122,7 @@ export async function GET(request: NextRequest) {
     let donorPfp = user.pfp_url;
     // if (isArb) {
     if (isArb && !user) {
-      donorPfp = arbLogoBase64;
+      donorPfp = communityLogoBase64;
       donorName = "Arbitrum Foundation";
     }
 

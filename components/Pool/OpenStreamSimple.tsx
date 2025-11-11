@@ -547,10 +547,6 @@ export default function OpenStreamSimple({
 
           {isSuccess && Number(monthlyDonation) > 0 && (
             <>
-              <div className="flex flex-col gap-1">
-                <p className="text-primary-500 text-sm">Success! 🫡</p>
-              </div>
-
               <p className="text-primary-500 text-sm">
                 You&apos;re now supporting top buidlers by the second! Make sure
                 to claim your{" "}
