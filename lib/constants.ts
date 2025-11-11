@@ -1,19 +1,7 @@
-import { base, Chain, optimismSepolia } from "wagmi/chains";
+import { base, Chain, optimismSepolia, arbitrum } from "wagmi/chains";
 import { networks } from "./flowapp/networks";
 
 export const MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 day
-
-export const TOKEN_METADATA = {
-  "0xD04383398dD2426297da660F9CCA3d439AF9ce1b": {
-    icon: "/usdc.png",
-  },
-  "0xD6FAF98BeFA647403cc56bDB598690660D5257d2": {
-    icon: "/dai.png",
-  },
-  "0x4ecf61a6c2fab8a047ceb3b3b263b401763e9d49": {
-    icon: "/usnd.png",
-  },
-};
 
 export const DEV_DONATION_PERCENT = 5;
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -23,8 +11,10 @@ export const FLUID_LOCKER_CONTRACT =
 
 // export const FEATURED_NETWORK_ID = "8453";
 // export const FEATURED_POOL_ID = "32";
-export const FEATURED_NETWORK_ID = "11155420";
-export const FEATURED_POOL_ID = "96";
+// export const FEATURED_NETWORK_ID = "11155420";
+// export const FEATURED_POOL_ID = "96";
+export const FEATURED_NETWORK_ID = "42161";
+export const FEATURED_POOL_ID = "6";
 export const FEATURED_TOKEN_SYMBOL = "$USND";
 
 type POOL_CONFIG = {
@@ -82,6 +72,26 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     FILTER_ZERO_UNITS: false,
     SUP_REWARDS: true,
     SPONSOR_ADDRESS: "0xed6a062fbe2993be323af118f79e9b213c81f4f2",
+    SPONSOR_ICON: "/images/arb-logo.svg",
+    IS_ARB: true,
+  },
+  // arb devs
+  "42161-96": {
+    DEFAULT_CHAIN_ID: "42161",
+    DEV_POOL_ADDRESS: "0xed480a635c5dffe1640a895bc39d8491a79c9aa9",
+    DEV_POOL_ID: "5",
+    DEFAULT_POOL_ID: "6",
+    SUP_PROGRAM_ID: 7761,
+    VIEM_CHAIN_OBJ: arbitrum,
+    CONTENT: {
+      NAME: "Arbitrum Mini App Rewards",
+      DESCRIPTION: "Continuous rewards for Arbitrum's top mini apps",
+      POOL_TITLE: "Sponsored by the Arbitrum Foundation",
+      LOGO: "/images/arb-logo.svg",
+    },
+    FILTER_ZERO_UNITS: false,
+    SUP_REWARDS: true,
+    SPONSOR_ADDRESS: "0x0a46991ca1d4488f884cad86e122c23a938e0136",
     SPONSOR_ICON: "/images/arb-logo.svg",
     IS_ARB: true,
   },

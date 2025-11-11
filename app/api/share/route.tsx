@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     const totalFlow = searchParams.get("totalFlow");
     const poolKey = searchParams.get("poolKey");
     const tokenSymbol = searchParams.get("tokenSymbol");
-    const isArb = poolKey === "11155420-96";
+    const isArb = poolKey === "42161-96";
 
     const poolImg =
       poolKey === "8453-32" ? crackedDevsBase64 : defaultDevsBase64;
