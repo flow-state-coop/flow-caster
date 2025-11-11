@@ -36,7 +36,7 @@ export default function InfoDrawer({
             poolKey={poolKey}
           />
         )}
-        {poolKey === "42161-96" && (
+        {poolKey === "42161-6" && (
           <ArbInfo
             activeMemberCount={activeMemberCount}
             handleCloseDrawer={handleCloseDrawer}

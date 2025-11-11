@@ -13,7 +13,7 @@ export const shareContent = (poolKey: string): string => {
   if (poolKey === "8453-32") {
     return `Streaming tips?! I'm supporting Cracked Farcaster Devs with a real-time token stream on @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`;
   }
-  if (poolKey === "42161-96") {
+  if (poolKey === "42161-6") {
     return `Arbitrum’s top mini app builders now earn by the second 💸🌊. 
 
     
