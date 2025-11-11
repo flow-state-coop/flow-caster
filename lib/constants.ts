@@ -56,27 +56,27 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     SUP_REWARDS: false,
   },
   // sep arb devs
-  "11155420-96": {
-    DEFAULT_CHAIN_ID: "11155420",
-    DEV_POOL_ADDRESS: "0xb5cb850de58ff3fb199b72bbb235b46dd314c0fd",
-    DEV_POOL_ID: "97",
-    DEFAULT_POOL_ID: "96",
-    SUP_PROGRAM_ID: 7761,
-    VIEM_CHAIN_OBJ: optimismSepolia,
-    CONTENT: {
-      NAME: "Arbitrum Mini App Rewards",
-      DESCRIPTION: "Continuous rewards for Arbitrum's top mini apps",
-      POOL_TITLE: "Sponsored by the Arbitrum Foundation",
-      LOGO: "/images/arb-logo.svg",
-    },
-    FILTER_ZERO_UNITS: false,
-    SUP_REWARDS: true,
-    SPONSOR_ADDRESS: "0xed6a062fbe2993be323af118f79e9b213c81f4f2",
-    SPONSOR_ICON: "/images/arb-logo.svg",
-    IS_ARB: true,
-  },
+  // "11155420-96": {
+  //   DEFAULT_CHAIN_ID: "11155420",
+  //   DEV_POOL_ADDRESS: "0xb5cb850de58ff3fb199b72bbb235b46dd314c0fd",
+  //   DEV_POOL_ID: "97",
+  //   DEFAULT_POOL_ID: "96",
+  //   SUP_PROGRAM_ID: 7761,
+  //   VIEM_CHAIN_OBJ: optimismSepolia,
+  //   CONTENT: {
+  //     NAME: "Arbitrum Mini App Rewards",
+  //     DESCRIPTION: "Continuous rewards for Arbitrum's top mini apps",
+  //     POOL_TITLE: "Sponsored by the Arbitrum Foundation",
+  //     LOGO: "/images/arb-logo.svg",
+  //   },
+  //   FILTER_ZERO_UNITS: false,
+  //   SUP_REWARDS: true,
+  //   SPONSOR_ADDRESS: "0xed6a062fbe2993be323af118f79e9b213c81f4f2",
+  //   SPONSOR_ICON: "/images/arb-logo.svg",
+  //   IS_ARB: true,
+  // },
   // arb devs
-  "42161-96": {
+  "42161-6": {
     DEFAULT_CHAIN_ID: "42161",
     DEV_POOL_ADDRESS: "0xed480a635c5dffe1640a895bc39d8491a79c9aa9",
     DEV_POOL_ID: "5",

@@ -27,6 +27,8 @@ const PoolContext = createContext<PoolContextType | undefined>(undefined);
 
 const defaultPoolKey = `${FEATURED_NETWORK_ID}-${FEATURED_POOL_ID}` as PoolKey;
 
+console.log("defaultPoolKey", defaultPoolKey);
+
 export function PoolProvider({ children }: { children: ReactNode }) {
   const { switchChain } = useSwitchChain();
   const [selectedPool, setSelectedPool] = useState<PoolKey>(defaultPoolKey);

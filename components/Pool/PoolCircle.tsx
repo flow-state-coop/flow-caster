@@ -101,7 +101,7 @@ export default function PoolCircle({
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
           baseRadius * 3.5, // Max 350% of base size
-          baseRadius * unitRatio * 10 // Scale by units with multiplier
+          baseRadius * unitRatio * 6 // Scale by units with multiplier
         )
       );
 
