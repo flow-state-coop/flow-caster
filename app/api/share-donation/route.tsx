@@ -70,7 +70,8 @@ const crackedDevsBase64 = `data:image/png;base64,${crackedDevsBuffer.toString(
   "base64"
 )}`;
 const defaultDevsBuffer = readFileSync(
-  path.join(process.cwd(), "static", "arb-devs.png")
+  // path.join(process.cwd(), "static", "arb-devs.png")
+  path.join(process.cwd(), "static", "no-arb-devs.png")
 );
 const defaultDevsBase64 = `data:image/png;base64,${defaultDevsBuffer.toString(
   "base64"

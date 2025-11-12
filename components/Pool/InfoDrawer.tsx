@@ -88,10 +88,15 @@ function ArbInfo({ handleOpenDrawer }: InfoDrawerProps) {
         Flow Caster scores Arbitrum’s top mini apps and assigns shares in a
         dynamic streaming funding pool.
       </p>
-      <p>Builders get paid every second instead of weekly.</p>
       <p>
-        The campaign is supported by the Arbitrum Foundation (60k USND over 6
-        months), Superfluid DAO{" "}
+        Builders get paid every second instead of weekly based on their
+        app&apos;s traction.
+      </p>
+      <p>
+        {/* The campaign is supported by the Arbitrum Foundation (60k USND over 6
+        months), Superfluid DAO{" "} */}
+        The campaign to grow the Arbitrum+Farcaster ecosystem is made possible
+        by Superfluid DAO{" "}
         <span
           onClick={onClaimSup}
           className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"

@@ -286,7 +286,7 @@ export default function PoolCircle({
           className="opacity-50"
         />
 
-        {/* Text path for pool name */}
+        {/* Text path for pool name
         <defs>
           <path
             id="pool-text-path"
@@ -301,6 +301,7 @@ export default function PoolCircle({
             {currentPoolData.CONTENT.POOL_TITLE}
           </textPath>
         </text>
+         */}
 
         {/* Flow lines from donors to pool */}
         {donors.map((donor, i) => {
