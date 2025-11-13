@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, RotateCw, X } from "lucide-react";
 import { encodeFunctionData, formatUnits, parseEther, parseUnits } from "viem";
 import sdk from "@farcaster/miniapp-sdk";
 import {
@@ -102,12 +102,13 @@ export default function OpenStreamSimple({
   // const tokenData = TOKEN_DATA[chainId];
 
   // Fetch SuperToken balance
-  const { data: superTokenBalance } = useReadSuperToken({
-    address: poolData?.token.id as `0x${string}`,
-    // address: tokenData.address,s
-    functionName: "balanceOf",
-    args: [address || ZERO_ADDRESS],
-  });
+  const { data: superTokenBalance, refetch: refetchSuperTokenBalance } =
+    useReadSuperToken({
+      address: poolData?.token.id as `0x${string}`,
+      // address: tokenData.address,s
+      functionName: "balanceOf",
+      args: [address || ZERO_ADDRESS],
+    });
 
   const userBalance = superTokenBalance
     ? Number(formatUnits(superTokenBalance, 18))
@@ -144,6 +145,20 @@ export default function OpenStreamSimple({
   const handleCancel = () => {
     setMonthlyDonation("0");
     proceedWithMainTransaction(true);
+  };
+
+  const [isRefreshingBalance, setIsRefreshingBalance] = useState(false);
+
+  const handleRefreshBalance = async () => {
+    if (!refetchSuperTokenBalance) return;
+    try {
+      setIsRefreshingBalance(true);
+      await refetchSuperTokenBalance();
+    } catch (refreshError) {
+      console.error("Failed to refresh balance:", refreshError);
+    } finally {
+      setIsRefreshingBalance(false);
+    }
   };
 
   const handleConnect = () => {
@@ -391,12 +406,26 @@ export default function OpenStreamSimple({
       <div className="max-w-md mx-auto">
         {!isSuccess && (
           <div className="mb-6 pb-6 w-full border-b border-primary-800">
-            <p className="mt-2 text-2xl text-primary-800 font-bold text-center">
-              {userBalance.toLocaleString("en-US", {
-                maximumFractionDigits: 2,
-              })}{" "}
-              {poolData?.token.symbol}
-            </p>
+            <div className="mt-2 flex items-center justify-center gap-3">
+              <p className="text-2xl text-primary-800 font-bold text-center">
+                {userBalance.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                {poolData?.token.symbol}
+              </p>
+              <button
+                type="button"
+                onClick={handleRefreshBalance}
+                disabled={isRefreshingBalance}
+                className="flex items-center gap-1 text-xs font-semibold text-primary-500 hover:text-primary-300 disabled:text-primary-300 disabled:cursor-not-allowed"
+              >
+                <RotateCw
+                  className={`h-3 w-3 ${
+                    isRefreshingBalance ? "animate-spin" : ""
+                  }`}
+                />
+              </button>
+            </div>
             <p className="mt-2 mb-4 text-sm text-primary-800 text-center">
               Nerite is a natively streamable stablecoin.
             </p>
