@@ -1,13 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
 import Image from "next/image";
+import PoolSwitcher from "./PoolSwitcher";
+import { usePool } from "@/contexts/pool-context";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
-  return (
-    <div className="flex flex-row items-center gap-1 w-full mb-1">
-      <Image src="/images/icon.png" width={30} height={30} alt="logo" />
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+  const pathname = usePathname();
 
-      <h1 className="text-xl font-header text-black tracking-tight">
-        flowcaster
-      </h1>
+  const hideSwitcher = pathname.includes("wallet");
+
+  return (
+    <div>
+      <div className="mt-2">{!hideSwitcher && <PoolSwitcher />}</div>
     </div>
   );
 }

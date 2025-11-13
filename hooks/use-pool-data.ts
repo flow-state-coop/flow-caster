@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { FEATURED_POOL_DATA, POOL_METADATA } from "@/lib/constants";
+import { FEATURED_POOL_DATA } from "@/lib/constants";
 import { PoolData } from "@/lib/types";
 
 interface UsePoolDataOptions {
@@ -22,10 +22,7 @@ export const usePoolData = ({
         poolId,
       });
 
-      if (
-        poolId === FEATURED_POOL_DATA.DEFAULT_POOL_ID &&
-        chainId === FEATURED_POOL_DATA.DEFAULT_CHAIN_ID
-      ) {
+      if (FEATURED_POOL_DATA.IS_CRACKED) {
         params.append("isCrackedDevs", "true");
       }
 
@@ -42,15 +39,11 @@ export const usePoolData = ({
     enabled,
   });
 
-  const poolMeta = POOL_METADATA[`${chainId}-${poolId}`];
-
   return {
     data: data,
     poolDistributors: data?.poolDistributors,
     poolMembers: data?.poolMembers,
     activeMemberCount: data?.activeMemberCount,
-    hasSupRewards: poolMeta?.hasSupRewards,
-    isCracked: poolMeta?.isCracked,
     ...rest,
   };
 };

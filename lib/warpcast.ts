@@ -7,6 +7,8 @@ import { env } from "@/lib/env";
  */
 export async function getFarcasterManifest() {
   let frameName = "flowcaster";
+  // let frameName = "retsacwolf";
+
   let noindex = false;
   const appUrl = env.NEXT_PUBLIC_URL;
   if (appUrl.includes("localhost")) {
@@ -36,13 +38,13 @@ export async function getFarcasterManifest() {
       splashBackgroundColor: "#FFFFFF",
       webhookUrl: `${appUrl}/api/webhook`,
       // Metadata https://github.com/farcasterxyz/miniapps/discussions/191
-      subtitle: "flowcaster", // 30 characters, no emojis or special characters, short description under app name
-      description: "flowcaster", // 170 characters, no emojis or special characters, promotional message displayed on Mini App Page
+      subtitle: frameName, // 30 characters, no emojis or special characters, short description under app name
+      description: frameName, // 170 characters, no emojis or special characters, promotional message displayed on Mini App Page
       primaryCategory: "social",
       tags: ["mini-app"], // up to 5 tags, filtering/search tags
-      tagline: "flowcaster", // 30 characters, marketing tagline should be punchy and descriptive
+      tagline: frameName, // 30 characters, marketing tagline should be punchy and descriptive
       ogTitle: `${frameName}`, // 30 characters, app name + short tag, Title case, no emojis
-      ogDescription: "flowcaster", // 100 characters, summarize core benefits in 1-2 lines
+      ogDescription: frameName, // 100 characters, summarize core benefits in 1-2 lines
       screenshotUrls: [
         // 1284 x 2778, visual previews of the app, max 3 screenshots
         `${appUrl}/images/feed.png`,

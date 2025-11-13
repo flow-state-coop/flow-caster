@@ -3,8 +3,8 @@
 import { useAccount } from "wagmi";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { useUser } from "@/contexts/user-context";
+import { usePool } from "@/contexts/pool-context";
 import { usePoolData } from "@/hooks/use-pool-data";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
 import { getTotalFlow } from "@/lib/pool";
 import Footer from "../Shared/Footer";
 import Spinner from "../Shared/Spinner";
@@ -13,20 +13,29 @@ import { ArrowRight } from "lucide-react";
 import ManageSupertoken from "./ManageSupertoken";
 
 export default function Wallet() {
+  const { getCurrentPoolData } = usePool();
+  const poolData = getCurrentPoolData();
+
   const {
-    data: poolData,
+    data: poolDataResult,
     poolDistributors,
     poolMembers,
     isLoading,
     error,
   } = usePoolData({
-    chainId: FEATURED_POOL_DATA.DEFAULT_CHAIN_ID,
-    poolId: FEATURED_POOL_DATA.DEFAULT_POOL_ID,
+    chainId: poolData.DEFAULT_CHAIN_ID,
+    poolId: poolData.DEFAULT_POOL_ID,
   });
   const { user } = useUser();
   const { address } = useAccount();
 
-  if (isLoading || !poolData || !poolDistributors || !poolMembers || !user) {
+  if (
+    isLoading ||
+    !poolDataResult ||
+    !poolDistributors ||
+    !poolMembers ||
+    !user
+  ) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <Spinner />
@@ -58,7 +67,11 @@ export default function Wallet() {
           </h2>
           <div className="flex flex-col h-[calc(100vh-175px)] justify-between">
             <div className="min-h-72 px-4 py-3 bg-primary-100 border border-primary-500 rounded-lg">
-              <ManageSupertoken address={address} />
+              <ManageSupertoken
+                address={address}
+                chainId={poolData.DEFAULT_CHAIN_ID}
+                poolId={poolData.DEFAULT_POOL_ID}
+              />
             </div>
             <div className="bg-primary-100 border border-primary-400 px-4 py-3 rounded-lg">
               <button
@@ -81,10 +94,10 @@ export default function Wallet() {
         </div>
 
         <Footer
-          chainId={FEATURED_POOL_DATA.DEFAULT_CHAIN_ID}
-          poolId={FEATURED_POOL_DATA.DEFAULT_POOL_ID}
-          poolAddress={poolData.id}
-          totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+          chainId={poolData.DEFAULT_CHAIN_ID}
+          poolId={poolData.DEFAULT_POOL_ID}
+          poolAddress={poolDataResult.id}
+          totalFlow={getTotalFlow(poolDataResult.poolDistributors).toString()}
         />
       </PoolUserProvider>
     </main>

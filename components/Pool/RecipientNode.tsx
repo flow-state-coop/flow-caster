@@ -11,6 +11,7 @@ import {
   truncateAddress,
 } from "@/lib/pool";
 import "tippy.js/dist/tippy.css";
+import { ArbCampaignData } from "@/lib/arb-campaign";
 
 interface RecipientNodeProps {
   x: number;
@@ -23,6 +24,8 @@ interface RecipientNodeProps {
   farcasterUser?: NeynarUser | null | undefined;
   connected: boolean;
   tokenSymbol: string;
+  isArb?: boolean;
+  arbApps?: ArbCampaignData[];
 }
 
 export default function RecipientNode({
@@ -36,6 +39,8 @@ export default function RecipientNode({
   farcasterUser,
   connected,
   tokenSymbol,
+  isArb,
+  arbApps,
 }: RecipientNodeProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const circleImgRef = useRef<SVGImageElement>(null);
@@ -47,17 +52,22 @@ export default function RecipientNode({
     });
   };
 
+  const farcasterPfp = !isArb && farcasterUser;
+  const noPfp = !farcasterUser;
+  const arbAppProfile = isArb && arbApps && arbApps[0];
+  // TODO: adjust to arb app display name and pfp url with new csv
+
   return (
     <Tippy
       content={
         <div className="text-xs p-4">
-          {farcasterUser ? (
+          {arbAppProfile && farcasterUser && (
             <>
               <div className="flex items-center gap-2 mb-2 ">
                 <img
                   src={farcasterUser.pfp_url}
                   alt={farcasterUser.display_name}
-                  className="w-6 h-6 rounded-full"
+                  className="w-8 h-8 rounded-full"
                 />
                 <div>
                   <div className="font-bold">{farcasterUser.display_name}</div>
@@ -65,9 +75,61 @@ export default function RecipientNode({
                 </div>
               </div>
             </>
-          ) : (
+          )}
+          {arbAppProfile && !farcasterUser && (
+            <>
+              <div className="flex items-center gap-2 mb-2 ">
+                <img
+                  src={arbAppProfile.iconUrl}
+                  alt={arbAppProfile.username}
+                  className="w-8 h-8 rounded-full"
+                />
+                <div>
+                  <div>@{arbAppProfile.username}</div>
+                </div>
+              </div>
+            </>
+          )}
+          {farcasterPfp && (
+            <>
+              <div className="flex items-center gap-2 mb-2 ">
+                <img
+                  src={farcasterUser.pfp_url}
+                  alt={farcasterUser.display_name}
+                  className="w-8 h-8 rounded-full"
+                />
+                <div>
+                  <div className="font-bold">{farcasterUser.display_name}</div>
+                  <div>@{farcasterUser.username}</div>
+                </div>
+              </div>
+            </>
+          )}
+          {noPfp && !arbAppProfile && (
             <div>
               <b>Account:</b> {truncateAddress(accountId)}
+            </div>
+          )}
+
+          {isArb && (
+            <div className="p-2">
+              {arbApps?.map((app, i) => {
+                return (
+                  <div key={i}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <img
+                        src={app.iconUrl || "/images/arb-logo.svg"}
+                        alt={app.appName}
+                        className="w-6 h-6 rounded-full"
+                      />
+                      <div>
+                        <div className="font-bold">{app.appName}</div>
+                        <div className="text-[10px]">score: {app.appScore}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -113,6 +175,15 @@ export default function RecipientNode({
               View Profile <ArrowRight className="w-4 h-4" />
             </button>
           )}
+
+          {arbAppProfile && !farcasterUser && (
+            <button
+              onClick={() => handleViewProfile(Number(arbAppProfile.fid))}
+              className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
+            >
+              View Profile <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       }
       trigger="mouseenter click"
@@ -134,6 +205,14 @@ export default function RecipientNode({
           </defs>
         )}
 
+        {arbAppProfile && !farcasterUser && (
+          <defs>
+            <clipPath id={`recipient-clip-${accountId}`}>
+              <circle cx={x} cy={y} r={radius} />
+            </clipPath>
+          </defs>
+        )}
+
         {/* Background circle */}
         <circle
           ref={circleRef}
@@ -146,10 +225,24 @@ export default function RecipientNode({
         />
 
         {/* Profile image */}
+
         {farcasterUser?.pfp_url && (
           <image
             ref={circleImgRef}
             href={farcasterUser.pfp_url}
+            x={x - radius}
+            y={y - radius}
+            width={radius * 2}
+            height={radius * 2}
+            clipPath={`url(#recipient-clip-${accountId})`}
+            className="cursor-pointer"
+          />
+        )}
+
+        {!farcasterUser?.pfp_url && arbAppProfile && arbAppProfile.iconUrl && (
+          <image
+            ref={circleImgRef}
+            href={arbAppProfile.iconUrl}
             x={x - radius}
             y={y - radius}
             width={radius * 2}

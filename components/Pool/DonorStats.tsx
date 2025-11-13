@@ -6,27 +6,35 @@ import FlowAmount from "./FlowAmount";
 
 interface DonorStatsProps {
   rate: string;
-  showSup: boolean;
+  hasSupRewards: boolean;
   showTotalFlow: boolean;
   startingAmount?: string;
   startingTimestamp?: string;
   donorAddress?: string;
   tokenSymbol: string;
+  sponsorAddress?: string;
+  isMiddle: boolean;
 }
 
 export default function DonorStats({
   rate,
-  showSup,
+  hasSupRewards,
   showTotalFlow,
   startingAmount,
   startingTimestamp,
   donorAddress,
   tokenSymbol,
+  sponsorAddress,
+  isMiddle,
 }: DonorStatsProps) {
   const { data } = useAccountSup({
     userAddress:
       donorAddress && donorAddress.startsWith("0x") ? donorAddress : undefined,
   });
+
+  const isSponsor =
+    isMiddle && donorAddress?.toLowerCase() === sponsorAddress?.toLowerCase();
+  const showSup = hasSupRewards && !isSponsor;
 
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">

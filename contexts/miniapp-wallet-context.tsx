@@ -1,14 +1,19 @@
 import { farcasterFrame as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createConfig, http, WagmiProvider } from "wagmi";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
+import { createConfig, http, injected, WagmiProvider } from "wagmi";
+import { Chain } from "wagmi/chains";
+import { TARGET_CHAIN_OBJS, FEATURED_POOLS } from "@/lib/constants";
 
 export const config = createConfig({
-  chains: [FEATURED_POOL_DATA.VIEM_CHAIN_OBJ],
+  chains: TARGET_CHAIN_OBJS as [Chain, ...Chain[]],
   transports: {
-    [FEATURED_POOL_DATA.VIEM_CHAIN_OBJ.id]: http(),
+    ...Object.keys(FEATURED_POOLS).reduce((acc, key) => {
+      acc[FEATURED_POOLS[key].VIEM_CHAIN_OBJ.id] = http();
+      return acc;
+    }, {} as Record<number, any>),
   },
   connectors: [miniAppConnector()],
+  // connectors: [injected()],
 });
 
 const queryClient = new QueryClient();

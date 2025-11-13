@@ -8,19 +8,20 @@ import {
   useAccount,
   useConnect,
   useSwitchChain,
-  useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
-import { superTokenAbi } from "@sfpro/sdk/abi";
-import erc20Abi from "@/lib/abi/erc20.json";
-import hostAbi from "@/lib/abi/sfHost.json";
 import gdaAbi from "@/lib/abi/gdaV1.json";
+import hostAbi from "@/lib/abi/sfHost.json";
 import { useUser } from "@/contexts/user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { usePool } from "@/contexts/pool-context";
-import { DEV_DONATION_PERCENT, ZERO_ADDRESS } from "@/lib/constants";
+import {
+  DEV_DONATION_PERCENT,
+  NERITE_TOKEN_ID,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
 import {
   Operation,
   OPERATION_TYPE,
@@ -48,7 +49,7 @@ interface OpenStreamProps {
   activeMemberCount?: number;
 }
 
-export default function OpenStream({
+export default function OpenStreamSimple({
   chainId,
   poolId,
   poolAddress,
@@ -62,7 +63,6 @@ export default function OpenStream({
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [monthlyDonation, setMonthlyDonation] = useState<string>("0");
-  const [wrapAmount, setWrapAmount] = useState<string>("");
   const [donateToDevs, setDonateToDevs] = useState<boolean>(true);
   const [currentMonthlyRate, setCurrentMonthlyRate] = useState<
     string | undefined
@@ -85,18 +85,7 @@ export default function OpenStream({
     poolId: currentPoolData.DEV_POOL_ID,
   });
 
-  console.log("status", status);
   const isConnected = status === "connected";
-
-  const {
-    writeContract: approve,
-    data: approvalHash,
-    reset: resetApproval,
-  } = useWriteContract();
-  const { isLoading: isApprovalConfirming, isSuccess: isApprovalSuccess } =
-    useWaitForTransactionReceipt({
-      hash: approvalHash,
-    });
 
   const {
     writeContract: batchCall,
@@ -120,50 +109,20 @@ export default function OpenStream({
     args: [address || ZERO_ADDRESS],
   });
 
-  // Fetch underlying token balance
-  const { data: underlyingBalance } = useReadContract({
-    // address: tokenData.underlyingAddress as `0x${string}`,
-    address: poolData?.token.underlyingAddress as `0x${string}`,
-    abi: erc20Abi,
-    functionName: "balanceOf",
-    args: [address || ZERO_ADDRESS],
-  }) as { data: bigint | undefined };
-
-  // Fetch underlying token allowance for SuperToken contract
-  const { data: underlyingAllowance } = useReadContract({
-    // address: tokenData.underlyingAddress as `0x${string}`,
-    address: poolData?.token.underlyingAddress as `0x${string}`,
-    abi: erc20Abi,
-    functionName: "allowance",
-    args: [address || ZERO_ADDRESS, poolData?.token.id],
-  }) as { data: bigint | undefined };
-
   const userBalance = superTokenBalance
     ? Number(formatUnits(superTokenBalance, 18))
-    : 0;
-  const usdcBalance = underlyingBalance
-    ? Number(
-        formatUnits(
-          underlyingBalance,
-          poolData?.token.underlyingToken.decimals || 18
-        )
-      )
     : 0;
 
   // Validation logic
   const monthlyDonationAmount = parseFloat(monthlyDonation) || 0;
-  const wrapAmountValue = parseFloat(wrapAmount) || 0;
-  const totalSuperTokenBalance = userBalance + wrapAmountValue;
+  const totalSuperTokenBalance = userBalance;
   const isMonthlyDonationEmpty =
     !currentMonthlyRate && monthlyDonationAmount === 0;
   const twoDayDonationAmount = (monthlyDonationAmount / 30) * 2;
   const isInsufficientBalance =
     monthlyDonationAmount > 0 && totalSuperTokenBalance < twoDayDonationAmount;
-  const isWrapAmountExceedsBalance = wrapAmountValue > usdcBalance;
-  const isButtonDisabled =
-    isMonthlyDonationEmpty ||
-    isInsufficientBalance ||
-    isWrapAmountExceedsBalance;
+
+  const isButtonDisabled = isMonthlyDonationEmpty || isInsufficientBalance;
 
   useEffect(() => {
     if (!connectedDonor || !address || !devPoolData || !isOpen) return;
@@ -183,7 +142,6 @@ export default function OpenStream({
   }, [connectedDonor, devPoolData, address, isOpen]);
 
   const handleCancel = () => {
-    setWrapAmount("0");
     setMonthlyDonation("0");
     proceedWithMainTransaction(true);
   };
@@ -192,6 +150,9 @@ export default function OpenStream({
     connect({ connector: connectors[0] });
     setError(null);
   };
+
+  console.log("chainId", chainId);
+  console.log("connectedChainId", connectedChainId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,47 +182,11 @@ export default function OpenStream({
       }
     }
 
-    const wrapAmountValue = parseEther(wrapAmount);
-
-    const currentAllowance = Number(underlyingAllowance) || 0;
-
-    // Step 1: Handle approval if needed
-    if (wrapAmountValue > 0 && currentAllowance < wrapAmountValue) {
-      setIsConfirming(true);
-      approve(
-        {
-          // address: tokenData.underlyingAddress as `0x${string}`,
-          address: poolData?.token.underlyingAddress as `0x${string}`,
-          abi: erc20Abi,
-          functionName: "approve",
-          args: [
-            poolData?.token.id,
-            parseUnits(
-              wrapAmount,
-              poolData?.token.underlyingToken.decimals || 18
-            ),
-          ],
-        },
-        {
-          onSuccess: () => {
-            console.log("Approval transaction sent successfully");
-            // The approval will be handled by the useWaitForTransactionReceipt hook
-          },
-          onError: (error) => {
-            console.error("Approval failed:", error);
-            setError(`Approval failed: ${error.message}`);
-            setIsLoading(false);
-            setIsConfirming(false);
-          },
-        }
-      );
-    } else {
-      // No approval needed, proceed with main transaction
-      proceedWithMainTransaction(false);
-    }
+    // No approval needed for supertoken pool, proceed with main transaction
+    proceedWithMainTransaction(false);
   };
 
-  // Step 2: Handle main transaction after approval
+  // Step 2: Handle main transaction
   const proceedWithMainTransaction = async (cancel?: boolean) => {
     setIsSuccess(false);
     setIsLoading(false);
@@ -275,23 +200,6 @@ export default function OpenStream({
     }
 
     let operations: Operation[] = [];
-    const _wrapAmount = cancel ? "0" : wrapAmount;
-    const wrapAmountValue = parseEther(_wrapAmount);
-
-    if (wrapAmountValue > 0) {
-      console.log("adding upgrade/wrap function");
-      operations = [
-        prepareOperation({
-          operationType: OPERATION_TYPE.SUPERTOKEN_UPGRADE,
-          target: poolData?.token.id as `0x${string}`,
-          data: encodeFunctionData({
-            abi: superTokenAbi,
-            functionName: "upgrade",
-            args: [wrapAmountValue],
-          }),
-        }),
-      ];
-    }
 
     // handle 0 submission for existing stream
     const _monthlyDonation =
@@ -379,19 +287,7 @@ export default function OpenStream({
     );
   };
 
-  // Monitor approval transaction completion
-  useEffect(() => {
-    if (isApprovalSuccess && isApprovalConfirming === false) {
-      console.log(
-        "Approval transaction confirmed, proceeding with main transaction"
-      );
-      setIsConfirming(false);
-      proceedWithMainTransaction();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isApprovalSuccess, isApprovalConfirming]);
-
-  // Monitor batch transaction completion
+  // Monitor distro transaction completion
   useEffect(() => {
     if (isBatchSuccess && isBatchConfirming === false) {
       if (Number(monthlyDonation) > 99) {
@@ -440,7 +336,6 @@ export default function OpenStream({
       setIsConfirming(false);
       setError(null);
       setIsSuccess(false);
-      resetApproval();
       resetBatch();
     }
     handleCloseDrawer();
@@ -448,14 +343,11 @@ export default function OpenStream({
 
   const getButtonText = () => {
     if (isLoading) return "Preparing...";
-    if (isConfirming || isApprovalConfirming || isBatchConfirming)
-      return "Confirming...";
+    if (isConfirming || isBatchConfirming) return "Confirming...";
     if (isSuccess) return "Success!";
     if (isMonthlyDonationEmpty) return "Add streaming amount";
-    if (isWrapAmountExceedsBalance)
-      return `${poolData?.token.underlyingToken.symbol} balance too low`;
     if (isInsufficientBalance)
-      return `${poolData?.token.symbol} balance too low. Wrap ${poolData?.token.underlyingToken.symbol}.`;
+      return `${poolData?.token.symbol} balance too low. Purchase ${poolData?.token.symbol}.`;
     if (connectedDonor) return "Edit Stream";
     return "Open Stream";
   };
@@ -464,6 +356,22 @@ export default function OpenStream({
     if (isSuccess) return "Success! 🫡";
     if (Number(connectedDonor?.flowRate) > 0) return "Edit Stream";
     return "Open Stream";
+  };
+
+  const handleViewToken = async () => {
+    await sdk.actions.swapToken({
+      buyToken: NERITE_TOKEN_ID,
+    });
+
+    //   await sdk.actions.viewToken({
+    //   token: NERITE_TOKEN_ID,
+    // });
+  };
+
+  const onClaimSup = async () => {
+    await sdk.actions.openMiniApp({
+      url: "https://farcaster.xyz/miniapps/1NTJKdUZCsPI/superfluid-claim-app",
+    });
   };
 
   return (
@@ -481,6 +389,22 @@ export default function OpenStream({
       </div>
 
       <div className="max-w-md mx-auto">
+        {!isSuccess && (
+          <div className="mb-6 pb-6 w-full border-b border-primary-800">
+            <p className="mt-2 text-2xl text-primary-800 font-bold text-center">
+              {userBalance.toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+              })}{" "}
+              {poolData?.token.symbol}
+            </p>
+            <p className="mt-2 mb-4 text-sm text-primary-800 text-center">
+              Nerite is a natively streamable stablecoin.
+            </p>
+            <BaseButton onClick={handleViewToken} type="button">
+              Buy {poolData?.token.symbol}
+            </BaseButton>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isSuccess && (
             <>
@@ -515,46 +439,16 @@ export default function OpenStream({
               </div>
 
               <div>
-                <label
-                  htmlFor="wrapAmount"
-                  className="block text-sm font-medium text-primary-800 mb-2"
-                >
-                  How much {poolData?.token.underlyingToken.symbol} should we
-                  wrap to fund your stream?
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    id="wrapAmount"
-                    value={wrapAmount}
-                    onChange={(e) => setWrapAmount(e.target.value)}
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <span className="text-gray-500 text-sm font-medium">
-                      {poolData?.token.underlyingToken.symbol}{" "}
-                    </span>
-                  </div>
-                </div>
-                <p className="mt-2 text-xs text-primary-700">
-                  {poolData?.token.underlyingToken.symbol} balance:{" "}
-                  {usdcBalance.toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
                 <div className="border border-primary-400 bg-primary-100 rounded-lg px-2 py-2 mt-2 text-xs">
                   <p className="text-primary-800 font-bold">
                     Your stream will last until your {poolData?.token.symbol}{" "}
-                    balance is depleted. You can wrap/unwrap more any time.{" "}
+                    balance is depleted.{" "}
                   </p>
                   <p className="mt-2 text-primary-800 font-normal">
                     {(() => {
                       const currentBalance = userBalance;
-                      const wrapAmountValue = parseFloat(wrapAmount) || 0;
                       const monthlyAmount = parseFloat(monthlyDonation) || 0;
-                      const totalBalance = currentBalance + wrapAmountValue;
+                      const totalBalance = currentBalance;
 
                       if (monthlyAmount > 0 && totalBalance > 0) {
                         const monthsSupported = totalBalance / monthlyAmount;
@@ -579,28 +473,6 @@ export default function OpenStream({
                     })()}
                   </p>
                 </div>
-                {(() => {
-                  const currentAllowance = Number(underlyingAllowance) || 0;
-                  const wrapAmountValue = parseUnits(
-                    wrapAmount,
-                    poolData?.token.underlyingToken.decimals || 18
-                  );
-
-                  if (
-                    wrapAmountValue > 0 &&
-                    currentAllowance < wrapAmountValue
-                  ) {
-                    return (
-                      <div className="border border-accent-400 bg-accent-100 rounded-lg px-2 py-2 mt-2 text-xs">
-                        <p className="text-xs text-accent-800">
-                          There will be an approval request allowing wrapping of{" "}
-                          {poolData?.token.underlyingToken.symbol}
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
               </div>
 
               {/* Donate to flowcaster devs */}
@@ -617,7 +489,7 @@ export default function OpenStream({
                     htmlFor="donateToDevs"
                     className="ml-2 block text-sm font-medium text-primary-800"
                   >
-                    Donate 5% to the Flow Caster devs
+                    Donate 5% to the Flow Caster devs for x2 SUP XP
                   </label>
                 </div>
               </div>
@@ -625,15 +497,6 @@ export default function OpenStream({
               {error && (
                 <div className="text-xs break-words bg-accent-100 border border-accent-400 text-accent-800 px-4 py-3 rounded-lg">
                   {truncateString(error, 50)}
-                </div>
-              )}
-
-              {approvalHash && (
-                <div
-                  onClick={() => openExplorerUrl(approvalHash)}
-                  className="flex flew-row items-center gap-1 mb-3 text-sm font-bold text-primary-500 hover:text-primary-300 hover:cursor-pointer"
-                >
-                  Approval TX in Explorer <ArrowRight className="w-4 h-4" />
                 </div>
               )}
 
@@ -657,11 +520,7 @@ export default function OpenStream({
                   <BaseButton
                     type="submit"
                     disabled={
-                      isLoading ||
-                      isConfirming ||
-                      isApprovalConfirming ||
-                      isSuccess ||
-                      isButtonDisabled
+                      isLoading || isConfirming || isSuccess || isButtonDisabled
                     }
                   >
                     {getButtonText()}
@@ -674,7 +533,6 @@ export default function OpenStream({
                       disabled={
                         isLoading ||
                         isConfirming ||
-                        isApprovalConfirming ||
                         isSuccess ||
                         isButtonDisabled
                       }
@@ -689,11 +547,16 @@ export default function OpenStream({
 
           {isSuccess && Number(monthlyDonation) > 0 && (
             <>
-              <div className="flex flex-col gap-1">
-                <p className="text-primary-500 text-sm">
-                  You&apos;ve joined the galaxy of Cracked Dev supporters!
-                </p>
-              </div>
+              <p className="text-primary-500 text-sm">
+                You&apos;re now supporting top buidlers by the second! Make sure
+                to claim your{" "}
+                <span
+                  className="hover:cursor-pointer text-primary-700 hover:text-primary-500 underline"
+                  onClick={onClaimSup}
+                >
+                  SUP XP Daily
+                </span>
+              </p>
 
               <p className="text-primary-500 text-sm">
                 Cast about it to help grow the flow.

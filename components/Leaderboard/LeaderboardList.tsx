@@ -9,6 +9,8 @@ import FlowAmount from "../Pool/FlowAmount";
 interface LeaderboardListProps {
   poolData?: PoolData;
   devPoolList?: Record<string, string>;
+  sponsorAddress?: string;
+  iconOverride?: string;
 }
 
 function truncateAddress(address: string, length = 6) {
@@ -18,6 +20,8 @@ function truncateAddress(address: string, length = 6) {
 export default function LeaderboardList({
   poolData,
   devPoolList,
+  sponsorAddress,
+  iconOverride,
 }: LeaderboardListProps) {
   const sorted = useMemo(() => {
     const devPoleRateList = devPoolList || {};
@@ -42,8 +46,8 @@ export default function LeaderboardList({
     return sorted;
   }, [poolData, devPoolList]);
 
-  const handleViewProfile = async (fid?: string) => {
-    if (!fid) return;
+  const handleViewProfile = async (isSponsor: boolean, fid?: string) => {
+    if (!fid || isSponsor) return;
     await sdk.actions.viewProfile({
       fid: Number(fid),
     });
@@ -56,9 +60,6 @@ export default function LeaderboardList({
       <h2 className="text-3xl text-primary-500 font-bold mb-3">
         Donor Leaderboard
       </h2>
-      <p className="text-sm font-bold text-black mt-3">
-        Cracked Farcaster Devs
-      </p>
       <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
         <div className="col-span-2">&nbsp;</div>
         <div className="text-right">{poolData.token.symbol}/mo</div>
@@ -68,15 +69,19 @@ export default function LeaderboardList({
         {sorted.map((d, i) => {
           const isTop = i === 0;
           const user = d.farcasterUser;
+          const isSponsor =
+            sponsorAddress &&
+            sponsorAddress.toLowerCase() === d.account.id.toLowerCase();
+          const iconPath = isSponsor ? iconOverride : "/images/icon.png";
           return (
             <div
               key={d.account.id}
               className={`flex items-center py-2 px-2 gap-2 text-base font-mono ${
                 user?.fid && "hover:bg-primary-200"
               }`}
-              onClick={() => handleViewProfile(user?.fid)}
+              onClick={() => handleViewProfile(!!isSponsor, user?.fid)}
             >
-              <div className="w-5 text-right mr-2 font-bold">
+              <div className="w-5 text-center mr-2 font-bold">
                 {isTop && (
                   <Crown fill="gold" className="w-6 h-6 text-yellow-400" />
                 )}
@@ -84,7 +89,7 @@ export default function LeaderboardList({
                 {!isTop && <>{i + 1}</>}
               </div>
               <div className="w-8 h-8 flex items-center justify-center relative">
-                {user?.pfp_url ? (
+                {user?.pfp_url && !isSponsor ? (
                   <img
                     src={user.pfp_url}
                     alt={user.display_name || user.username}
@@ -92,7 +97,7 @@ export default function LeaderboardList({
                   />
                 ) : (
                   <img
-                    src="/images/icon.png"
+                    src={iconPath}
                     alt="fs logo"
                     className="w-8 h-8 rounded-full relative z-10"
                   />

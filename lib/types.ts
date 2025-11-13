@@ -1,4 +1,5 @@
 import { NeynarUser } from "@/lib/neynar";
+import { ArbCampaignData } from "@/lib/arb-campaign";
 
 export type FlowPoolData = {
   token: string;
@@ -30,6 +31,7 @@ export interface PoolData {
     poolTotalAmountDistributedUntilUpdatedAt: string;
     updatedAtTimestamp: string;
     farcasterUser: NeynarUser | null | undefined;
+    arbCampaign?: ArbCampaignData[];
   }>;
   poolDistributors: Array<{
     __typename: string;
@@ -46,6 +48,14 @@ export interface PoolData {
     __typename: string;
     id: string;
     symbol: string;
+    name: string;
+    decimals: number;
+    isSuperToken: boolean;
+    underlyingAddress: string;
+    underlyingToken: {
+      symbol: string;
+      decimals: number;
+    };
   };
   poolMeta: {
     name: string;
@@ -53,8 +63,3 @@ export interface PoolData {
   };
   activeMemberCount: number;
 }
-
-export type AppPoolMeta = {
-  hasSupRewards: boolean;
-  isCracked: boolean;
-};

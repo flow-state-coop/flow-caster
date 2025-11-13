@@ -14,6 +14,10 @@ import ClaimSup from "../Pool/ClaimSup";
 import BaseButton from "./BaseButton";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { useMiniApp } from "@/contexts/miniapp-context";
+import { usePool } from "@/contexts/pool-context";
+import ConnectPoolCracked from "../Pool/ConnectPoolCracked";
+import OpenStreamSimple from "../Pool/OpenStreamSimple";
+import { shareContent } from "@/lib/helpers";
 
 interface FooterProps {
   chainId: string;
@@ -21,8 +25,9 @@ interface FooterProps {
   poolAddress: string;
   totalFlow: string | number;
   activeMemberCount?: number;
+  poolTokenSymbol: string;
 }
-type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
+export type DrawerTypes = "stream" | "claim" | "info" | "connect" | "edit";
 
 export default function Footer({
   chainId,
@@ -30,12 +35,14 @@ export default function Footer({
   poolAddress,
   totalFlow,
   activeMemberCount,
+  poolTokenSymbol,
 }: FooterProps) {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<DrawerTypes | undefined>();
-  const { isCracked } = usePoolData({ chainId, poolId });
   const { isMiniAppReady } = useMiniApp();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
 
   const {
     shouldConnect,
@@ -63,17 +70,15 @@ export default function Footer({
   };
 
   const handleCast = async () => {
+    const targetUrl = `${
+      process.env.NEXT_PUBLIC_URL
+    }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+      totalFlow
+    )}&tokenSymbol=${poolTokenSymbol}`;
+    console.log("targetUrl", targetUrl);
     await sdk.actions.composeCast({
-      text: `Streaming tips?! Open a real-time stream split to ${
-        activeMemberCount ? activeMemberCount : ""
-      } Cracked Farcaster Devs with @flowstatecoop. \n\nInstant + Consistent Funding = More Builders Building`,
-      embeds: [
-        `${
-          process.env.NEXT_PUBLIC_URL
-        }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
-          totalFlow
-        )}`,
-      ],
+      text: shareContent(`${chainId}-${poolId}`),
+      embeds: [targetUrl],
     });
   };
 
@@ -126,26 +131,31 @@ export default function Footer({
               <Award size={20} />
             </Link>
 
-            <Link
-              href={`/wallet`}
-              className={`p-2 text-black hover:text-gray-800 ${
-                pathname.includes("wallet") && "border-b border-black"
-              }`}
-            >
-              <LucideWallet size={20} />
-            </Link>
-            <button
-              className="p-2 text-black hover:text-gray-800"
-              onClick={() => handleOpenDrawer("claim")}
-            >
-              <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
-                <img
-                  src="/images/sup.svg"
-                  alt="Farcaster"
-                  className="w-5 h-5"
-                />
-              </div>
-            </button>
+            {currentPoolData.IS_CRACKED && (
+              <Link
+                href={`/wallet`}
+                className={`p-2 text-black hover:text-gray-800 ${
+                  pathname.includes("wallet") && "border-b border-black"
+                }`}
+              >
+                <LucideWallet size={20} />
+              </Link>
+            )}
+
+            {currentPoolData.SUP_REWARDS && (
+              <button
+                className="p-2 text-black hover:text-gray-800"
+                onClick={() => handleOpenDrawer("claim")}
+              >
+                <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
+                  <img
+                    src="/images/sup.svg"
+                    alt="Farcaster"
+                    className="w-5 h-5"
+                  />
+                </div>
+              </button>
+            )}
 
             <div
               className="p-2 text-black hover:text-gray-800 hover:cursor-pointer"
@@ -153,14 +163,12 @@ export default function Footer({
             >
               <Share size={20} />
             </div>
-            {isCracked && (
-              <button
-                className="p-2 text-black hover:text-gray-800"
-                onClick={() => handleOpenDrawer("info")}
-              >
-                <Info size={20} />
-              </button>
-            )}
+            <button
+              className="p-2 text-black hover:text-gray-800"
+              onClick={() => handleOpenDrawer("info")}
+            >
+              <Info size={20} />
+            </button>
           </div>
         </div>
       </div>
@@ -182,15 +190,31 @@ export default function Footer({
         <div className="p-6">
           {/* Drawer Content */}
           {drawerType === "stream" || drawerType === "edit" ? (
-            <OpenStream
-              chainId={chainId}
-              poolId={poolId}
-              poolAddress={poolAddress}
-              connectedDonor={connectedDonor}
-              handleCloseDrawer={handleCloseDrawer}
-              isOpen={isDrawerOpen}
-              activeMemberCount={activeMemberCount}
-            />
+            <>
+              {currentPoolData.IS_ARB && (
+                <OpenStreamSimple
+                  chainId={chainId}
+                  poolId={poolId}
+                  poolAddress={poolAddress}
+                  connectedDonor={connectedDonor}
+                  handleCloseDrawer={handleCloseDrawer}
+                  isOpen={isDrawerOpen}
+                  activeMemberCount={activeMemberCount}
+                />
+              )}
+
+              {!currentPoolData.IS_ARB && (
+                <OpenStream
+                  chainId={chainId}
+                  poolId={poolId}
+                  poolAddress={poolAddress}
+                  connectedDonor={connectedDonor}
+                  handleCloseDrawer={handleCloseDrawer}
+                  isOpen={isDrawerOpen}
+                  activeMemberCount={activeMemberCount}
+                />
+              )}
+            </>
           ) : null}
           {drawerType === "claim" && (
             <ClaimSup handleCloseDrawer={handleCloseDrawer} />
@@ -198,21 +222,39 @@ export default function Footer({
           {drawerType === "info" && (
             <InfoDrawer
               handleCloseDrawer={handleCloseDrawer}
+              handleOpenDrawer={handleOpenDrawer}
               activeMemberCount={activeMemberCount}
+              poolKey={`${chainId}-${poolId}`}
             />
           )}
-          {drawerType === "connect" && connectedMember && (
-            <ConnectPool
-              poolAddress={poolAddress}
-              poolId={poolId}
-              chainId={chainId}
-              connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
-              connectedMember={connectedMember}
-              handleCloseDrawer={handleCloseDrawer}
-              noUnits={noUnits}
-              shouldConnect={!connectedMember.isConnected}
-            />
-          )}
+          {drawerType === "connect" &&
+            connectedMember &&
+            currentPoolData.IS_CRACKED && (
+              <ConnectPoolCracked
+                poolAddress={poolAddress}
+                poolId={poolId}
+                chainId={chainId}
+                connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+                connectedMember={connectedMember}
+                handleCloseDrawer={handleCloseDrawer}
+                noUnits={noUnits}
+                shouldConnect={!connectedMember.isConnected}
+              />
+            )}
+
+          {drawerType === "connect" &&
+            connectedMember &&
+            !currentPoolData.IS_CRACKED && (
+              <ConnectPool
+                poolAddress={poolAddress}
+                poolId={poolId}
+                chainId={chainId}
+                connectedAddressNotPoolAddress={connectedAddressNotPoolAddress}
+                connectedMember={connectedMember}
+                handleCloseDrawer={handleCloseDrawer}
+                shouldConnect={!connectedMember.isConnected}
+              />
+            )}
         </div>
       </div>
     </>

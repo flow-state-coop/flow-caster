@@ -7,7 +7,7 @@ import { useUser } from "@/contexts/user-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { getTotalFlow } from "@/lib/pool";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
+import { usePool } from "@/contexts/pool-context";
 import LeaderboardList from "./LeaderboardList";
 import Footer from "../Shared/Footer";
 import Spinner from "../Shared/Spinner";
@@ -17,6 +17,9 @@ export default function Leaderboard() {
   const [devPoolList, setDevPoolList] = useState<
     Record<string, string> | undefined
   >();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+
   const {
     data: poolData,
     poolDistributors,
@@ -27,23 +30,23 @@ export default function Leaderboard() {
     chainId: chainId,
     poolId: poolId,
   });
-  const { poolDistributors: devPoolistributors } = usePoolData({
+  const { poolDistributors: devPoolDistributors } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
   const { user } = useUser();
   const { address } = useAccount();
 
   useEffect(() => {
-    if (!devPoolistributors) return;
+    if (!devPoolDistributors) return;
 
-    const rateList = devPoolistributors.reduce((acc, d) => {
+    const rateList = devPoolDistributors.reduce((acc, d) => {
       acc[d.account.id] = d.flowRate;
       return acc;
     }, {} as Record<string, string>);
 
     setDevPoolList(rateList);
-  }, [devPoolistributors]);
+  }, [devPoolDistributors]);
 
   if (isLoading || !poolData || !poolDistributors) {
     return (
@@ -71,12 +74,20 @@ export default function Leaderboard() {
         user={user?.data}
         connectedAddress={address}
       >
-        <LeaderboardList poolData={poolData} devPoolList={devPoolList} />
+        <div className="mt-3">
+          <LeaderboardList
+            poolData={poolData}
+            devPoolList={devPoolList}
+            sponsorAddress={currentPoolData.SPONSOR_ADDRESS}
+            iconOverride={currentPoolData.SPONSOR_ICON}
+          />
+        </div>
         <Footer
           chainId={chainId}
           poolId={poolId}
           poolAddress={poolData.id}
           totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
+          poolTokenSymbol={poolData.token.symbol}
         />
       </PoolUserProvider>
     </main>

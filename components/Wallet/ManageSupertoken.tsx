@@ -12,18 +12,26 @@ import {
   useConnect,
 } from "wagmi";
 import { useReadSuperToken } from "@sfpro/sdk/hook";
-import { FEATURED_POOL_DATA, TOKEN_DATA, ZERO_ADDRESS } from "@/lib/constants";
+import { usePool } from "@/contexts/pool-context";
+import { ZERO_ADDRESS } from "@/lib/constants";
 import erc20Abi from "@/lib/abi/erc20.json";
 import { superTokenAbi } from "@sfpro/sdk/abi";
 import { openExplorerUrl } from "@/lib/helpers";
 import BaseButton from "../Shared/BaseButton";
 import { truncateString } from "@/lib/pool";
+import { usePoolData } from "@/hooks/use-pool-data";
 
 interface ManageSupertokenProps {
   address: `0x${string}`;
+  chainId: string;
+  poolId: string;
 }
 
-export default function ManageSupertoken({ address }: ManageSupertokenProps) {
+export default function ManageSupertoken({
+  address,
+  chainId,
+  poolId,
+}: ManageSupertokenProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +41,13 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   const { switchChain } = useSwitchChain();
   const { chainId: connectedChainId, status } = useAccount();
   const { connect, connectors } = useConnect();
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+
+  const { data: poolData } = usePoolData({
+    chainId,
+    poolId,
+  });
 
   console.log("status", status);
   const isConnected = status === "connected";
@@ -57,12 +72,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       hash: txHash,
     });
 
-  const tokenData = TOKEN_DATA[FEATURED_POOL_DATA.DEFAULT_CHAIN_ID];
-
   // Fetch SuperToken balance
   const { data: superTokenBalance, refetch: refetchSuperTokenBal } =
     useReadSuperToken({
-      address: tokenData.address,
+      address: poolData?.token.id as `0x${string}`,
       functionName: "balanceOf",
       args: [address || ZERO_ADDRESS],
     });
@@ -70,7 +83,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
   // Fetch underlying token balance
   const { data: underlyingBalance, refetch: refetchUnderlyingBalance } =
     useReadContract({
-      address: tokenData.underlyingAddress as `0x${string}`,
+      address: poolData?.token.underlyingAddress as `0x${string}`,
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [address || ZERO_ADDRESS],
@@ -78,17 +91,22 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
   // Fetch underlying token allowance for SuperToken contract
   const { data: underlyingAllowance } = useReadContract({
-    address: tokenData.underlyingAddress as `0x${string}`,
+    address: poolData?.token.underlyingAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "allowance",
-    args: [address || ZERO_ADDRESS, tokenData.address],
+    args: [address || ZERO_ADDRESS, poolData?.token.id as `0x${string}`],
   }) as { data: bigint | undefined };
 
   const userSuperTokenBalance = superTokenBalance
     ? Number(formatUnits(superTokenBalance, 18))
     : 0;
   const userUnderlyingBalance = underlyingBalance
-    ? Number(formatUnits(underlyingBalance, tokenData.underlyingDecimals))
+    ? Number(
+        formatUnits(
+          underlyingBalance,
+          poolData?.token.underlyingToken.decimals || 18
+        )
+      )
     : 0;
 
   // Validation logic
@@ -113,10 +131,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
       return;
     }
 
-    if (Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID) !== connectedChainId) {
+    if (Number(currentPoolData.DEFAULT_CHAIN_ID) !== connectedChainId) {
       try {
         await switchChain({
-          chainId: Number(FEATURED_POOL_DATA.DEFAULT_CHAIN_ID),
+          chainId: Number(currentPoolData.DEFAULT_CHAIN_ID),
         });
       } catch (error) {
         console.error("Chain switching failed:", error);
@@ -147,10 +165,10 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
         setIsConfirming(true);
         approve(
           {
-            address: tokenData.underlyingAddress as `0x${string}`,
+            address: poolData?.token.underlyingAddress as `0x${string}`,
             abi: erc20Abi,
             functionName: "approve",
-            args: [tokenData.address, wrapAmount],
+            args: [poolData?.token.id as `0x${string}`, wrapAmount],
           },
           {
             onSuccess: () => {
@@ -183,7 +201,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     executeTx(
       {
         abi: superTokenAbi,
-        address: tokenData.address,
+        address: poolData?.token.id as `0x${string}`,
         functionName: "upgrade",
         args: [wrapAmount],
       },
@@ -211,7 +229,7 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     executeTx(
       {
         abi: superTokenAbi,
-        address: tokenData.address,
+        address: poolData?.token.id as `0x${string}`,
         functionName: "downgrade",
         args: [unwrapAmount],
       },
@@ -275,7 +293,9 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
     if (isSuccess) return "Success!";
     if (isAmountEmpty) return `Enter ${isWrapping ? "wrap" : "unwrap"} amount`;
     if (isInsufficientBalance) {
-      const symbol = isWrapping ? tokenData.underlyingSymbol : tokenData.symbol;
+      const symbol = isWrapping
+        ? poolData?.token.underlyingToken.symbol
+        : poolData?.token.symbol;
       return `${symbol} balance too low`;
     }
     return isWrapping ? "Wrap Tokens" : "Unwrap Tokens";
@@ -283,8 +303,12 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
   const getBalanceSymbol = (toggle?: boolean) => {
     if (toggle)
-      return isWrapping ? tokenData.symbol : tokenData.underlyingSymbol;
-    return isWrapping ? tokenData.underlyingSymbol : tokenData.symbol;
+      return isWrapping
+        ? poolData?.token.symbol
+        : poolData?.token.underlyingToken.symbol;
+    return isWrapping
+      ? poolData?.token.underlyingToken.symbol
+      : poolData?.token.symbol;
   };
 
   return (
@@ -307,8 +331,8 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
             <div className="flex flex-col">
               <div className="font-bold text-lg">Wrap</div>
               <div className="flex flex-row gap-1 w-full items-center justify-center">
-                ({tokenData.underlyingSymbol} <ArrowRight className="w-3 h-3" />{" "}
-                {tokenData.symbol})
+                ({poolData?.token.underlyingToken.symbol}{" "}
+                <ArrowRight className="w-3 h-3" /> {poolData?.token.symbol})
               </div>
             </div>
           </button>
@@ -327,8 +351,8 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
             <div className="flex flex-col">
               <div className="font-bold text-lg">Unwrap</div>
               <div className="flex flex-row gap-1 w-full items-center justify-center">
-                ({tokenData.symbol} <ArrowRight className="w-3 h-3" />{" "}
-                {tokenData.underlyingSymbol})
+                ({poolData?.token.symbol} <ArrowRight className="w-3 h-3" />{" "}
+                {poolData?.token.underlyingToken.symbol})
               </div>
             </div>
           </button>
@@ -336,13 +360,13 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
 
         <div className="flex flex-row justify-between flex-wrap text-xs text-primary-800">
           <p className="mt-2 font-bold">
-            {tokenData.underlyingSymbol} balance:{" "}
+            {poolData?.token.underlyingToken.symbol} balance:{" "}
             {userUnderlyingBalance?.toLocaleString("en-US", {
               maximumFractionDigits: 4,
             })}
           </p>
           <p className="mt-2 font-bold">
-            {tokenData.symbol} balance:{" "}
+            {poolData?.token.symbol} balance:{" "}
             {userSuperTokenBalance.toLocaleString("en-US", {
               maximumFractionDigits: 4,
             })}
@@ -380,14 +404,17 @@ export default function ManageSupertoken({ address }: ManageSupertokenProps) {
           amountValue > 0 &&
           (() => {
             const currentAllowance = Number(underlyingAllowance) || 0;
-            const wrapAmount = parseUnits(amount, tokenData.underlyingDecimals);
+            const wrapAmount = parseUnits(
+              amount,
+              poolData?.token.underlyingToken.decimals || 18
+            );
 
             if (currentAllowance < wrapAmount) {
               return (
                 <div className="border border-accent-400 bg-accent-100 rounded-lg px-3 py-3 text-xs">
                   <p className="text-accent-800">
                     There will be an approval request allowing wrapping of{" "}
-                    {tokenData.underlyingSymbol}
+                    {poolData?.token.underlyingToken.symbol}
                   </p>
                 </div>
               );

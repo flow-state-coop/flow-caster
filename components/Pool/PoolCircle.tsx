@@ -7,7 +7,8 @@ import { Crown } from "lucide-react";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
 import { createDonorBuckets } from "@/lib/pool";
-import { FEATURED_POOL_DATA, VIZ_PAUSED } from "@/lib/constants";
+import { usePool } from "@/contexts/pool-context";
+import { VIZ_PAUSED } from "@/lib/constants";
 import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import DonorStats from "./DonorStats";
@@ -41,6 +42,8 @@ export default function PoolCircle({
   const [recipientPositions, setRecipientPositions] = useState<any[]>([]);
   const [donors, setDonors] = useState<PoolDonor[]>([]);
   const poolCircleRef = useRef<SVGCircleElement>(null);
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
 
   const {
     poolDistributors,
@@ -51,9 +54,9 @@ export default function PoolCircle({
     poolId: poolId,
   });
 
-  const { poolDistributors: devPoolistributors } = usePoolData({
+  const { poolDistributors: devPoolDistributors } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
 
   // Transform pool data to component format
@@ -66,22 +69,23 @@ export default function PoolCircle({
       udpatedAt: member.updatedAtTimestamp,
       farcasterUser: member.farcasterUser,
       connected: member.isConnected,
+      arbCampaign: member.arbCampaign,
     }));
 
     return formattedRecipients;
   }, [poolMembers]);
 
   useEffect(() => {
-    if (!devPoolistributors || !poolDistributors) return;
+    if (!devPoolDistributors || !poolDistributors) return;
 
     const formattedDonors = createDonorBuckets(
       poolDistributors,
-      devPoolistributors,
+      devPoolDistributors,
       connectedAddress
     );
 
     setDonors(formattedDonors);
-  }, [poolDistributors, devPoolistributors, connectedAddress]);
+  }, [poolDistributors, devPoolDistributors, connectedAddress]);
 
   useEffect(() => {
     if (!poolData) return;
@@ -96,8 +100,8 @@ export default function PoolCircle({
       const nodeRadius = Math.max(
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
-          baseRadius * 3, // Max 300% of base size
-          baseRadius * unitRatio * 4 // Scale by units with multiplier
+          baseRadius * 3.5, // Max 350% of base size
+          baseRadius * unitRatio * 6 // Scale by units with multiplier
         )
       );
 
@@ -282,7 +286,7 @@ export default function PoolCircle({
           className="opacity-50"
         />
 
-        {/* Text path for pool name */}
+        {/* Text path for pool name
         <defs>
           <path
             id="pool-text-path"
@@ -292,11 +296,12 @@ export default function PoolCircle({
             fill="none"
           />
         </defs>
-        <text className="text-black font-bold text-3xl">
+        <text className="text-black font-bold text-2xl">
           <textPath href="#pool-text-path" startOffset="0%" textAnchor="start">
-            {poolData.poolMeta.name}
+            {currentPoolData.CONTENT.POOL_TITLE}
           </textPath>
         </text>
+         */}
 
         {/* Flow lines from donors to pool */}
         {donors.map((donor, i) => {
@@ -397,6 +402,13 @@ export default function PoolCircle({
                   startingAmount={donor?.startingAmount}
                   startingTimestamp={donor?.startingTimestamp}
                   tokenSymbol={poolData.token.symbol}
+                  iconOverride={
+                    currentPoolData.SPONSOR_ADDRESS !== undefined &&
+                    currentPoolData.SPONSOR_ADDRESS.toLowerCase() ===
+                      donor?.accountId?.toLowerCase()
+                      ? currentPoolData.SPONSOR_ICON
+                      : undefined
+                  }
                 />
               )}
 
@@ -436,6 +448,8 @@ export default function PoolCircle({
             totalFlowRate={Number(poolData.flowRate)}
             connected={recipient.connected}
             tokenSymbol={poolData.token.symbol}
+            isArb={currentPoolData.IS_ARB}
+            arbApps={recipient.arbCampaign}
           />
         ))}
         {/* Pool circle particles */}
@@ -487,7 +501,9 @@ export default function PoolCircle({
             <DonorStats
               key={`${donor.accountId}-${donor.rate}-${i}`}
               rate={donor.rate}
-              showSup={i < 2}
+              hasSupRewards={currentPoolData.SUP_REWARDS!! && i < 2}
+              isMiddle={i === 1}
+              sponsorAddress={currentPoolData.SPONSOR_ADDRESS}
               showTotalFlow={i > 1}
               startingTimestamp={poolData.updatedAtTimestamp}
               startingAmount={poolData.totalAmountDistributedUntilUpdatedAt}

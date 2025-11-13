@@ -1,15 +1,16 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { useUser } from "@/contexts/user-context";
+import { usePool } from "@/contexts/pool-context";
 import { PoolUserProvider } from "@/contexts/pool-user-context";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { getTotalFlow } from "@/lib/pool";
-import { FEATURED_POOL_DATA } from "@/lib/constants";
 import PoolCircle from "@/components/Pool/PoolCircle";
 import Footer from "./Footer";
 import Spinner from "./Spinner";
 import BaseButton from "./BaseButton";
+import { useEffect } from "react";
 
 interface PoolHQProps {
   chainId: string;
@@ -17,6 +18,9 @@ interface PoolHQProps {
 }
 
 export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
+  const { getCurrentPoolData } = usePool();
+  const currentPoolData = getCurrentPoolData();
+
   const {
     data: poolData,
     poolDistributors,
@@ -31,11 +35,31 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
 
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
-    poolId: FEATURED_POOL_DATA.DEV_POOL_ID,
+    poolId: currentPoolData.DEV_POOL_ID,
   });
 
   const { user, signIn } = useUser();
-  const { address } = useAccount();
+  const { address, chainId: connectedChainId } = useAccount();
+  const { switchChain } = useSwitchChain();
+
+  useEffect(() => {
+    const connectToChain = async () => {
+      try {
+        await switchChain({ chainId: Number(chainId) });
+      } catch (error) {
+        console.error("Chain switching failed:", error);
+        return;
+      }
+    };
+    console.log("poolhq chainId", chainId);
+    console.log("poolhq connectedChainId", connectedChainId);
+
+    if (Number(chainId) !== connectedChainId) {
+      connectToChain();
+    }
+  }, [chainId, connectedChainId, switchChain]);
+
+  // console.log("poolData", poolData);
 
   if (error) {
     return (
@@ -80,6 +104,7 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
         poolAddress={poolData.id}
         totalFlow={getTotalFlow(poolData.poolDistributors).toString()}
         activeMemberCount={activeMemberCount}
+        poolTokenSymbol={poolData.token.symbol}
       />
     </PoolUserProvider>
   );

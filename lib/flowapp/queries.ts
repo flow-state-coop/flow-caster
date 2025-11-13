@@ -57,6 +57,14 @@ export const getSuperFluidQuery = (showZeroUnits: boolean) => {
         token {
           id
           symbol
+          name
+          decimals
+          isSuperToken
+          underlyingAddress
+          underlyingToken {
+            symbol
+            decimals
+          }
         }
         poolCreatedEvent {
           timestamp
