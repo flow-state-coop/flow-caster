@@ -17,6 +17,13 @@ function truncateAddress(address: string, length = 6) {
   return address.slice(0, length) + "..." + address.slice(-4);
 }
 
+function truncateName(name: string, length = 15) {
+  if (name.length > length) {
+    return name.slice(0, length) + "...";
+  }
+  return name;
+}
+
 export default function LeaderboardList({
   poolData,
   devPoolList,
@@ -106,7 +113,7 @@ export default function LeaderboardList({
               <div className="flex-1 min-w-0">
                 <span className="font-bold text-black text-xs">
                   {user?.username
-                    ? user.username
+                    ? truncateName(user.username)
                     : truncateAddress(d.account.id)}
                 </span>
               </div>

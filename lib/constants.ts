@@ -84,7 +84,7 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     SUP_PROGRAM_ID: 7761,
     VIEM_CHAIN_OBJ: arbitrum,
     CONTENT: {
-      NAME: "Arbitrum Mini App Rewards",
+      NAME: "Cracked Arbitrum Devs",
       DESCRIPTION: "Continuous rewards for Arbitrum's top mini apps",
       POOL_TITLE: "Sponsored by the Arbitrum Foundation",
       LOGO: "/images/arb-logo.svg",
