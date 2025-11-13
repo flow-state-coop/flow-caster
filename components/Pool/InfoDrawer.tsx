@@ -102,8 +102,8 @@ function ArbInfo({ handleOpenDrawer }: InfoDrawerProps) {
           className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
         >
           (3M+ SUP in incentives)
-        </span>
-        , &{" "}
+        </span>{" "}
+        &{" "}
         <span
           onClick={() => handleOpenDrawer("stream")}
           className="underline text-primary-900 font-bold hover:cursor-pointer hover:text-primary-600"
