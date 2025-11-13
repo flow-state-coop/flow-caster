@@ -1,4 +1,7 @@
-import { sendFrameNotificationToAllUsers } from "@/lib/notification-client";
+import {
+  // sendFrameNotificationToAllUsers,
+  sendFrameNotificationToAllUsersOneAtATime,
+} from "@/lib/notification-client";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -16,7 +19,8 @@ export async function POST(request: Request) {
     console.log("notification", notification);
     console.log("process.env.NEXT_PUBLIC_URL", process.env.NEXT_PUBLIC_URL);
 
-    const result = await sendFrameNotificationToAllUsers({
+    // const result = await sendFrameNotificationToAllUsers({
+    const result = await sendFrameNotificationToAllUsersOneAtATime({
       title: notification.title,
       body: notification.body,
       targetUrl: notification.targetUrl || `${process.env.NEXT_PUBLIC_URL}`,

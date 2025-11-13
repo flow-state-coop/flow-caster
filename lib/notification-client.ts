@@ -24,11 +24,13 @@ export async function sendFrameNotification({
   fid,
   title,
   body,
+  targetUrl,
   notificationDetails,
 }: {
   fid: number;
   title: string;
   body: string;
+  targetUrl?: string;
   notificationDetails?: MiniAppNotificationDetails | null;
 }): Promise<SendFrameNotificationResult> {
   if (!notificationDetails) {
@@ -47,7 +49,7 @@ export async function sendFrameNotification({
       notificationId: crypto.randomUUID(),
       title,
       body,
-      targetUrl: appUrl,
+      targetUrl: targetUrl || appUrl,
       tokens: [notificationDetails.token],
     } satisfies SendNotificationRequest),
   });
@@ -141,6 +143,62 @@ export async function sendFrameNotificationToAllUsers({
     if (result.state !== "success") {
       return result;
     }
+  }
+
+  return { state: "success" };
+}
+
+export async function sendFrameNotificationToAllUsersOneAtATime({
+  title,
+  body,
+  targetUrl,
+  notificationDetails,
+}: {
+  title: string;
+  body: string;
+  targetUrl?: string;
+  notificationDetails?: MiniAppNotificationDetails[] | null;
+}): Promise<SendFrameNotificationResult> {
+  if (!notificationDetails) {
+    notificationDetails = await getAllUserNotificationDetails();
+  }
+  if (!notificationDetails) {
+    return { state: "no_token" };
+  }
+
+  console.log(
+    `notfiying ${notificationDetails.length} users one at a time`,
+  );
+
+  const failedDetails: MiniAppNotificationDetails[] = [];
+
+  for (const details of notificationDetails) {
+    try {
+      const result = await sendNotificationBatch(
+        [details],
+        title,
+        body,
+        targetUrl,
+      );
+      if (result.state !== "success") {
+        failedDetails.push(details);
+      }
+    } catch (error) {
+      console.error(
+        "sendFrameNotificationToAllUsersOneAtATime unexpected error",
+        error,
+        details,
+      );
+      failedDetails.push(details);
+    }
+  }
+
+  if (failedDetails.length) {
+    console.error(
+      "sendFrameNotificationToAllUsersOneAtATime failed details",
+      failedDetails,
+    );
+    return { state: "error", error: failedDetails };
   }
 
   return { state: "success" };
