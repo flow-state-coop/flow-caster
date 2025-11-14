@@ -94,6 +94,8 @@ async function sendNotificationBatch(
 
   const responseJson = await response.json();
 
+  console.log("responseJson", responseJson);
+
   if (response.status === 200) {
     const responseBody = sendNotificationResponseSchema.safeParse(responseJson);
     if (responseBody.success === false) {
@@ -132,17 +134,31 @@ export async function sendFrameNotificationToAllUsers({
   console.log(`notfiying ${notificationDetails.length} users`);
 
   // Process in batches of 100
-  const batchSize = 100;
+  // const batchSize = 100;
+  const batchSize = 20;
   const batches = [];
   for (let i = 0; i < notificationDetails.length; i += batchSize) {
     batches.push(notificationDetails.slice(i, i + batchSize));
   }
 
+  const failedBatches: MiniAppNotificationDetails[][] = [];
+
   for (const batch of batches) {
-    const result = await sendNotificationBatch(batch, title, body, targetUrl);
-    if (result.state !== "success") {
-      return result;
+    try {
+      const result = await sendNotificationBatch(batch, title, body, targetUrl);
+      if (result.state !== "success") {
+        console.log("**** error", result);
+        console.log("**** batch", batch);
+        failedBatches.push(batch);
+      }
+    } catch (error) {
+      console.error("sendFrameNotificationToAllUsers unexpected error", error, batch);
+      failedBatches.push(batch);
     }
+  }
+
+  if (failedBatches.length === batches.length) {
+    return { state: "error", error: failedBatches };
   }
 
   return { state: "success" };
@@ -166,9 +182,7 @@ export async function sendFrameNotificationToAllUsersOneAtATime({
     return { state: "no_token" };
   }
 
-  console.log(
-    `notfiying ${notificationDetails.length} users one at a time`,
-  );
+  console.log(`notfiying ${notificationDetails.length} users one at a time`);
 
   const failedDetails: MiniAppNotificationDetails[] = [];
 
@@ -178,7 +192,7 @@ export async function sendFrameNotificationToAllUsersOneAtATime({
         [details],
         title,
         body,
-        targetUrl,
+        targetUrl
       );
       if (result.state !== "success") {
         failedDetails.push(details);
@@ -187,7 +201,7 @@ export async function sendFrameNotificationToAllUsersOneAtATime({
       console.error(
         "sendFrameNotificationToAllUsersOneAtATime unexpected error",
         error,
-        details,
+        details
       );
       failedDetails.push(details);
     }
@@ -196,7 +210,7 @@ export async function sendFrameNotificationToAllUsersOneAtATime({
   if (failedDetails.length) {
     console.error(
       "sendFrameNotificationToAllUsersOneAtATime failed details",
-      failedDetails,
+      failedDetails
     );
     return { state: "error", error: failedDetails };
   }

@@ -6,9 +6,11 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { poolid, chainid, poolname, username, flowrate } = body;
 
+    const token = poolid == "5" ? "USND" : "USDCx";
+
     const result = await sendFrameNotificationToAllUsers({
-      title: "A stream has been opened!",
-      body: `${username} is streaming ${flowrate} USDCx/mo to ${poolname}.`,
+      title: "Whoaaa, that's a big stream 🌊!",
+      body: `${username} is streaming ${flowrate} ${token}/mo to ${poolname}.`,
       targetUrl: `${process.env.NEXT_PUBLIC_URL}/pool/${chainid}/${poolid}`,
     });
 
