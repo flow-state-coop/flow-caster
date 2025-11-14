@@ -85,8 +85,8 @@ export async function POST(request: Request) {
         await setUserNotificationDetails(fid, event.notificationDetails);
         await sendFrameNotification({
           fid,
-          title: `Welcome to flowcaster`,
-          body: `3M+ Superfluid SUP tokens are up for grabs. Stream USND ($1 minimum) to earn!`,
+          title: `Welcome to Flow Caster`,
+          body: `Open a token stream, support cracked devs, earn $SUP.`,
         });
       } else {
         await deleteUserNotificationDetails(fid);

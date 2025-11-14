@@ -311,7 +311,7 @@ export default function OpenStreamSimple({
           body: JSON.stringify({
             poolid: poolId,
             chainid: chainId,
-            poolname: "Farcaster Cracked Devs",
+            poolname: "Arbitrum Cracked Devs",
             username: user?.data?.username || "A mystery donor",
             flowrate: monthlyDonation,
           }),
