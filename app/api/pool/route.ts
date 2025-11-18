@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     const pool = flowSplitterPoolQueryRes?.pools[0];
 
-    console.log("pool", pool);
+    // console.log("pool", pool);
 
     if (!pool) {
       throw Error("Missing Pool");
@@ -80,6 +80,8 @@ export async function GET(request: NextRequest) {
       // Neynar API expects comma-separated addresses
       const addressesString = allAddresses.join(",");
       farcasterUsers = await fetchUsersByEthAddress(addressesString);
+
+      console.log("farcasterUsers", farcasterUsers);
     } catch (error) {
       console.error("Error fetching Farcaster users:", error);
       // Continue without Farcaster data if the API call fails
