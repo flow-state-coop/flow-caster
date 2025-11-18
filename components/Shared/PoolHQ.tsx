@@ -33,6 +33,8 @@ export default function PoolHQ({ chainId, poolId }: PoolHQProps) {
     poolId: poolId,
   });
 
+  console.log("poolData", poolData);
+
   const { poolDistributors: devPoolistributors } = usePoolData({
     chainId,
     poolId: currentPoolData.DEV_POOL_ID,

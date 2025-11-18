@@ -6,6 +6,7 @@ export type ArbCampaignData = {
   escrowActive: boolean;
   ethAddress: string;
   username: string;
+  userpfp: string;
   fid: string;
   iconUrl: string;
   appName: string;
@@ -18,6 +19,7 @@ type CsvRow = {
   eth_address: string;
   app_name: string;
   icon_url: string;
+  user_pfp_url: string;
   escrow_address: string;
   escrow_active: string;
   arbitrum_weighted_score: string;
@@ -42,6 +44,7 @@ function parseCsv(): CsvRow[] {
   const headers = lines[0].split(",").map((h) => h.trim());
   const usernameIdx = headers.indexOf("username");
   const fidIdx = headers.indexOf("fid");
+  const userPfpIdx = headers.indexOf("user_pfp_url");
   const ethAddressIdx = headers.indexOf("eth_address");
   const appNameIdx = headers.indexOf("app_name");
   const iconUrlIdx = headers.indexOf("icon_url");
@@ -58,6 +61,7 @@ function parseCsv(): CsvRow[] {
     rows.push({
       username: values[usernameIdx] || "",
       fid: values[fidIdx] || "",
+      user_pfp_url: values[userPfpIdx] || "",
       eth_address: values[ethAddressIdx] || "",
       app_name: values[appNameIdx] || "",
       icon_url: values[iconUrlIdx] || "",
@@ -94,6 +98,7 @@ export function getArbCampaignDataForAddress(
       ethAddress: row.eth_address,
       username: row.username,
       fid: row.fid,
+      userpfp: row.user_pfp_url,
       iconUrl: row.icon_url,
       appName: row.app_name,
       appScore: row.arbitrum_weighted_score,
@@ -111,6 +116,7 @@ export function getArbCampaignDataForAddress(
     ethAddress: row.eth_address,
     username: row.username,
     fid: row.fid,
+    userpfp: row.user_pfp_url,
     iconUrl: row.icon_url,
     appName: row.app_name,
     appScore: row.arbitrum_weighted_score,

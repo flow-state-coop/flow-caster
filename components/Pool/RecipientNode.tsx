@@ -65,22 +65,35 @@ export default function RecipientNode({
             <>
               <div className="flex items-center gap-2 mb-2 ">
                 <img
-                  src={farcasterUser.pfp_url}
-                  alt={farcasterUser.display_name}
+                  src={arbAppProfile.userpfp}
+                  alt={arbAppProfile.username}
                   className="w-8 h-8 rounded-full"
                 />
                 <div>
-                  <div className="font-bold">{farcasterUser.display_name}</div>
-                  <div>@{farcasterUser.username}</div>
+                  <div>@{arbAppProfile.username}</div>
                 </div>
               </div>
             </>
+
+            //       <>
+            //   <div className="flex items-center gap-2 mb-2 ">
+            //     <img
+            //       src={farcasterUser.pfp_url}
+            //       alt={farcasterUser.display_name}
+            //       className="w-8 h-8 rounded-full"
+            //     />
+            //     <div>
+            //       <div className="font-bold">{farcasterUser.display_name}</div>
+            //       <div>@{farcasterUser.username}</div>
+            //     </div>
+            //   </div>
+            // </>
           )}
           {arbAppProfile && !farcasterUser && (
             <>
               <div className="flex items-center gap-2 mb-2 ">
                 <img
-                  src={arbAppProfile.iconUrl}
+                  src={arbAppProfile.userpfp}
                   alt={arbAppProfile.username}
                   className="w-8 h-8 rounded-full"
                 />
@@ -90,7 +103,7 @@ export default function RecipientNode({
               </div>
             </>
           )}
-          {farcasterPfp && (
+          {farcasterPfp && !arbAppProfile && (
             <>
               <div className="flex items-center gap-2 mb-2 ">
                 <img
@@ -167,7 +180,7 @@ export default function RecipientNode({
             </>
           )}
 
-          {farcasterUser && (
+          {farcasterUser && !arbAppProfile && (
             <button
               onClick={() => handleViewProfile(Number(farcasterUser.fid))}
               className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
@@ -176,7 +189,8 @@ export default function RecipientNode({
             </button>
           )}
 
-          {arbAppProfile && !farcasterUser && (
+          {/* {arbAppProfile && !farcasterUser && ( */}
+          {arbAppProfile && (
             <button
               onClick={() => handleViewProfile(Number(arbAppProfile.fid))}
               className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
@@ -197,7 +211,7 @@ export default function RecipientNode({
     >
       <g>
         {/* Profile image as a clip path */}
-        {farcasterUser?.pfp_url && (
+        {farcasterUser?.pfp_url && !arbAppProfile && (
           <defs>
             <clipPath id={`recipient-clip-${accountId}`}>
               <circle cx={x} cy={y} r={radius} />
@@ -205,7 +219,8 @@ export default function RecipientNode({
           </defs>
         )}
 
-        {arbAppProfile && !farcasterUser && (
+        {/* {arbAppProfile && !farcasterUser && ( */}
+        {arbAppProfile && (
           <defs>
             <clipPath id={`recipient-clip-${accountId}`}>
               <circle cx={x} cy={y} r={radius} />
@@ -226,7 +241,7 @@ export default function RecipientNode({
 
         {/* Profile image */}
 
-        {farcasterUser?.pfp_url && (
+        {farcasterUser?.pfp_url && !arbAppProfile && (
           <image
             ref={circleImgRef}
             href={farcasterUser.pfp_url}
@@ -239,7 +254,22 @@ export default function RecipientNode({
           />
         )}
 
-        {!farcasterUser?.pfp_url && arbAppProfile && arbAppProfile.iconUrl && (
+        {arbAppProfile && (
+          <image
+            ref={circleImgRef}
+            href={arbAppProfile.userpfp}
+            x={x - radius}
+            y={y - radius}
+            width={radius * 2}
+            height={radius * 2}
+            clipPath={`url(#recipient-clip-${accountId})`}
+            className="cursor-pointer"
+          />
+        )}
+
+        {/* app image */}
+
+        {/* {!farcasterUser?.pfp_url && arbAppProfile && arbAppProfile.iconUrl && (
           <image
             ref={circleImgRef}
             href={arbAppProfile.iconUrl}
@@ -250,7 +280,7 @@ export default function RecipientNode({
             clipPath={`url(#recipient-clip-${accountId})`}
             className="cursor-pointer"
           />
-        )}
+        )} */}
       </g>
     </Tippy>
   );
