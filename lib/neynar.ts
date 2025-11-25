@@ -1,5 +1,10 @@
 import { env } from "@/lib/env";
-import { getNeynarUsers, setNeynarUsers } from "./redis";
+import {
+  getNeynarUser,
+  getNeynarUserByAddresssByAddress,
+  setNeynarUser,
+  setNeynarUserByAddresssByAddress,
+} from "./redis";
 
 export interface NeynarUser {
   fid: string;
@@ -16,7 +21,17 @@ export interface NeynarUser {
   };
 }
 
-export const fetchUser = async (fid: string): Promise<NeynarUser> => {
+export const fetchUser = async (
+  fid: string,
+  opts?: { fresh?: boolean }
+): Promise<NeynarUser> => {
+  const { fresh } = opts ?? {};
+
+  if (!fresh) {
+    const cached = await getNeynarUser(fid);
+    if (cached) return cached;
+  }
+
   const response = await fetch(
     `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
     {
@@ -25,6 +40,7 @@ export const fetchUser = async (fid: string): Promise<NeynarUser> => {
       },
     }
   );
+
   if (!response.ok) {
     console.error(
       "Failed to fetch Farcaster user on Neynar",
@@ -32,8 +48,13 @@ export const fetchUser = async (fid: string): Promise<NeynarUser> => {
     );
     throw new Error("Failed to fetch Farcaster user on Neynar");
   }
+
   const data = await response.json();
-  return data.users[0];
+  const user = data.users[0] as NeynarUser;
+
+  await setNeynarUser(fid, user);
+
+  return user;
 };
 
 const normalizeAddress = (address: string) => address.trim().toLowerCase();
@@ -59,7 +80,7 @@ export const fetchUsersByEthAddress = async (
 
   let cached: (NeynarUser | null)[] = [];
   try {
-    cached = await getNeynarUsers(normalizedAddresses);
+    cached = await getNeynarUserByAddresssByAddress(normalizedAddresses);
   } catch (error) {
     console.error("Failed to read Neynar users from cache", error);
     cached = normalizedAddresses.map(() => null);
@@ -118,7 +139,7 @@ export const fetchUsersByEthAddress = async (
   }
 
   if (cacheableUsers.length) {
-    await setNeynarUsers(cacheableUsers);
+    await setNeynarUserByAddresssByAddress(cacheableUsers);
   }
 
   for (const address of normalizedAddresses) {
