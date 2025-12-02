@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
     try {
       // Neynar API expects comma-separated addresses
       const addressesString = allAddresses.join(",");
+
       farcasterUsers = await fetchUsersByEthAddress(addressesString);
 
       console.log("farcasterUsers", farcasterUsers);

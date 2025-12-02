@@ -103,6 +103,8 @@ export const fetchUsersByEthAddress = async (
   }
 
   const missingList = Array.from(missingAddresses);
+
+  console.log("missingList", missingList.join(","));
   const response = await fetch(
     `https://api.neynar.com/v2/farcaster/user/bulk-by-address/?addresses=${missingList.join(
       ","
@@ -114,11 +116,9 @@ export const fetchUsersByEthAddress = async (
     }
   );
   if (!response.ok) {
-    console.error(
-      "Failed to fetch Farcaster users on Neynar",
-      await response.json()
-    );
-    throw new Error("Failed to fetch Farcaster user on Neynar");
+    console.error("Failed to fetch Farcaster users on Neynar", missingList);
+    // 20250102: remove this throw so a bad address doesn't spoil the data
+    // throw new Error("Failed to fetch Farcaster user on Neynar");
   }
   const data = (await response.json()) as Record<string, NeynarUser[]>;
   const normalizedData = Object.entries(data).reduce<
