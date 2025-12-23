@@ -97,11 +97,12 @@ export default function PoolCircle({
 
     const nodes = recipients.map((recipient) => {
       const unitRatio = recipient.units / Number(poolData.totalUnits);
+      const unitScale = recipients.length < 5 ? 2.25 : 6;
       const nodeRadius = Math.max(
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
           baseRadius * 3.5, // Max 350% of base size
-          baseRadius * unitRatio * 6 // Scale by units with multiplier
+          baseRadius * unitRatio * unitScale // Scale by units with multiplier
         )
       );
 
