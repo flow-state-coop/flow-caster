@@ -29,6 +29,16 @@ interface PoolDonor {
   startingTimestamp?: string;
 }
 
+const getUnitScale = (recipientCount: number): number => {
+  if (recipientCount < 4) {
+    return 2.25;
+  } else if (recipientCount < 6) {
+    return 4.5;
+  } else {
+    return 6;
+  }
+};
+
 export default function PoolCircle({
   connectedUser,
   connectedAddress,
@@ -97,7 +107,7 @@ export default function PoolCircle({
 
     const nodes = recipients.map((recipient) => {
       const unitRatio = recipient.units / Number(poolData.totalUnits);
-      const unitScale = recipients.length < 5 ? 2.25 : 6;
+      const unitScale = getUnitScale(recipients.length);
       const nodeRadius = Math.max(
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
