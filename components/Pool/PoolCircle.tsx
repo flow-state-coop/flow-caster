@@ -34,6 +34,8 @@ const getUnitScale = (recipientCount: number): number => {
     return 2.25;
   } else if (recipientCount < 6) {
     return 4.5;
+  } else if (recipientCount < 9) {
+    return 4;
   } else {
     return 6;
   }
