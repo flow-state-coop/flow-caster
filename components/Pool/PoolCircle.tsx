@@ -32,6 +32,8 @@ interface PoolDonor {
 const getUnitScale = (recipientCount: number): number => {
   if (recipientCount < 4) {
     return 2.25;
+  } else if (recipientCount < 5) {
+    return 3;
   } else if (recipientCount < 6) {
     return 4.5;
   } else if (recipientCount < 9) {
