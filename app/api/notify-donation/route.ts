@@ -4,9 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { poolid, chainid, poolname, username, flowrate } = body;
-
-    const token = poolid == "5" ? "USND" : "USDCx";
+    const { poolid, chainid, poolname, username, flowrate, token } = body;
 
     const result = await sendFrameNotificationToAllUsers({
       title: "Whoaaa, that's a big stream 🌊!",

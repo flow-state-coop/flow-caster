@@ -314,6 +314,7 @@ export default function OpenStreamSimple({
             poolname: "Arbitrum Cracked Devs",
             username: user?.data?.username || "A mystery donor",
             flowrate: monthlyDonation,
+            token: poolData?.token.symbol || "USND",
           }),
         };
         fetch(`/api/notify-donation`, options);
