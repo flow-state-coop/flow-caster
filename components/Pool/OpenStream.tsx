@@ -403,6 +403,7 @@ export default function OpenStream({
             poolname: "Farcaster Cracked Devs",
             username: user?.data?.username || "A mystery donor",
             flowrate: monthlyDonation,
+            token: poolData?.token.symbol || "USDCx",
           }),
         };
         fetch(`/api/notify-donation`, options);
