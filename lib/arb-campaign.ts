@@ -11,6 +11,7 @@ export type ArbCampaignData = {
   iconUrl: string;
   appName: string;
   appScore: string;
+  appUrl: string;
 };
 
 type CsvRow = {
@@ -23,6 +24,7 @@ type CsvRow = {
   escrow_address: string;
   escrow_active: string;
   arbitrum_weighted_score: string;
+  app_url: string;
 };
 
 let cachedData: CsvRow[] | null = null;
@@ -51,6 +53,7 @@ function parseCsv(): CsvRow[] {
   const escrowAddressIdx = headers.indexOf("Escrow Address");
   const escrowActiveIdx = headers.indexOf("Escrow Active");
   const appScoreIdx = headers.indexOf("arbitrum_weighted_score");
+  const appUrlIdx = headers.indexOf("app_url");
 
   const rows: CsvRow[] = [];
 
@@ -68,6 +71,7 @@ function parseCsv(): CsvRow[] {
       escrow_address: values[escrowAddressIdx] || "",
       escrow_active: values[escrowActiveIdx] || "",
       arbitrum_weighted_score: values[appScoreIdx] || "",
+      app_url: values[appUrlIdx] || "",
     });
   }
 
@@ -102,6 +106,7 @@ export function getArbCampaignDataForAddress(
       iconUrl: row.icon_url,
       appName: row.app_name,
       appScore: row.arbitrum_weighted_score,
+      appUrl: row.app_url,
     }));
   }
 
@@ -120,5 +125,6 @@ export function getArbCampaignDataForAddress(
     iconUrl: row.icon_url,
     appName: row.app_name,
     appScore: row.arbitrum_weighted_score,
+    appUrl: row.app_url,
   }));
 }
