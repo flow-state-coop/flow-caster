@@ -52,6 +52,10 @@ export default function RecipientNode({
     });
   };
 
+  const handleViewApp = async (url: string) => {
+    await sdk.actions.openUrl({ url });
+  };
+
   const farcasterPfp = !isArb && farcasterUser;
   const noPfp = !farcasterUser;
   const arbAppProfile = isArb && arbApps && arbApps[0];
@@ -129,7 +133,7 @@ export default function RecipientNode({
               {arbApps?.map((app, i) => {
                 return (
                   <div key={i}>
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2">
                       <img
                         src={app.iconUrl || "/images/arb-logo.svg"}
                         alt={app.appName}
@@ -140,6 +144,14 @@ export default function RecipientNode({
                         <div className="text-[10px]">score: {app.appScore}</div>
                       </div>
                     </div>
+                    {app.appUrl && (
+                      <button
+                        onClick={() => handleViewApp(app.appUrl)}
+                        className="flex flew-row items-center gap-1 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
+                      >
+                        View App <ArrowRight className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 );
               })}
