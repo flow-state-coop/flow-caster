@@ -13,6 +13,8 @@ import RecipientNode from "./RecipientNode";
 import DonorNode from "./DonorNode";
 import DonorStats from "./DonorStats";
 import FlowLine from "./Flowline";
+import SupRewardNode from "./SupRewardNode";
+import SupFlowLine from "./SupFlowLine";
 
 interface PoolCircleProps {
   connectedUser: NeynarUser | null | undefined;
@@ -95,7 +97,7 @@ export default function PoolCircle({
     const formattedDonors = createDonorBuckets(
       poolDistributors,
       devPoolDistributors,
-      connectedAddress
+      connectedAddress,
     );
 
     setDonors(formattedDonors);
@@ -116,8 +118,8 @@ export default function PoolCircle({
         baseRadius * 0.8, // Min 80% of base size
         Math.min(
           baseRadius * 3.5, // Max 350% of base size
-          baseRadius * unitRatio * unitScale // Scale by units with multiplier
-        )
+          baseRadius * unitRatio * unitScale, // Scale by units with multiplier
+        ),
       );
 
       // Start with random position
@@ -140,7 +142,7 @@ export default function PoolCircle({
       .forceSimulation(nodes)
       .force(
         "collide",
-        d3.forceCollide().radius((d: any) => d.radius + 2)
+        d3.forceCollide().radius((d: any) => d.radius + 2),
       )
       .force("center", d3.forceCenter(centerX, centerY))
       .force("x", d3.forceX(centerX).strength(0.1))
@@ -153,7 +155,7 @@ export default function PoolCircle({
         // Keep nodes within pool bounds
         nodes.forEach((node: any) => {
           const distanceFromCenter = Math.sqrt(
-            Math.pow(node.x - centerX, 2) + Math.pow(node.y - centerY, 2)
+            Math.pow(node.x - centerX, 2) + Math.pow(node.y - centerY, 2),
           );
           const maxDistance = radius - node.radius - 10; // 10px padding
           if (distanceFromCenter > maxDistance) {
@@ -198,11 +200,27 @@ export default function PoolCircle({
       ease: "power1.outIn",
     });
 
+    // SUP outline glow/pulse (slower than orange)
+    let supOutlineAnimation: gsap.core.Tween | null = null;
+    if (currentPoolData.SUP_REWARDS) {
+      supOutlineAnimation = gsap.to("#sup-outline", {
+        repeat: -1,
+        yoyo: true,
+        duration: 1.5,
+        filter: "drop-shadow(0 0 12px #75eb00)",
+        stroke: "#75eb00",
+        strokeWidth: 6,
+        opacity: 1,
+        ease: "power1.inOut",
+      });
+    }
+
     return () => {
       poolOutlineAnimation.kill();
       flowLineAnimation.kill();
+      supOutlineAnimation?.kill();
     };
-  }, []);
+  }, [currentPoolData.SUP_REWARDS]);
 
   // Pool particles animation
   const poolParticles = Array.from({ length: 10 });
@@ -249,7 +267,7 @@ export default function PoolCircle({
               ref.setAttribute("cy", y.toString());
             }
           },
-        }
+        },
       );
     });
 
@@ -273,7 +291,7 @@ export default function PoolCircle({
               ref.setAttribute("cy", y.toString());
             }
           },
-        }
+        },
       );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -289,7 +307,7 @@ export default function PoolCircle({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <svg width="390" height="500" viewBox="0 0 800 500" className="bg-white">
+      <svg width="390" height="550" viewBox="0 0 800 550" className="bg-white">
         <circle
           ref={poolCircleRef}
           id="pool-outline"
@@ -300,6 +318,20 @@ export default function PoolCircle({
           strokeWidth="4"
           className="opacity-50"
         />
+
+        {/* SUP rewards outer ring */}
+        {currentPoolData.SUP_REWARDS && (
+          <circle
+            id="sup-outline"
+            cx={centerX}
+            cy={centerY}
+            r={radius + 14}
+            fill="none"
+            stroke="#75eb00"
+            strokeWidth="4"
+            className="opacity-70"
+          />
+        )}
 
         {/* Text path for pool name
         <defs>
@@ -348,6 +380,11 @@ export default function PoolCircle({
             rateString = "medium";
           }
 
+          // Calculate perpendicular offset for parallel SUP line
+          const lineLength = Math.sqrt(dx * dx + dy * dy);
+          const perpX = (-dy / lineLength) * 15; // 15px offset perpendicular to line
+          const perpY = (dx / lineLength) * 15;
+
           return (
             <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               <FlowLine
@@ -357,6 +394,16 @@ export default function PoolCircle({
                 y2={poolEdgeY}
                 rate={rateString}
               />
+              {/* SUP reward flow line (parallel, from pool to donor) */}
+              {currentPoolData.SUP_REWARDS && (
+                <SupFlowLine
+                  x1={poolEdgeX + perpX}
+                  y1={poolEdgeY + perpY}
+                  x2={x + perpX}
+                  y2={y + perpY}
+                  rate={rateString}
+                />
+              )}
             </g>
           );
         })}
@@ -509,6 +556,10 @@ export default function PoolCircle({
             />
           );
         })}
+        {/* SUP Reward Node - bottom left of pool, overlapping edge (rendered last to be on top) */}
+        {currentPoolData.SUP_REWARDS && (
+          <SupRewardNode x={120} y={450} radius={80} />
+        )}
       </svg>
       <div className="flex flex-row justify-between w-full mt-2">
         {donors.map((donor, i) => {

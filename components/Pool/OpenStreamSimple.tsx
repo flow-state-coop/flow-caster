@@ -298,7 +298,7 @@ export default function OpenStreamSimple({
           setIsLoading(false);
           setIsConfirming(false);
         },
-      }
+      },
     );
   };
 
@@ -487,11 +487,11 @@ export default function OpenStreamSimple({
                             "en-US",
                             {
                               maximumFractionDigits: 2,
-                            }
+                            },
                           )} months.`;
                         } else {
                           const daysSupported = Math.floor(
-                            monthsSupported * 30
+                            monthsSupported * 30,
                           );
                           return `Proposed runway: ${daysSupported} days.`;
                         }
@@ -584,7 +584,7 @@ export default function OpenStreamSimple({
                   className="hover:cursor-pointer text-primary-700 hover:text-primary-500 underline"
                   onClick={onClaimSup}
                 >
-                  SUP XP Daily
+                  SUP XP Daily.
                 </span>
               </p>
 
