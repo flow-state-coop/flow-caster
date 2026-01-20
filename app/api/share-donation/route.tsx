@@ -45,11 +45,11 @@ const STYLES = {
 };
 
 const archivoBuffer = readFileSync(
-  path.join(process.cwd(), "static", "Archivo-Regular.ttf")
+  path.join(process.cwd(), "static", "Archivo-Regular.ttf"),
 );
 
 const archivoBlackBuffer = readFileSync(
-  path.join(process.cwd(), "static", "Archivo-Black.ttf")
+  path.join(process.cwd(), "static", "Archivo-Black.ttf"),
 );
 
 // Load logo as base64 (1.8KB file)
@@ -57,24 +57,24 @@ const logoBuffer = readFileSync(path.join(process.cwd(), "static", "icon.png"));
 const logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
 const communityLogoBuffer = readFileSync(
-  path.join(process.cwd(), "static", "community-logo.png")
+  path.join(process.cwd(), "static", "community-logo.png"),
 );
 const communityLogoBase64 = `data:image/png;base64,${communityLogoBuffer.toString(
-  "base64"
+  "base64",
 )}`;
 
 const crackedDevsBuffer = readFileSync(
-  path.join(process.cwd(), "static", "cracked-devs.png")
+  path.join(process.cwd(), "static", "cracked-devs.png"),
 );
 const crackedDevsBase64 = `data:image/png;base64,${crackedDevsBuffer.toString(
-  "base64"
+  "base64",
 )}`;
 const defaultDevsBuffer = readFileSync(
   // path.join(process.cwd(), "static", "arb-devs.png")
-  path.join(process.cwd(), "static", "no-arb-devs.png")
+  path.join(process.cwd(), "static", "no-arb-devs.png"),
 );
 const defaultDevsBase64 = `data:image/png;base64,${defaultDevsBuffer.toString(
-  "base64"
+  "base64",
 )}`;
 
 export async function GET(request: NextRequest) {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
 
     const res = await fetch(
       `https://api.neynar.com/v2/farcaster/user/bulk/?fids=${fid}`,
-      options
+      options,
     );
 
     if (res.ok) {
@@ -133,180 +133,172 @@ export async function GET(request: NextRequest) {
       : "Support Farcaster Cracked Devs";
 
     return new ImageResponse(
-      (
-        <div
-          tw="flex flex-row"
-          style={{
-            display: "flex",
-            backgroundColor: "white",
-            height: "100%",
-            width: "100%",
-            position: "relative",
-          }}
-        >
-          <div tw="flex flex-col" style={{ padding: 20, display: "flex" }}>
-            <div
-              tw="flex flex-row items-center"
-              style={{ display: "flex", marginBottom: "20px" }}
-            >
-              <img src={logoBase64} height={20} width={20} alt="logo" />
-              <div style={STYLES.header}>flowcaster</div>
-            </div>
+      <div
+        tw="flex flex-row"
+        style={{
+          display: "flex",
+          backgroundColor: "white",
+          height: "100%",
+          width: "100%",
+          position: "relative",
+        }}
+      >
+        <div tw="flex flex-col" style={{ padding: 20, display: "flex" }}>
+          <div
+            tw="flex flex-row items-center"
+            style={{ display: "flex", marginBottom: "20px" }}
+          >
+            <img src={logoBase64} height={20} width={20} alt="logo" />
+            <div style={STYLES.header}>Flow Caster</div>
+          </div>
 
-            <div
-              tw="flex flex-col w-full"
-              style={{ display: "flex", gap: "10px" }}
-            >
-              <div style={STYLES.sectionText}>{lineOne}</div>
-              <div style={{ ...STYLES.sectionText, color: "#D95D39" }}>
-                {LineTwo}
+          <div
+            tw="flex flex-col w-full"
+            style={{ display: "flex", gap: "10px" }}
+          >
+            <div style={STYLES.sectionText}>{lineOne}</div>
+            <div style={{ ...STYLES.sectionText, color: "#D95D39" }}>
+              {LineTwo}
+            </div>
+            {isArb && (
+              <div style={{ ...STYLES.sectionText, color: "#75eb00" }}>
+                Earn SUP
               </div>
-              {isArb && (
-                <div style={{ ...STYLES.sectionText, color: "#75eb00" }}>
-                  Earn SUP
-                </div>
-              )}
+            )}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "20px",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  marginTop: "20px",
                 }}
               >
-                <div
+                <img
+                  style={STYLES.pfpImg}
+                  src={donorPfp}
+                  height={100}
+                  width={100}
+                  alt="pfp"
+                />
+                <svg
+                  width="44"
+                  height="22"
+                  viewBox="0 0 44 22"
+                  fill="none"
                   style={{
-                    display: "flex",
+                    position: "absolute",
+                    top: -3,
+                    left: 100,
+                    width: "60%",
+                    height: "60%",
+                    pointerEvents: "none",
+                    opacity: ".85",
                   }}
                 >
-                  <img
-                    style={STYLES.pfpImg}
-                    src={donorPfp}
-                    height={100}
-                    width={100}
-                    alt="pfp"
-                  />
-                  <svg
-                    width="44"
-                    height="22"
-                    viewBox="0 0 44 22"
-                    fill="none"
-                    style={{
-                      position: "absolute",
-                      top: -3,
-                      left: 100,
-                      width: "60%",
-                      height: "60%",
-                      pointerEvents: "none",
-                      opacity: ".85",
-                    }}
-                  >
-                    <g filter="url(#filter0_f_124_10)">
-                      <line
-                        x1="3.05045"
-                        y1="19.3739"
-                        x2="41.3739"
-                        y2="2.94955"
-                        stroke="#D95D39"
-                        stroke-width="4"
-                        stroke-linecap="round"
+                  <g filter="url(#filter0_f_124_10)">
+                    <line
+                      x1="3.05045"
+                      y1="19.3739"
+                      x2="41.3739"
+                      y2="2.94955"
+                      stroke="#D95D39"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <g opacity="0.85" filter="url(#filter1_f_124_10)">
+                    <circle cx="14.5" cy="14.5" r="3.5" fill="#F3BDAB" />
+                    <circle
+                      cx="14.5"
+                      cy="14.5"
+                      r="3.4"
+                      stroke="#D95D39"
+                      stroke-width="0.2"
+                    />
+                  </g>
+                  <defs>
+                    <filter
+                      id="filter0_f_124_10"
+                      x="0.550781"
+                      y="0.445312"
+                      width="43.3242"
+                      height="21.4297"
+                      filterUnits="userSpaceOnUse"
+                      color-interpolation-filters="sRGB"
+                    >
+                      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                      <feBlend
+                        mode="normal"
+                        in="SourceGraphic"
+                        in2="BackgroundImageFix"
+                        result="shape"
                       />
-                    </g>
-                    <g opacity="0.85" filter="url(#filter1_f_124_10)">
-                      <circle cx="14.5" cy="14.5" r="3.5" fill="#F3BDAB" />
-                      <circle
-                        cx="14.5"
-                        cy="14.5"
-                        r="3.4"
-                        stroke="#D95D39"
-                        stroke-width="0.2"
+                      <feGaussianBlur
+                        stdDeviation="0.25"
+                        result="effect1_foregroundBlur_124_10"
                       />
-                    </g>
-                    <defs>
-                      <filter
-                        id="filter0_f_124_10"
-                        x="0.550781"
-                        y="0.445312"
-                        width="43.3242"
-                        height="21.4297"
-                        filterUnits="userSpaceOnUse"
-                        color-interpolation-filters="sRGB"
-                      >
-                        <feFlood
-                          flood-opacity="0"
-                          result="BackgroundImageFix"
-                        />
-                        <feBlend
-                          mode="normal"
-                          in="SourceGraphic"
-                          in2="BackgroundImageFix"
-                          result="shape"
-                        />
-                        <feGaussianBlur
-                          stdDeviation="0.25"
-                          result="effect1_foregroundBlur_124_10"
-                        />
-                      </filter>
-                      <filter
-                        id="filter1_f_124_10"
-                        x="10.75"
-                        y="10.75"
-                        width="7.5"
-                        height="7.5"
-                        filterUnits="userSpaceOnUse"
-                        color-interpolation-filters="sRGB"
-                      >
-                        <feFlood
-                          flood-opacity="0"
-                          result="BackgroundImageFix"
-                        />
-                        <feBlend
-                          mode="normal"
-                          in="SourceGraphic"
-                          in2="BackgroundImageFix"
-                          result="shape"
-                        />
-                        <feGaussianBlur
-                          stdDeviation="0.125"
-                          result="effect1_foregroundBlur_124_10"
-                        />
-                      </filter>
-                    </defs>
-                  </svg>
-                </div>
-
-                <p
-                  style={{
-                    ...STYLES.detailText,
-                    fontSize: "16px",
-                    marginBottom: "0px",
-                    color: "#679A8B",
-                  }}
-                >
-                  {donorName}
-                </p>
-                {flowRate && (
-                  <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
-                    is streaming {flowRate} {tokenSymbol || "tokens"} / mo
-                  </p>
-                )}
-                {!flowRate && (
-                  <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
-                    is streaming {tokenSymbol || "tokens"}
-                  </p>
-                )}
+                    </filter>
+                    <filter
+                      id="filter1_f_124_10"
+                      x="10.75"
+                      y="10.75"
+                      width="7.5"
+                      height="7.5"
+                      filterUnits="userSpaceOnUse"
+                      color-interpolation-filters="sRGB"
+                    >
+                      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                      <feBlend
+                        mode="normal"
+                        in="SourceGraphic"
+                        in2="BackgroundImageFix"
+                        result="shape"
+                      />
+                      <feGaussianBlur
+                        stdDeviation="0.125"
+                        result="effect1_foregroundBlur_124_10"
+                      />
+                    </filter>
+                  </defs>
+                </svg>
               </div>
+
+              <p
+                style={{
+                  ...STYLES.detailText,
+                  fontSize: "16px",
+                  marginBottom: "0px",
+                  color: "#679A8B",
+                }}
+              >
+                {donorName}
+              </p>
+              {flowRate && (
+                <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
+                  is streaming {flowRate} {tokenSymbol || "tokens"} / mo
+                </p>
+              )}
+              {!flowRate && (
+                <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
+                  is streaming {tokenSymbol || "tokens"}
+                </p>
+              )}
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <img src={poolImg} height={350} width={350} alt="circle" />
-          </div>
         </div>
-      ),
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <img src={poolImg} height={350} width={350} alt="circle" />
+        </div>
+      </div>,
       {
         width: 600,
         height: 400,
@@ -345,7 +337,7 @@ export async function GET(request: NextRequest) {
             style: "normal",
           },
         ],
-      }
+      },
     );
   } catch (e: any) {
     console.log(`${e.message}`);

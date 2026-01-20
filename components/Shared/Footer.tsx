@@ -73,7 +73,7 @@ export default function Footer({
     const targetUrl = `${
       process.env.NEXT_PUBLIC_URL
     }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
-      totalFlow
+      totalFlow,
     )}&tokenSymbol=${poolTokenSymbol}`;
     console.log("targetUrl", targetUrl);
     await sdk.actions.composeCast({
@@ -99,7 +99,7 @@ export default function Footer({
                   handleOpenDrawer(
                     connectedDonor && Number(connectedDonor.flowRate) > 0
                       ? "edit"
-                      : "stream"
+                      : "stream",
                   )
                 }
               >
@@ -140,21 +140,6 @@ export default function Footer({
               >
                 <LucideWallet size={20} />
               </Link>
-            )}
-
-            {currentPoolData.SUP_REWARDS && (
-              <button
-                className="p-2 text-black hover:text-gray-800"
-                onClick={() => handleOpenDrawer("claim")}
-              >
-                <div className="flex flex-row items-center gap-1 text-brand-sfGreen font-bold">
-                  <img
-                    src="/images/sup.svg"
-                    alt="Farcaster"
-                    className="w-5 h-5"
-                  />
-                </div>
-              </button>
             )}
 
             <div

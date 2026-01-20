@@ -28,10 +28,10 @@ export async function generateMetadata({
     version: "next",
     imageUrl: imageUrl,
     button: {
-      title: "Launch flowcaster",
+      title: "Launch Flow Caster",
       action: {
         type: "launch_frame",
-        name: "flowcaster",
+        name: "Flow Caster",
         url: appUrl,
         splashImageUrl: `${appUrl}/images/splash.png`,
         splashBackgroundColor: "#ffffff",
@@ -39,10 +39,10 @@ export async function generateMetadata({
     },
   };
   return {
-    title: "flowcaster",
+    title: "Flow Caster",
     openGraph: {
-      title: "flowcaster",
-      description: "flowcaster",
+      title: "Flow Caster",
+      description: "Flow Caster",
     },
     other: {
       "fc:frame": JSON.stringify(frame),
