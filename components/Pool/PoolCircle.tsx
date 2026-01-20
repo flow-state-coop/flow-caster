@@ -307,7 +307,7 @@ export default function PoolCircle({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <svg width="390" height="550" viewBox="0 0 800 550" className="bg-white">
+      <svg width="390" height="500" viewBox="0 0 800 500" className="bg-white">
         <circle
           ref={poolCircleRef}
           id="pool-outline"
