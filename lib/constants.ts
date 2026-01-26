@@ -91,7 +91,7 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     },
     FILTER_ZERO_UNITS: false,
     SUP_REWARDS: true,
-    SPONSOR_ADDRESS: "0x0a46991ca1d4488f884cad86e122c23a938e0136",
+    SPONSOR_ADDRESS: "0x33EFeA60E686C65BF4Dad2Fae868BF726f4c8a59",
     SPONSOR_ICON: "/images/arb-logo.svg",
     IS_ARB: true,
   },
@@ -100,14 +100,19 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
 export const NERITE_TOKEN_ID = `eip155:42161/erc20:0x4ecf61a6c2fab8a047ceb3b3b263b401763e9d49`;
 
 export const TARGET_CHAIN_OBJS = Object.keys(FEATURED_POOLS).map(
-  (k) => FEATURED_POOLS[k].VIEM_CHAIN_OBJ
+  (k) => FEATURED_POOLS[k].VIEM_CHAIN_OBJ,
 );
 
 export const FEATURED_POOL_DATA =
   FEATURED_POOLS[`${FEATURED_NETWORK_ID}-${FEATURED_POOL_ID}`];
 
 export const FEATURED_POOL_NETWORK = networks.find(
-  (network) => network.id === Number(FEATURED_NETWORK_ID)
+  (network) => network.id === Number(FEATURED_NETWORK_ID),
 );
+
+export const NETWORK_ICONS = {
+  "42161": "/images/arb-logo.svg",
+  "8453": "/images/base-logo.svg",
+};
 
 export const VIZ_PAUSED = true;

@@ -385,6 +385,11 @@ export default function PoolCircle({
           const perpX = (-dy / lineLength) * 15; // 15px offset perpendicular to line
           const perpY = (dx / lineLength) * 15;
 
+          // Calculate SUP circle edge (radius + 14 to match sup-outline)
+          const supRadius = radius + 14;
+          const supEdgeX = centerX - (dx / dist) * supRadius;
+          const supEdgeY = centerY - (dy / dist) * supRadius;
+
           return (
             <g key={`${donor.accountId}-${donor.rate}-${i}`}>
               <FlowLine
@@ -394,11 +399,11 @@ export default function PoolCircle({
                 y2={poolEdgeY}
                 rate={rateString}
               />
-              {/* SUP reward flow line (parallel, from pool to donor) */}
+              {/* SUP reward flow line (parallel, from sup-outline to donor) */}
               {currentPoolData.SUP_REWARDS && (
                 <SupFlowLine
-                  x1={poolEdgeX + perpX}
-                  y1={poolEdgeY + perpY}
+                  x1={supEdgeX + perpX}
+                  y1={supEdgeY + perpY}
                   x2={x + perpX}
                   y2={y + perpY}
                   rate={rateString}
