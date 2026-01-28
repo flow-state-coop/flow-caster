@@ -30,6 +30,7 @@ import {
 import {
   calculateFlowratePerSecond,
   ratePerMonthFormattedNoLocale,
+  ratePerWeekFormattedNoLocale,
   TIME_UNIT,
   truncateString,
 } from "@/lib/pool";
@@ -62,9 +63,10 @@ export default function OpenStreamSimple({
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [monthlyDonation, setMonthlyDonation] = useState<string>("0");
+  // const [monthlyDonation, setMonthlyDonation] = useState<string>("0");
+  const [weeklyDonation, setWeeklyDonation] = useState<string>("0");
   const [donateToDevs, setDonateToDevs] = useState<boolean>(true);
-  const [currentMonthlyRate, setCurrentMonthlyRate] = useState<
+  const [currentWeeklyRate, setCurrentWeeklyRate] = useState<
     string | undefined
   >();
   const [currentDevDonor, setCurrentDevDonor] = useState(false);
@@ -115,15 +117,23 @@ export default function OpenStreamSimple({
     : 0;
 
   // Validation logic
-  const monthlyDonationAmount = parseFloat(monthlyDonation) || 0;
+  // const monthlyDonationAmount = parseFloat(monthlyDonation) || 0;
+  const weeklyDonationAmount = parseFloat(weeklyDonation) || 0;
   const totalSuperTokenBalance = userBalance;
-  const isMonthlyDonationEmpty =
-    !currentMonthlyRate && monthlyDonationAmount === 0;
-  const twoDayDonationAmount = (monthlyDonationAmount / 30) * 2;
-  const isInsufficientBalance =
-    monthlyDonationAmount > 0 && totalSuperTokenBalance < twoDayDonationAmount;
+  // const isMonthlyDonationEmpty =
+  // !currentWeeklyRate && monthlyDonationAmount === 0;
+  const isWeeklyDonationEmpty =
+    !currentWeeklyRate && weeklyDonationAmount === 0;
+  // const twoDayDonationAmount = (monthlyDonationAmount / 30) * 2;
+  const twoDayDonationAmount = (weeklyDonationAmount / 7) * 2;
 
-  const isButtonDisabled = isMonthlyDonationEmpty || isInsufficientBalance;
+  // const isInsufficientBalance =
+  //   monthlyDonationAmount > 0 && totalSuperTokenBalance < twoDayDonationAmount;
+  const isInsufficientBalance =
+    weeklyDonationAmount > 0 && totalSuperTokenBalance < twoDayDonationAmount;
+
+  // const isButtonDisabled = isMonthlyDonationEmpty || isInsufficientBalance;
+  const isButtonDisabled = isWeeklyDonationEmpty || isInsufficientBalance;
 
   useEffect(() => {
     if (!connectedDonor || !address || !devPoolData || !isOpen) return;
@@ -137,13 +147,16 @@ export default function OpenStreamSimple({
     const totalFlowRate = donor
       ? (BigInt(donor.flowRate) + BigInt(connectedDonor.flowRate)).toString()
       : connectedDonor.flowRate;
-    const rate = ratePerMonthFormattedNoLocale(totalFlowRate);
-    setCurrentMonthlyRate(rate);
-    setMonthlyDonation(rate);
+    // const rate = ratePerMonthFormattedNoLocale(totalFlowRate);
+    const rate = ratePerWeekFormattedNoLocale(totalFlowRate);
+    setCurrentWeeklyRate(rate);
+    // setMonthlyDonation(rate);
+    setWeeklyDonation(rate);
   }, [connectedDonor, devPoolData, address, isOpen]);
 
   const handleCancel = () => {
-    setMonthlyDonation("0");
+    // setMonthlyDonation("0");
+    setWeeklyDonation("0");
     proceedWithMainTransaction(true);
   };
 
@@ -217,23 +230,27 @@ export default function OpenStreamSimple({
     let operations: Operation[] = [];
 
     // handle 0 submission for existing stream
-    const _monthlyDonation =
-      cancel || monthlyDonation === "" ? "0" : monthlyDonation;
-    let poolMonthlyDonation = parseFloat(_monthlyDonation);
+    // const _monthlyDonation =
+    //   cancel || monthlyDonation === "" ? "0" : monthlyDonation;
+
+    const _weeklyDonation =
+      cancel || weeklyDonation === "" ? "0" : weeklyDonation;
+    let poolWeeklyDonation = parseFloat(_weeklyDonation);
 
     const zeroOutDevDonation =
-      (poolMonthlyDonation == 0 && currentDevDonor) ||
+      (poolWeeklyDonation == 0 && currentDevDonor) ||
       (currentDevDonor && !donateToDevs);
 
     if (donateToDevs || zeroOutDevDonation) {
-      const devMonthlyDonation = zeroOutDevDonation
+      const devWeeklyDonation = zeroOutDevDonation
         ? 0
-        : parseFloat(_monthlyDonation) * (DEV_DONATION_PERCENT / 100);
-      poolMonthlyDonation = parseFloat(_monthlyDonation) - devMonthlyDonation;
+        : parseFloat(_weeklyDonation) * (DEV_DONATION_PERCENT / 100);
+      poolWeeklyDonation = parseFloat(_weeklyDonation) - devWeeklyDonation;
 
       const devFlowRate = calculateFlowratePerSecond({
-        amountWei: parseEther(devMonthlyDonation.toString()),
-        timeUnit: TIME_UNIT["month"],
+        amountWei: parseEther(devWeeklyDonation.toString()),
+        // timeUnit: TIME_UNIT["month"],
+        timeUnit: TIME_UNIT["week"],
       });
 
       operations = [
@@ -257,8 +274,9 @@ export default function OpenStreamSimple({
     }
 
     const poolFlowRate = calculateFlowratePerSecond({
-      amountWei: parseEther(poolMonthlyDonation.toString()),
-      timeUnit: TIME_UNIT["month"],
+      amountWei: parseEther(poolWeeklyDonation.toString()),
+      // timeUnit: TIME_UNIT["month"],
+      timeUnit: TIME_UNIT["week"],
     });
 
     operations = [
@@ -305,7 +323,7 @@ export default function OpenStreamSimple({
   // Monitor distro transaction completion
   useEffect(() => {
     if (isBatchSuccess && isBatchConfirming === false) {
-      if (Number(monthlyDonation) > 99) {
+      if (Number(weeklyDonation) > 99) {
         const options = {
           method: "POST",
           body: JSON.stringify({
@@ -313,7 +331,7 @@ export default function OpenStreamSimple({
             chainid: chainId,
             poolname: "Arbitrum Cracked Devs",
             username: user?.data?.username || "A mystery donor",
-            flowrate: monthlyDonation,
+            flowrate: weeklyDonation,
             token: poolData?.token.symbol || "USND",
           }),
         };
@@ -330,7 +348,7 @@ export default function OpenStreamSimple({
   }, [isBatchSuccess, isBatchConfirming]);
 
   const handleCast = async () => {
-    let targetUrl = `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?flowRate=${monthlyDonationAmount}`;
+    let targetUrl = `${process.env.NEXT_PUBLIC_URL}/pool/${chainId}/${poolId}/donation?flowRate=${weeklyDonationAmount}`;
 
     if (user?.data?.fid) {
       targetUrl += `&fid=${user.data.fid}`;
@@ -361,7 +379,8 @@ export default function OpenStreamSimple({
     if (isLoading) return "Preparing...";
     if (isConfirming || isBatchConfirming) return "Confirming...";
     if (isSuccess) return "Success!";
-    if (isMonthlyDonationEmpty) return "Add streaming amount";
+    // if (isMonthlyDonationEmpty) return "Add streaming amount";
+    if (isWeeklyDonationEmpty) return "Add streaming amount";
     if (isInsufficientBalance)
       return `${poolData?.token.symbol} balance too low. Purchase ${poolData?.token.symbol}.`;
     if (connectedDonor) return "Edit Stream";
@@ -440,17 +459,17 @@ export default function OpenStreamSimple({
             <>
               <div>
                 <label
-                  htmlFor="monthlyDonation"
+                  htmlFor="weeklyDonation"
                   className="block text-sm font-medium text-primary-800 mb-2"
                 >
-                  How much do you want to stream per month?
+                  How much do you want to stream per week?
                 </label>
                 <div className="relative">
                   <input
                     type="number"
-                    id="monthlyDonation"
-                    value={monthlyDonation}
-                    onChange={(e) => setMonthlyDonation(e.target.value)}
+                    id="weeklyDonation"
+                    value={weeklyDonation}
+                    onChange={(e) => setWeeklyDonation(e.target.value)}
                     placeholder="0.00"
                     className="w-full text-black px-4 py-3 pr-20 rounded-lg border border-primary-300 focus:ring-2 focus:ring-secondary-800 focus:border-transparent"
                   />
@@ -477,26 +496,24 @@ export default function OpenStreamSimple({
                   <p className="mt-2 text-primary-800 font-normal">
                     {(() => {
                       const currentBalance = userBalance;
-                      const monthlyAmount = parseFloat(monthlyDonation) || 0;
+                      const weeklyAmount = parseFloat(weeklyDonation) || 0;
                       const totalBalance = currentBalance;
 
-                      if (monthlyAmount > 0 && totalBalance > 0) {
-                        const monthsSupported = totalBalance / monthlyAmount;
-                        if (monthsSupported >= 1) {
-                          return `Proposed runway: ${monthsSupported.toLocaleString(
+                      if (weeklyAmount > 0 && totalBalance > 0) {
+                        const weeksSupported = totalBalance / weeklyAmount;
+                        if (weeksSupported >= 1) {
+                          return `Proposed runway: ${weeksSupported.toLocaleString(
                             "en-US",
                             {
                               maximumFractionDigits: 2,
                             },
-                          )} months.`;
+                          )} weeks.`;
                         } else {
-                          const daysSupported = Math.floor(
-                            monthsSupported * 30,
-                          );
+                          const daysSupported = Math.floor(weeksSupported * 7);
                           return `Proposed runway: ${daysSupported} days.`;
                         }
-                      } else if (monthlyAmount === 0) {
-                        return "Enter a monthly amount to see runway.";
+                      } else if (weeklyAmount === 0) {
+                        return "Enter a weekly amount to see runway.";
                       } else {
                         return "Wrap some tokens to fund your stream.";
                       }
@@ -575,7 +592,7 @@ export default function OpenStreamSimple({
             </>
           )}
 
-          {isSuccess && Number(monthlyDonation) > 0 && (
+          {isSuccess && Number(weeklyDonation) > 0 && (
             <>
               <p className="text-primary-500 text-sm">
                 You&apos;re now supporting top buidlers by the second! Make sure
@@ -598,7 +615,7 @@ export default function OpenStreamSimple({
             </>
           )}
 
-          {isSuccess && Number(monthlyDonation) <= 0 && (
+          {isSuccess && Number(weeklyDonation) <= 0 && (
             <>
               <div className="flex flex-col gap-1 mb-5">
                 <p className="text-primary-500 text-sm">Stream cancelled</p>

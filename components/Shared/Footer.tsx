@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Award, Info, Share, House, LucideWallet } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { usePoolUser } from "@/contexts/pool-user-context";
-import { ratePerMonthFormatted } from "@/lib/pool";
+import { ratePerMonthFormatted, ratePerWeekFormatted } from "@/lib/pool";
 import InfoDrawer from "../Pool/InfoDrawer";
 import OpenStream from "../Pool/OpenStream";
 import ConnectPool from "../Pool/ConnectPool";
@@ -72,7 +72,7 @@ export default function Footer({
   const handleCast = async () => {
     const targetUrl = `${
       process.env.NEXT_PUBLIC_URL
-    }/pool/${chainId}/${poolId}?totalFlow=${ratePerMonthFormatted(
+    }/pool/${chainId}/${poolId}?totalFlow=${ratePerWeekFormatted(
       totalFlow,
     )}&tokenSymbol=${poolTokenSymbol}`;
     console.log("targetUrl", targetUrl);

@@ -183,6 +183,12 @@ export const ratePerMonthFormattedNoLocale = (flowRate: number | string) => {
   ).toFixed(2);
 };
 
+export const ratePerWeekFormattedNoLocale = (flowRate: number | string) => {
+  return Number(
+    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.week)),
+  ).toFixed(2);
+};
+
 export const totalFlowedStatic = (
   flowRate: number | string,
   startingTimestamp: string | number,
