@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { sdk } from "@farcaster/miniapp-sdk";
 import Tippy from "@tippyjs/react";
 import { useAccountSup } from "@/hooks/use-account-sup";
-import { ratePerMonthFormatted } from "@/lib/pool";
+import { ratePerMonthFormatted, ratePerWeekFormatted } from "@/lib/pool";
 import "tippy.js/dist/tippy.css";
 
 interface SupRewardNodeProps {
@@ -38,13 +38,15 @@ export default function SupRewardNode({
             Support Devs, Earn SUP
           </div>
           <div className="text-base font-bold text-primary-500 mb-4">
-            500K $SUP/mo is up for grabs. Earn XP for every 1 USND streamed.
+            125K $SUP/week is up for grabs. Earn XP for every 1 USND streamed.
           </div>
           {data && (
             <div className="flex flex-col items-center w-full gap-1 mb-4">
               <p className="font-bold text-black">Your Rewards Rate</p>
               <div className="text-2xl font-bold text-brand-sfGreen">
-                {`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}
+                {/* {`${ratePerMonthFormatted(data.flowRate)} SUP / mo`} */}
+
+                <div>{`${ratePerWeekFormatted(data.flowRate)} SUP / week`}</div>
               </div>
             </div>
           )}

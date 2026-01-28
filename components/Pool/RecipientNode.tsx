@@ -8,6 +8,7 @@ import Tippy from "@tippyjs/react";
 import {
   displayIndividualFlowPercentage,
   displayIndividualFlowRate,
+  displayIndividualFlowRatePerWeek,
   truncateAddress,
 } from "@/lib/pool";
 import "tippy.js/dist/tippy.css";
@@ -167,10 +168,21 @@ export default function RecipientNode({
                 </span>
               </div>
 
-              <div className="font-bold text-xl text-accent-800 leading-tight">
+              {/* <div className="font-bold text-xl text-accent-800 leading-tight">
                 {displayIndividualFlowRate(totalUnits, units, totalFlowRate)}{" "}
                 <span className="text-xs text-black font-semibold">
                   {tokenSymbol} / mo
+                </span>
+              </div> */}
+
+              <div className="font-bold text-xl text-accent-800 leading-tight">
+                {displayIndividualFlowRatePerWeek(
+                  totalUnits,
+                  units,
+                  totalFlowRate,
+                )}{" "}
+                <span className="text-xs text-black font-semibold">
+                  {tokenSymbol} / week
                 </span>
               </div>
 

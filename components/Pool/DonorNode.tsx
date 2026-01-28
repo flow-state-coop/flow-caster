@@ -8,6 +8,7 @@ import Tippy from "@tippyjs/react";
 import {
   formatPoolCount,
   ratePerMonthFormatted,
+  ratePerWeekFormatted,
   truncateAddress,
 } from "@/lib/pool";
 import FlowAmount from "./FlowAmount";
@@ -115,10 +116,17 @@ export default function DonorNode({
 
           {rate && startingTimestamp && (
             <>
-              <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
+              {/* <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
                 {ratePerMonthFormatted(rate)}
                 <span className="text-xs text-black font-semibold ml-1">
                   {tokenSymbol} / mo
+                </span>
+              </div> */}
+
+              <div className="font-bold text-xl text-accent-800 leading-tight mt-3">
+                {ratePerWeekFormatted(rate)}
+                <span className="text-xs text-black font-semibold ml-1">
+                  {tokenSymbol} / week
                 </span>
               </div>
 

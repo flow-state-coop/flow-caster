@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { X } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { useAccountSup } from "@/hooks/use-account-sup";
-import { ratePerMonthFormatted } from "@/lib/pool";
+import { ratePerMonthFormatted, ratePerWeekFormatted } from "@/lib/pool";
 import BaseButton from "../Shared/BaseButton";
 
 interface ClaimSupProps {
@@ -46,7 +46,8 @@ export default function ClaimSup({ handleCloseDrawer }: ClaimSupProps) {
         <div className="flex flex-col items-center w-full gap-1 mb-6">
           <p className="font-bold text-black">Your Rewards Rate</p>
           <div className="text-2xl font-bold text-brand-sfGreen mb-5">
-            <div>{`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}</div>
+            {/* <div>{`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}</div> */}
+            <div>{`${ratePerWeekFormatted(data.flowRate)} SUP / week`}</div>
           </div>
         </div>
       )}

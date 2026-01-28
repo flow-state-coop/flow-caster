@@ -279,7 +279,7 @@ export async function GET(request: NextRequest) {
               </p>
               {flowRate && (
                 <p style={{ ...STYLES.detailText, marginTop: "7px" }}>
-                  is streaming {flowRate} {tokenSymbol || "tokens"} / mo
+                  is streaming {flowRate} {tokenSymbol || "tokens"} / week
                 </p>
               )}
               {!flowRate && (
