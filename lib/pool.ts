@@ -2,7 +2,7 @@ import { formatEther } from "viem";
 import { PoolData } from "./types";
 
 export const getTotalFlow = (
-  poolDistributors: PoolData["poolDistributors"]
+  poolDistributors: PoolData["poolDistributors"],
 ) => {
   return poolDistributors.reduce((total, current) => {
     try {
@@ -19,38 +19,44 @@ export const getTotalFlow = (
 export const createDonorBuckets = (
   poolDistributors: PoolData["poolDistributors"],
   devPoolistributors: PoolData["poolDistributors"],
-  connectedAddress: `0x${string}` | undefined
+  connectedAddress: `0x${string}` | undefined,
 ) => {
-  const devPoolRateList = devPoolistributors.reduce((acc, d) => {
-    acc[d.account.id] = d.flowRate;
-    return acc;
-  }, {} as Record<string, string>);
+  const devPoolRateList = devPoolistributors.reduce(
+    (acc, d) => {
+      acc[d.account.id] = d.flowRate;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 
-  const withDevPoolRate = poolDistributors.reduce((acc, d) => {
-    const devRate = devPoolRateList[d.account.id];
-    if (devRate) {
-      acc.push({
-        ...d,
-        flowRate: (Number(d.flowRate) + Number(devRate)).toString(),
-      });
-    } else {
-      acc.push(d);
-    }
-    return acc;
-  }, [] as PoolData["poolDistributors"]);
+  const withDevPoolRate = poolDistributors.reduce(
+    (acc, d) => {
+      const devRate = devPoolRateList[d.account.id];
+      if (devRate) {
+        acc.push({
+          ...d,
+          flowRate: (Number(d.flowRate) + Number(devRate)).toString(),
+        });
+      } else {
+        acc.push(d);
+      }
+      return acc;
+    },
+    [] as PoolData["poolDistributors"],
+  );
 
   const sorted = withDevPoolRate.sort(
-    (a, b) => parseFloat(b.flowRate) - parseFloat(a.flowRate)
+    (a, b) => parseFloat(b.flowRate) - parseFloat(a.flowRate),
   );
 
   const topDonor = sorted[0];
 
   let connectedDonor = poolDistributors.find(
-    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
+    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase(),
   );
 
   let connectedDevPoolDonor = devPoolistributors.find(
-    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase()
+    (d) => d.account.id.toLowerCase() === connectedAddress?.toLowerCase(),
   );
 
   if (connectedDonor && connectedDevPoolDonor) {
@@ -89,7 +95,7 @@ export const truncateString = (addr: string, numChars: number) =>
 
 export const displayIndividualFlowPercentage = (
   totalUnits: number | string,
-  units: number | string
+  units: number | string,
 ) => {
   return ((100 / Number(totalUnits)) * Number(units)).toFixed(2);
 };
@@ -97,11 +103,25 @@ export const displayIndividualFlowPercentage = (
 export const displayIndividualFlowRate = (
   totalUnits: number | string,
   units: number | string,
-  flowRate: number | string
+  flowRate: number | string,
 ) => {
   const perc = ((100 / Number(totalUnits)) * Number(units)) / 100;
 
   const rate = ratePerMonth(flowRate);
+
+  const eth = formatEther(BigInt(perc * Number(rate)));
+
+  return Number(eth).toFixed(2);
+};
+
+export const displayIndividualFlowRatePerWeek = (
+  totalUnits: number | string,
+  units: number | string,
+  flowRate: number | string,
+) => {
+  const perc = ((100 / Number(totalUnits)) * Number(units)) / 100;
+
+  const rate = ratePerWeek(flowRate);
 
   const eth = formatEther(BigInt(perc * Number(rate)));
 
@@ -120,7 +140,7 @@ export const streamGranularityInSeconds = {
 export const individualRatePerMonth = (
   totalUnits: number | string,
   units: number | string,
-  flowRate: number | string
+  flowRate: number | string,
 ) => {
   return BigInt(flowRate) * BigInt(streamGranularityInSeconds.month);
 };
@@ -130,12 +150,28 @@ export const ratePerMonth = (flowRate: number | string) => {
 };
 export const ratePerMonthWei = (flowRate: number | string) => {
   return formatEther(
-    BigInt(flowRate) * BigInt(streamGranularityInSeconds.month)
+    BigInt(flowRate) * BigInt(streamGranularityInSeconds.month),
   );
 };
 export const ratePerMonthFormatted = (flowRate: number | string) => {
   return Number(
-    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month))
+    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month)),
+  ).toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+  });
+};
+
+export const ratePerWeek = (flowRate: number | string) => {
+  return BigInt(flowRate) * BigInt(streamGranularityInSeconds.week);
+};
+export const ratePerWeekWei = (flowRate: number | string) => {
+  return formatEther(
+    BigInt(flowRate) * BigInt(streamGranularityInSeconds.week),
+  );
+};
+export const ratePerWeekFormatted = (flowRate: number | string) => {
+  return Number(
+    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.week)),
   ).toLocaleString("en-US", {
     maximumFractionDigits: 2,
   });
@@ -143,18 +179,18 @@ export const ratePerMonthFormatted = (flowRate: number | string) => {
 
 export const ratePerMonthFormattedNoLocale = (flowRate: number | string) => {
   return Number(
-    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month))
+    formatEther(BigInt(flowRate) * BigInt(streamGranularityInSeconds.month)),
   ).toFixed(2);
 };
 
 export const totalFlowedStatic = (
   flowRate: number | string,
   startingTimestamp: string | number,
-  startingAmount: string | number
+  startingAmount: string | number,
 ) => {
   const rate = ratePerMonth(flowRate);
   const elapsedTimeInMilliseconds = BigInt(
-    Date.now() - Number(startingTimestamp) * 1000
+    Date.now() - Number(startingTimestamp) * 1000,
   );
   const flowingAmount =
     BigInt(startingAmount) +
