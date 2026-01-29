@@ -38,7 +38,7 @@ export default function SupRewardNode({
             Support Devs, Earn SUP
           </div>
           <div className="text-base font-bold text-primary-500 mb-4">
-            125K $SUP/mo is up for grabs. Earn XP for every 1 USND streamed.
+            125K $SUP/week is up for grabs. Earn XP for every 1 USND streamed.
           </div>
           {data && (
             <div className="flex flex-col items-center w-full gap-1 mb-4">
