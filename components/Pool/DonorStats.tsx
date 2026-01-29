@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccountSup } from "@/hooks/use-account-sup";
-import { ratePerMonthFormatted } from "@/lib/pool";
+import { ratePerMonthFormatted, ratePerWeekFormatted } from "@/lib/pool";
 import FlowAmount from "./FlowAmount";
 
 interface DonorStatsProps {
@@ -38,7 +38,8 @@ export default function DonorStats({
 
   return (
     <div className="text-[10px] text-center flex flex-col items-center text-black font-bold w-full">
-      <div>{`${ratePerMonthFormatted(rate)} ${tokenSymbol} / mo`}</div>
+      {/* <div>{`${ratePerMonthFormatted(rate)} ${tokenSymbol} / mo`}</div> */}
+      <div>{`${ratePerWeekFormatted(rate)} ${tokenSymbol} / week`}</div>
 
       {showTotalFlow && (
         <FlowAmount
@@ -51,7 +52,8 @@ export default function DonorStats({
 
       {showSup && data && (
         <div className="text-brand-sfGreen">
-          <div>{`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}</div>
+          {/* <div>{`${ratePerMonthFormatted(data.flowRate)} SUP / mo`}</div> */}
+          <div>{`${ratePerWeekFormatted(data.flowRate)} SUP / week`}</div>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { Crown } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
-import { ratePerMonthFormatted } from "@/lib/pool";
+import { ratePerMonthFormatted, ratePerWeekFormatted } from "@/lib/pool";
 import { PoolData } from "@/lib/types";
 import FlowAmount from "../Pool/FlowAmount";
 
@@ -33,21 +33,24 @@ export default function LeaderboardList({
   const sorted = useMemo(() => {
     const devPoleRateList = devPoolList || {};
     const distributors = poolData?.poolDistributors || [];
-    const withDevPoolRate = distributors.reduce((acc, d) => {
-      const devRate = devPoleRateList[d.account.id];
-      if (devRate) {
-        acc.push({
-          ...d,
-          flowRate: (Number(d.flowRate) + Number(devRate)).toString(),
-        });
-      } else {
-        acc.push(d);
-      }
-      return acc;
-    }, [] as PoolData["poolDistributors"]);
+    const withDevPoolRate = distributors.reduce(
+      (acc, d) => {
+        const devRate = devPoleRateList[d.account.id];
+        if (devRate) {
+          acc.push({
+            ...d,
+            flowRate: (Number(d.flowRate) + Number(devRate)).toString(),
+          });
+        } else {
+          acc.push(d);
+        }
+        return acc;
+      },
+      [] as PoolData["poolDistributors"],
+    );
 
     const sorted = [...withDevPoolRate].sort(
-      (a, b) => parseFloat(b.flowRate) - parseFloat(a.flowRate)
+      (a, b) => parseFloat(b.flowRate) - parseFloat(a.flowRate),
     );
 
     return sorted;
@@ -69,7 +72,7 @@ export default function LeaderboardList({
       </h2>
       <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 mb-2 px-2">
         <div className="col-span-2">&nbsp;</div>
-        <div className="text-right">{poolData.token.symbol}/mo</div>
+        <div className="text-right">{poolData.token.symbol}/week</div>
         <div className="text-right">Total</div>
       </div>
       <div className="divide-y divide-primary-200 text-black bg-brand-light rounded-lg py-3 mb-24">
@@ -118,7 +121,8 @@ export default function LeaderboardList({
                 </span>
               </div>
               <div className="w-20 text-right tabular-nums text-sm font-bold">
-                {`${ratePerMonthFormatted(d.flowRate)}`}
+                {/* {`${ratePerMonthFormatted(d.flowRate)}`} */}
+                {`${ratePerWeekFormatted(d.flowRate)}`}
               </div>
               <div className="w-24 text-right tabular-nums text-sm font-bold">
                 {/* {`${Number(
@@ -131,7 +135,7 @@ export default function LeaderboardList({
 
                 <FlowAmount
                   startingAmount={BigInt(
-                    d.totalAmountDistributedUntilUpdatedAt || "0"
+                    d.totalAmountDistributedUntilUpdatedAt || "0",
                   )}
                   startingTimestamp={Number(d.updatedAtTimestamp)}
                   flowRate={BigInt(d.flowRate)}

@@ -275,7 +275,7 @@ export async function GET(request: NextRequest) {
                     marginTop: "7px",
                   }}
                 >
-                  Streaming / Month
+                  Streaming / Week
                 </p>
               )}
             </div>
