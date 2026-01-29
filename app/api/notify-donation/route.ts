@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     const result = await sendFrameNotificationToAllUsers({
       title: "Whoaaa, that's a big stream 🌊!",
-      body: `${username} is streaming ${flowrate} ${token}/mo to ${poolname}.`,
+      body: `${username} is streaming ${flowrate} ${token}/week to ${poolname}.`,
       targetUrl: `${process.env.NEXT_PUBLIC_URL}/pool/${chainid}/${poolid}`,
     });
 
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       {
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }
