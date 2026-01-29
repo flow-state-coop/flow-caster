@@ -507,7 +507,7 @@ export default function OpenStream({
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="text-gray-500 text-sm font-medium">
-                      {poolData?.token.symbol}
+                      {poolData?.token.symbol}/week
                     </span>
                   </div>
                 </div>
