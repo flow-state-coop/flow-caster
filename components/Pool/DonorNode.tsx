@@ -30,6 +30,7 @@ interface DonorNodeProps {
   startingAmount?: string;
   tokenSymbol: string;
   iconOverride?: string;
+  fidOverride?: string;
 }
 
 export default function DonorNode({
@@ -48,6 +49,7 @@ export default function DonorNode({
   startingAmount,
   tokenSymbol,
   iconOverride,
+  fidOverride,
 }: DonorNodeProps) {
   const [showing, setShowing] = useState(false);
 
@@ -144,6 +146,15 @@ export default function DonorNode({
           {farcasterUser && (
             <button
               onClick={() => handleViewProfile(Number(farcasterUser.fid))}
+              className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
+            >
+              View Profile <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
+
+          {fidOverride && (
+            <button
+              onClick={() => handleViewProfile(Number(fidOverride))}
               className="flex flew-row items-center gap-1 mt-3 py-1 text-sm text-primary-500 font-semibold hover:text-primary-300"
             >
               View Profile <ArrowRight className="w-4 h-4" />
