@@ -11,6 +11,8 @@ interface LeaderboardListProps {
   devPoolList?: Record<string, string>;
   sponsorAddress?: string;
   iconOverride?: string;
+  sponsorFid?: string;
+  sponsorName?: string;
 }
 
 function truncateAddress(address: string, length = 6) {
@@ -28,7 +30,9 @@ export default function LeaderboardList({
   poolData,
   devPoolList,
   sponsorAddress,
+  sponsorFid,
   iconOverride,
+  sponsorName,
 }: LeaderboardListProps) {
   const sorted = useMemo(() => {
     const devPoleRateList = devPoolList || {};
@@ -56,8 +60,17 @@ export default function LeaderboardList({
     return sorted;
   }, [poolData, devPoolList]);
 
-  const handleViewProfile = async (isSponsor: boolean, fid?: string) => {
-    if (!fid || isSponsor) return;
+  const handleViewProfile = async (
+    isSponsor: boolean,
+    fid?: string,
+    sponsorFid?: string,
+  ) => {
+    if (!fid) return;
+    let _fid = fid;
+    if (isSponsor && sponsorFid) {
+      _fid = sponsorFid;
+    }
+
     await sdk.actions.viewProfile({
       fid: Number(fid),
     });
@@ -83,13 +96,16 @@ export default function LeaderboardList({
             sponsorAddress &&
             sponsorAddress.toLowerCase() === d.account.id.toLowerCase();
           const iconPath = isSponsor ? iconOverride : "/images/icon.png";
+          const hasHover = isSponsor || user?.fid;
           return (
             <div
               key={d.account.id}
               className={`flex items-center py-2 px-2 gap-2 text-base font-mono ${
-                user?.fid && "hover:bg-primary-200"
+                hasHover && "hover:bg-primary-200"
               }`}
-              onClick={() => handleViewProfile(!!isSponsor, user?.fid)}
+              onClick={() =>
+                handleViewProfile(!!isSponsor, user?.fid, sponsorFid)
+              }
             >
               <div className="w-5 text-center mr-2 font-bold">
                 {isTop && (
@@ -114,11 +130,17 @@ export default function LeaderboardList({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <span className="font-bold text-black text-xs">
-                  {user?.username
-                    ? truncateName(user.username)
-                    : truncateAddress(d.account.id)}
-                </span>
+                {isSponsor && sponsorName ? (
+                  <span className="font-bold text-black text-xs">
+                    {sponsorName}
+                  </span>
+                ) : (
+                  <span className="font-bold text-black text-xs">
+                    {user?.username
+                      ? truncateName(user.username)
+                      : truncateAddress(d.account.id)}
+                  </span>
+                )}
               </div>
               <div className="w-20 text-right tabular-nums text-sm font-bold">
                 {/* {`${ratePerMonthFormatted(d.flowRate)}`} */}

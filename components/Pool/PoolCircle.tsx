@@ -39,7 +39,7 @@ const getUnitScale = (recipientCount: number): number => {
   } else if (recipientCount < 6) {
     return 4.5;
   } else if (recipientCount < 9) {
-    return 4;
+    return 4.65;
   } else {
     return 6;
   }
@@ -474,6 +474,13 @@ export default function PoolCircle({
                     currentPoolData.SPONSOR_ADDRESS.toLowerCase() ===
                       donor?.accountId?.toLowerCase()
                       ? currentPoolData.SPONSOR_ICON
+                      : undefined
+                  }
+                  fidOverride={
+                    currentPoolData.SPONSOR_ADDRESS !== undefined &&
+                    currentPoolData.SPONSOR_ADDRESS.toLowerCase() ===
+                      donor?.accountId?.toLowerCase()
+                      ? currentPoolData.SPONSOR_FID
                       : undefined
                   }
                 />

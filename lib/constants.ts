@@ -36,6 +36,8 @@ type POOL_CONFIG = {
   SUP_REWARDS?: boolean;
   SPONSOR_ADDRESS?: string;
   SPONSOR_ICON?: string;
+  SPONSOR_FID?: string;
+  SPONSOR_NAME?: string;
 };
 
 export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
@@ -92,7 +94,9 @@ export const FEATURED_POOLS: Record<string, POOL_CONFIG> = {
     FILTER_ZERO_UNITS: false,
     SUP_REWARDS: true,
     SPONSOR_ADDRESS: "0x33EFeA60E686C65BF4Dad2Fae868BF726f4c8a59",
+    SPONSOR_FID: "536359",
     SPONSOR_ICON: "/images/arb-logo.svg",
+    SPONSOR_NAME: "Arbitrum Foundation",
     IS_ARB: true,
   },
 };

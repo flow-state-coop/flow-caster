@@ -40,10 +40,13 @@ export default function Leaderboard() {
   useEffect(() => {
     if (!devPoolDistributors) return;
 
-    const rateList = devPoolDistributors.reduce((acc, d) => {
-      acc[d.account.id] = d.flowRate;
-      return acc;
-    }, {} as Record<string, string>);
+    const rateList = devPoolDistributors.reduce(
+      (acc, d) => {
+        acc[d.account.id] = d.flowRate;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
 
     setDevPoolList(rateList);
   }, [devPoolDistributors]);
@@ -79,7 +82,9 @@ export default function Leaderboard() {
             poolData={poolData}
             devPoolList={devPoolList}
             sponsorAddress={currentPoolData.SPONSOR_ADDRESS}
+            sponsorFid={currentPoolData.SPONSOR_FID}
             iconOverride={currentPoolData.SPONSOR_ICON}
+            sponsorName={currentPoolData.SPONSOR_NAME}
           />
         </div>
         <Footer
