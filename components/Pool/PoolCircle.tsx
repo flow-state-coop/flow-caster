@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { Crown } from "lucide-react";
 import { usePoolData } from "@/hooks/use-pool-data";
 import { NeynarUser } from "@/lib/neynar";
-import { createDonorBuckets } from "@/lib/pool";
+import { createDonorBuckets, getUnitScale } from "@/lib/pool";
 import { usePool } from "@/contexts/pool-context";
 import { VIZ_PAUSED } from "@/lib/constants";
 import RecipientNode from "./RecipientNode";
@@ -30,20 +30,6 @@ interface PoolDonor {
   startingAmount?: string;
   startingTimestamp?: string;
 }
-
-const getUnitScale = (recipientCount: number): number => {
-  if (recipientCount < 4) {
-    return 2.25;
-  } else if (recipientCount < 5) {
-    return 3;
-  } else if (recipientCount < 6) {
-    return 4.5;
-  } else if (recipientCount < 9) {
-    return 4.65;
-  } else {
-    return 6;
-  }
-};
 
 export default function PoolCircle({
   connectedUser,
